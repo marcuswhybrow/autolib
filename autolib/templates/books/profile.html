@@ -1,0 +1,15 @@
+{% extends 'autolib/base.html' %}
+
+{% block content %}
+	{% if user.is_authenticated %}
+		<h2>{{ user.get_full_name }}</h2>
+		<h3>Your Libraries</h3>
+		<ul>
+			{% for library in libraries %}
+				<li>{{ library.name }}</li>
+			{% endfor %}
+		</ul>
+	{% else %}
+		<h2>Log in First</h2>
+	{% endif %}
+{% endblock %}

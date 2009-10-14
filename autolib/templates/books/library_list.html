@@ -1,0 +1,27 @@
+{% extends "autolib/base.html" %}
+
+{% block content %}
+	{% if users %}
+		<ul id="users">
+			{% for user in users %}
+				<li>{{ user.username }}</li>
+				<ul id="libraries">
+					{% for library in libraries %}
+						{% ifequal library.owner user %}
+							<li>{{ library.name }}</li>
+							<ul id="books">
+								{% for book in books %}
+									{% ifequal book.library library %}
+										<li><a href="books/{{ book.isbn }}">{{ book.title }}</a> by {{ book.author }}</li>
+									{% endifequal %}
+								{% endfor %}
+							</ul>
+						{% endifequal %}
+					{% endfor %}
+				</ul>
+			{% endfor %}
+		</ul>
+	{% else %}
+		<p>There are no user in the database</p>
+	{% endif %}
+{% endblock %}

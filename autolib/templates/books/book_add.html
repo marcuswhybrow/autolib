@@ -1,0 +1,21 @@
+{% extends "autolib/base.html" %}
+
+{% if is_logged_in %}
+
+{% block content %}
+	{% if user.is_authenticated %}
+		<h2>Add a new Book</h2>
+		<form action="handler/" method="post">
+			{{ form.as_p }}
+			<input type="submit" value="Add Book" />
+		</form>
+	{% else %}
+		<h2>Log in to add a Book</h2>
+	{% endif %}
+{% endblock %}
+
+{% else %}
+
+<p>to add a book please log in first</p>
+
+{% endif %}

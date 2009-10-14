@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
+<head>
+	<link rel="stylesheet" href="/media/reset.css" />
+	<link rel="stylesheet" href="/media/style.css" />
+	<title>{% block title %}AutoLibrarian{% endblock %}</title>
+</head>
+
+<body>
+	<div id="page-wrap-outer">
+	<div id="page-wrap">
+		<div id="header">
+			<h1>AutoLibrarian</h1>
+<!--
+			<div id="quick-links">
+				{% if is_logged_in %}
+					<p>You are logged in</p>
+				{% else %}
+					<p>Please log in</p>
+				{% endif %}
+			</div>
+-->
+		</div>
+
+		<div id="content">
+			{% block content %}
+			Content Goes Here
+			{% endblock %}
+		</div>
+
+	</div>
+	</div>
+	<div id="footer">
+		{% block footer %}
+		<p>AutoLibrarian Project &bull; The Jenkinson Theme</p>
+		{% endblock %}
+	</div>
+</body>
+</html>

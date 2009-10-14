@@ -1,0 +1,9 @@
+{% extends "autolib/base.html" %}
+
+{% block content %}
+	<ul id="books">
+		{% for book in books %}
+			<li><a href="{{ book.isbn }}">{{ book.title }}</a> by {{ book.author }}</li>
+		{% endfor %}
+	</ul>
+{% endblock %}
