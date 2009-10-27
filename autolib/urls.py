@@ -10,7 +10,7 @@ urlpatterns = patterns('',
 	(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
 
 	# Enable the Books Application URL paths
-	(r'^books/', include("autolib.books.urls")),
+	(r'^books/', include('autolib.books.urls')),
 
 	# Enables the Profile View
 	(r'^profile/', 'autolib.books.views.profile'),
@@ -20,6 +20,9 @@ urlpatterns = patterns('',
 	
 	# Enable the admin URL paths
 	(r'^admin/', include(admin.site.urls)),
+	
+	# Enable googlehooks
+	(r'^hooks/', include('autolib.googlehooks.urls')),
 	
 	# SOAP test
 	(r'^hello_world/', 'autolib.books.views.hello_world_service'),

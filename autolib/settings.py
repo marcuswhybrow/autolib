@@ -81,9 +81,14 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'autolib.books',
     'django.contrib.admin',
+    'autolib.googlehooks',
 )
 
 APPEND_SLASH = True
+
+GOOGLEHOOKS_PROJECTS = {
+	'autolib': ('IQB1-5TSo5XXpG5E', '"IT WORKS!" >> /home/marcus/test.txt'),
+}
 
 try:
     from local_settings import *
