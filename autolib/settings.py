@@ -87,8 +87,10 @@ INSTALLED_APPS = (
 APPEND_SLASH = True
 
 GOOGLEHOOKS_PROJECTS = {
-	'autolib': ('IQB1-5TSo5XXpG5E', '"IT WORKS!" >> /home/marcus/test.txt'),
+	'autolib': ('IQB1-5TSo5XXpG5E', '/usr/local/bin/autolib-post-commit'),
 }
+
+GOOGLEHOOKS_LOGFILE = '/var/log/googlehooks.log'
 
 try:
     from local_settings import *
