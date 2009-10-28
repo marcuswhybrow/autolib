@@ -56,7 +56,7 @@ def library_list(request):
 # SOAP view
 class HelloWorldService(DjangoSoapApp):
 
-	__tns__ = 'http://192.168.1.145:8000/'
+	__tns__ = 'http://autolib.marcuswhybrow.net/api/'
 
 	@soapmethod(soap_types.String, soap_types.Integer, _returns=soap_types.Array(soap_types.String))
 	def say_hello(self, name, times):
@@ -68,6 +68,5 @@ class HelloWorldService(DjangoSoapApp):
 hello_world_service = HelloWorldService()
 
 def wsdl_doc(request):
-	client = make_service_client('http://192.168.1.145:8000/hello_world/', HelloWorldService())
-	wsdl = client.server.wsdl('')
-	return HttpResponse(wsdl, mimetype='text/xml')
+	client = make_service_client('http://autolib.marcuswhybrow.net/api/', HelloWorldService())
+	return HttpResponse(client.server.wsdl(''), mimetype='text/xml')

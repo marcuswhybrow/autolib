@@ -25,9 +25,9 @@ urlpatterns = patterns('',
 	(r'^hooks/', include('autolib.googlehooks.urls')),
 	
 	# SOAP test
-	(r'^hello_world/', 'autolib.books.views.hello_world_service'),
-	(r'^hello_world/service.wsdl', 'autolib.books.views.hello_world_service'),
+	(r'^api/', 'autolib.books.views.hello_world_service'),
+	(r'^api/service.wsdl', 'autolib.books.views.hello_world_service'),
 	
-	(r'^wsdl/', 'autolib.books.views.wsdl_doc'),
+	(r'^api/wsdl/', 'autolib.books.views.wsdl_doc'),
 
 )
