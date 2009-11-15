@@ -21,7 +21,7 @@ class DjangoSoapApp(SimpleWSGISoapApp):
 				django_response[header] = value
 		
 		environ = request.META.copy()
-		body = ''.join(['%s=%s' % v for v in request.POST.items()])
+		body = ''.join(['%s=%s' % v for v in request.POST.items()]).encode()
 		environ['CONTENT_LENGTH'] = len(body)
 		environ['wsgi.input'] = DumbStringIO(body)
 		environ['wsgi.multithread'] = False
