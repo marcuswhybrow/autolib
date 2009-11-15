@@ -1,0 +1,36 @@
+{% extends "books/base_full.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="/media/js/jqtransform/jqtransform.css" />
+<script type="text/javascript" src="/media/js/jqtransform/jquery.jqtransform.js"></script>
+<script type="text/javascript">
+	$(function() {
+		//find all the forms with the class of jqtransform and then apply the plugin
+		$("form.jqtransform").jqTransform();
+	});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="section">
+	<div class="inner">
+		<h2>Login</h2>
+		{% if form.errors %}
+		<p class="error">Your username and password didn't match. Please try again.</p>
+		{% endif %}
+		<form method="post" action="{% url django.contrib.auth.views.login %}" class="jqtransform">
+			<div class="rowElem clearfix">
+				{{ form.username.label_tag }}
+				{{ form.username }}
+			</div>
+			<div class="rowElem clearfix">
+				{{ form.password.label_tag }}
+				{{ form.password }}
+			</div>
+			<div class="rowElem">
+				<input type="submit" value="login" />
+			</div>
+		</form>
+	</div>
+</div>
+{% endblock %}

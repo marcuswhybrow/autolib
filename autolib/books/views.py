@@ -2,58 +2,66 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 # Model imports
 from django.contrib.auth.models import User
-from models import Book, Library, BookForm
+from models import Collection, BookForm, Book
 # SOAP imports
 from soaplib_handler import DjangoSoapApp, soapmethod, soap_types
 from soaplib.client import make_service_client
 
+from urllib import unquote_plus
+
+###
+### Views
+###
+
 def index(request):
 	return render_to_response('books/book_list.html', {
-		'books' : Book.objects.all(),
+		'books': Book.objects.all(),
+		'user': request.user,
 	})
 
 # Book related views
 def book(request, isbn):
 	return render_to_response('books/book_detail.html', {
 		'book' : get_object_or_404(Book, isbn=isbn),
+		'user': request.user,
 	})
 
-def book_add(request):
-	if request.user.is_authenticated():
-		args = {'form' : BookForm(), 'user' : request.user}
-	else:
-		args = {'error_message' : 'Please log in to add a book'}
-	
-	return render_to_response('books/book_add.html', args)
-
-
-def book_add_handler(request):
-	try:
-		Book(isbn=request.POST['isbn'], title=request.POST['title'], author=request.POST['author'], library=Library(request.POST['library'])).save()
-	except (KeyError):
-		return render_to_response('books/book_add.html', {'error_message' : "That Book allready exists in your Library"})
-	else:
-		return HttpResponseRedirect(reverse('autolib.books.views.book', args=(request.POST['isbn'],)))
-	
-	
-def profile(request):
-	return render_to_response('books/profile.html', {
-		'user' : request.user,
-		'libraries' : Library.objects.filter(owner=request.user)
-	})
-
-# Library related views
+#  related views
 def library_list(request):
 	return render_to_response('books/library_list.html', {
-		'libraries' : Library.objects.all(),
-		'books' : Book.objects.all(),
 		'users' : User.objects.all(),
+		'user': request.user,
 	})
 
+@login_required
+def libraries(request):
+	return render_to_response('books/libraries.html', {
+		'libraries': request.user.libraries.all(),
+		'user': request.user,
+	})
 
-# SOAP view
+@login_required
+def library_detail(request, library_name):
+	return render_to_response('books/library_detail.html',{
+		'library': get_object_or_404(request.user.libraries, name=unquote_plus(library_name)),
+		'user': request.user,
+	})
+
+@login_required
+def bookshelf_detail(request, library_name, bookshelf_name):
+	print 'Bookshelf: %s' % unquote_plus(bookshelf_name)
+	return render_to_response('books/bookshelf_detail.html',{
+		'library': get_object_or_404(request.user.libraries.get(name=unquote_plus(library_name)).children, name=unquote_plus(bookshelf_name)),
+		'user': request.user,
+	})
+
+###
+### SOAP
+###
+
 class HelloWorldService(DjangoSoapApp):
 
 	__tns__ = 'http://autolib.marcuswhybrow.net/api/'
@@ -70,3 +78,50 @@ hello_world_service = HelloWorldService()
 def wsdl_doc(request):
 	client = make_service_client('http://autolib.marcuswhybrow.net/api/', HelloWorldService())
 	return HttpResponse(client.server.wsdl(''), mimetype='text/xml')
+
+
+###
+### Forms
+###
+
+def create_library(request):
+	if request.method == 'POST':
+		form = NewCollectionForm(request.POST)
+		if form.is_valid():
+			collection = form.save(commit=False)
+			collection.owner = request.user
+			collection.type = ''
+			collection.save()
+	else:
+		form = NewCollectionForm()
+	return render_to_response('books/_form.html', {
+		'form': form,
+	})
+	
+def create_bookshelf(request, library):
+	if request.method == 'POST':
+		form = NewCollectionForm(request.POST)
+		if form.is_valid():
+			collection = form.save(commit=False)
+			collection.parent = library
+			collection.type = 'bookshelf'
+			collection.save()
+	else:
+		form = NewCollectionForm()
+	return render_to_response('books/bookshelf_form.html', {
+		'form': form,
+	})
+	
+def create_series(request, bookshelf):
+	if request.method == 'POST':
+		form = NewCollectionForm(request.POST)
+		if form.is_valid():
+			collection = form.save(commit=False)
+			collection.owner = bookshelf
+			collection.type = 'series'
+			collection.save()
+	else:
+		form = NewCollectionForm()
+	return render_to_response('books/series_form.html', {
+		'form': form,
+	})

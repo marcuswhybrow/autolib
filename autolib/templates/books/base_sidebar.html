@@ -1,0 +1,16 @@
+{% extends "books/base.html" %}
+
+{% block main %}
+<div id="sb-wrapper" class="clearfix">
+	<div id="sb-sidebar">
+		{% block sidebar %}
+		&nbsp;
+		{% endblock %}
+	</div><!-- / #sb-sidebar -->
+	
+	<div id="sb-content">
+		{% block content %}
+		{% endblock %}
+	</div><!-- / #sb-content -->
+	{% endblock %}
+</div><!-- / #sb-wrapper -->

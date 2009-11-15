@@ -1,0 +1,5 @@
+Follow the link below to activate your account with AutoLib:
+
+http://{{ site }}/accounts/activate/{{ activation_key }}/
+
+You have {{ expiration_days }} days form the sending of this email to activate your account.

@@ -7,6 +7,7 @@ TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
+    ('Marcus Whybrow', 'marcus@marcuswhybrow.net'),
 )
 
 MANAGERS = ADMINS
@@ -82,6 +83,7 @@ INSTALLED_APPS = (
     'autolib.books',
     'django.contrib.admin',
     'autolib.googlehooks',
+    'registration',
 )
 
 APPEND_SLASH = True
@@ -91,6 +93,12 @@ GOOGLEHOOKS_PROJECTS = {
 }
 
 GOOGLEHOOKS_LOGFILE = '/var/log/googlehooks.log'
+
+LOGIN_REDIRECT_URL = '/libraries/'
+
+ACCOUNT_ACTIVATION_DAYS = 7
+
+EMAIL_HOST = '172.17.10.200'
 
 try:
     from local_settings import *

@@ -1,0 +1,56 @@
+{% extends "books/base_full.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="/media/js/jqtransform/jqtransform.css" />
+<script type="text/javascript" src="/media/js/jqtransform/jquery.jqtransform.js"></script>
+<script type="text/javascript">
+	$(function() {
+		//find all the forms with the class of jqtransform and then apply the plugin
+		$("form.jqtransform").jqTransform();
+	});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="banner" class="clearfix">
+	<div class="stage one active">
+		<span>1.</span>
+		<p>Enter details</p>
+	</div>
+	<div class="stage two">
+		<span>2.</span>
+		<p>Activation</p>
+	</div>
+	<div class="stage three">
+		<span>3.</span>
+		<p>Activated</p>
+	</div>
+</div>
+
+<div class="section">
+	<div class="inner">
+		<h2>Register</h2>
+		<form action="{% url registration.urls.register %}" method="post" class="jqtransform">
+			<div class="rowElem"
+				{{ form.username.label_tag }}
+				{{ form.username }}
+			</div>
+			<div class="rowElem"
+				{{ form.email.label_tag }}
+				{{ form.email }}
+			</div>
+			<div class="rowElem"
+				{{ form.password1.label_tag }}
+				{{ form.password1 }}
+			</div>
+			<div class="rowElem"
+				{{ form.password2.label_tag }}
+				{{ form.password2 }}
+			</div>
+			<div class="rowElem"
+				<input type="submit" value="Register" />
+			</div>
+		</form>
+	</div>
+</div>
+{% endblock %}
