@@ -98,8 +98,6 @@ LOGIN_REDIRECT_URL = '/libraries/'
 
 ACCOUNT_ACTIVATION_DAYS = 7
 
-EMAIL_HOST = '172.17.10.200'
-
 try:
     from local_settings import *
 except ImportError:
