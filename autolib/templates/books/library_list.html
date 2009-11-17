@@ -1,40 +1,19 @@
 {% extends "books/base_full.html" %}
 
 {% block content %}
-	
 	<div class="section">
 		<div class="inner">
-			<h2>Everything</h2>
-			<p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis. Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus</p>
-			<p>This right here is everything in the database. Yes I know, that is completely unrealistic but This page has to do something right now, doesnt it.</p>
-		</div>
-	</div>
-	
-	{% if users %}
-	<div class="section">
-		<div class="inner">
-			<ul id="users">
-				{% for user in users %}
-					<li>{{ user.username }}</li>
-					<ul id="libraries">
-						{% for library in user.collections.all %}
-							{% ifequal library.owner user %}
-								<li>{{ library.name }}</li>
-								<ul id="books">
-									{% for book in library.books.all %}
-										{% ifequal book.collection library %}
-											<li><a href="books/{{ book.isbn }}">{{ book.isbn }}</a></li>
-										{% endifequal %}
-									{% endfor %}
-								</ul>
-							{% endifequal %}
-						{% endfor %}
-					</ul>
+			<h2>Your Libraries</h2>
+			<p>Your libraries will all be here one day.</p>
+			{% if object_list %}
+			<ul>
+				{% for library in object_list %}
+					<li><a href="{{ library.get_absolute_url }}">{{ library.name }}</a></li>
 				{% endfor %}
 			</ul>
+			{% else %}
+			<p class="error">Erm. You do realise you dont have any libraries yet.</p>
+			{% endif %}
 		</div>
 	</div>
-	{% else %}
-		<p>There are no users in the database</p>
-	{% endif %}
 {% endblock %}
