@@ -10,7 +10,7 @@ urlpatterns = patterns('',
 	# -------------
 	
 	# Site root - Enables the Library List (Index) View
-	(r'^$', 'autolib.books.views.library_list'),
+	(r'^$', 'autolib.books.views.index'),
 
 	# Enable the Books Application URL paths
 	(r'^libraries/', include('autolib.books.urls')),

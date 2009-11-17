@@ -12,13 +12,15 @@ from soaplib.client import make_service_client
 
 from urllib import unquote_plus
 
+from django.template import RequestContext
+from django.views.generic.list_detail import object_list
+
 ###
 ### Views
 ###
 
 def index(request):
-	return render_to_response('books/book_list.html', {
-		'books': Book.objects.all(),
+	return render_to_response('books/index.html', {
 		'user': request.user,
 	})
 
@@ -28,25 +30,24 @@ def book(request, isbn):
 		'book' : get_object_or_404(Book, isbn=isbn),
 		'user': request.user,
 	})
-
-#  related views
+'''
+@login_required
 def library_list(request):
 	return render_to_response('books/library_list.html', {
-		'users' : User.objects.all(),
-		'user': request.user,
-	})
+		'libraries': request.user.libraries.all(),
+	}, context_instance=RequestContext(request))
+'''
 
 @login_required
-def libraries(request):
-	return render_to_response('books/libraries.html', {
-		'libraries': request.user.libraries.all(),
-		'user': request.user,
-	})
+def library_list(request, template_name):
+	queryset = request.user.libraries.all()
+	return object_list(request, queryset=queryset, template_name=template_name)
 
 @login_required
 def library_detail(request, library_name):
+	print 'Library: %s' % unquote_plus(library_name)
 	return render_to_response('books/library_detail.html',{
-		'library': get_object_or_404(request.user.libraries, name=unquote_plus(library_name)),
+		'library': get_object_or_404(Collection, name=unquote_plus(library_name), owner=request.user),
 		'user': request.user,
 	})
 
@@ -54,7 +55,7 @@ def library_detail(request, library_name):
 def bookshelf_detail(request, library_name, bookshelf_name):
 	print 'Bookshelf: %s' % unquote_plus(bookshelf_name)
 	return render_to_response('books/bookshelf_detail.html',{
-		'library': get_object_or_404(request.user.libraries.get(name=unquote_plus(library_name)).children, name=unquote_plus(bookshelf_name)),
+		'bookshelf': get_object_or_404(request.user.libraries.get(name=unquote_plus(library_name)).children, name=unquote_plus(bookshelf_name)),
 		'user': request.user,
 	})
 

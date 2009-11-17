@@ -1,9 +1,11 @@
 from django.conf.urls.defaults import *
 
-urlpatterns = patterns('autolib.books.views',
+import views
+
+urlpatterns = patterns('',
 
 	# Enable the Books Application URL paths
-	(r'^$', 'libraries'),
-	(r'^(?P<library_name>(^/)+)/', 'library_detail'),
-	(r'^(?P<library_name>(^/)+)/(?P<bookshelf_name>(^/)+)/', 'bookshelf_detail'),
+	url(r'^$', views.library_list, {'template_name': 'books/library_list.html'}),
+	url(r'^(?P<library_name>[^/]+)/$', views.library_detail),
+	url(r'^(?P<library_name>[^/]+)/(?P<bookshelf_name>[^/]+)/$', views.bookshelf_detail),
 )
