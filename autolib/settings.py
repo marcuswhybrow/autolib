@@ -88,12 +88,6 @@ INSTALLED_APPS = (
 
 APPEND_SLASH = True
 
-GOOGLEHOOKS_PROJECTS = {
-	'autolib': ('IQB1-5TSo5XXpG5E', '/usr/local/bin/autolib-post-commit'),
-}
-
-GOOGLEHOOKS_LOGFILE = '/var/log/googlehooks.log'
-
 LOGIN_REDIRECT_URL = '/libraries/'
 
 ACCOUNT_ACTIVATION_DAYS = 7

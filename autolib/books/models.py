@@ -21,6 +21,9 @@ COLLECTION_TYPE_CHOICES = (
 )
 
 class Collection(models.Model):
+	class Meta:
+		unique_together = (('type', 'owner', 'name'),('type', 'parent', 'name'))
+	
 	name = models.CharField(max_length=200)
 	type = models.CharField(max_length=20, choices=COLLECTION_TYPE_CHOICES)
 	description = models.CharField(max_length=1024, null=True, blank=True)
@@ -59,18 +62,12 @@ class Collection(models.Model):
 		
 		if self.type == 'library':
 			assert self.parent is None and self.owner is not None, 'A Library can not have a parent, and must have an owner'
-			for library in self.owner.libraries.all():
-				assert self.name != library.name
 			
 		elif self.type == 'bookshelf':
 			assert self.parent.type == 'library' and self.owner is None, 'A Bookshelf must have a parent of type "library", and must not have an owner'
-			for bookshelf in self.parent.children.all():
-				assert self.name != bookshelf.name
 			
 		elif self.type == 'series':
 			assert self.parent.type == 'bookshelf' and self.owner is None, 'A Series must have a parent of type "bookshelf", and must not have an owner'
-			for series in self.parent.children.all():
-				assert self.name != series.name
 			
 		else:
 			raise AssertionError, 'A Collection must be of type "library", "bookshelf" or "series"'
