@@ -45,7 +45,6 @@ def library_list(request, template_name):
 
 @login_required
 def library_detail(request, library_name):
-	print 'Library: %s' % unquote_plus(library_name)
 	return render_to_response('books/library_detail.html',{
 		'library': get_object_or_404(Collection, name=unquote_plus(library_name), owner=request.user),
 		'user': request.user,
@@ -53,7 +52,6 @@ def library_detail(request, library_name):
 
 @login_required
 def bookshelf_detail(request, library_name, bookshelf_name):
-	print 'Bookshelf: %s' % unquote_plus(bookshelf_name)
 	return render_to_response('books/bookshelf_detail.html',{
 		'bookshelf': get_object_or_404(request.user.libraries.get(name=unquote_plus(library_name)).children, name=unquote_plus(bookshelf_name)),
 		'user': request.user,
