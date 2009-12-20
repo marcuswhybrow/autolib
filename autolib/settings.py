@@ -90,7 +90,7 @@ INSTALLED_APPS = (
 
 
 TEMPLATE_CONTEXT_PROCESSORS = (
-	"autolib.context_processors.user",
+	"context_processors.user",
 	"django.core.context_processors.auth",
 	"django.core.context_processors.debug",
 	"django.core.context_processors.i18n",
