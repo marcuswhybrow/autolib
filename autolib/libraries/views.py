@@ -4,6 +4,8 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 
+from django.template import RequestContext
+
 # Model imports
 from django.contrib.auth.models import User
 from libraries.models import Collection
@@ -35,15 +37,13 @@ def library_list(request, template_name):
 def library_detail(request, library_name):
 	return render_to_response('books/library_detail.html',{
 		'library': get_object_or_404(Collection, name=unquote_plus(library_name), owner=request.user),
-		'user': request.user,
-	})
+	}, context_instance=RequestContext(request))
 
 @login_required
 def bookshelf_detail(request, library_name, bookshelf_name):
 	return render_to_response('books/bookshelf_detail.html',{
 		'bookshelf': get_object_or_404(request.user.libraries.get(name=unquote_plus(library_name)).children, name=unquote_plus(bookshelf_name)),
-		'user': request.user,
-	})
+	}, context_instance=RequestContext(request))
 
 ### SOAP
 ### ----

@@ -28,7 +28,7 @@ form.jqtransform div.rowElem label                          { padding-bottom: 5p
 
 div.section             { width: 100%; margin-top: 18px; float: left; border-bottom: #eee 1px solid; }
 div.section.last        { margin-bottom: 18px; }
-div.section div.inner   { padding: 0 18px 0; }
+div.section div.inner   { padding: 0 18px 18px; }
 
 div.banner              { width: 100%; }
 
