@@ -17,7 +17,7 @@ urlpatterns = patterns('',
 	(r'^libraries/', include('libraries.urls')),
 	
 	# Enable the Users Application URL paths
-	(r'^users/', include('autolib.users.urls')),
+	(r'^users/', include('users.urls')),
 	
 	# User stuff
 	(r'^accounts/', include('registration.backends.default.urls')),
@@ -30,12 +30,12 @@ urlpatterns = patterns('',
 	(r'^admin/', include(admin.site.urls)),
 	
 	# Enable googlehooks
-	(r'^hooks/', include('autolib.googlehooks.urls')),
+	(r'^hooks/', include('googlehooks.urls')),
 
 	# SOAP test
-	(r'^api/', 'autolib.libraries.views.hello_world_service'),
-	(r'^api/service.wsdl', 'autolib.libraries.views.hello_world_service'),
-	(r'^api/wsdl/', 'autolib.libraries.views.wsdl_doc'),
+	(r'^api/', 'libraries.views.hello_world_service'),
+	(r'^api/service.wsdl', 'libraries.views.hello_world_service'),
+	(r'^api/wsdl/', 'libraries.views.wsdl_doc'),
 
 	# Enable media from the same website
 	(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
