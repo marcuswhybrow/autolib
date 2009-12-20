@@ -15,9 +15,8 @@ from urllib import unquote_plus
 from django.template import RequestContext
 from django.views.generic.list_detail import object_list
 
-###
 ### Views
-###
+### -----
 
 def index(request):
 	return render_to_response('books/index.html', {
@@ -57,9 +56,8 @@ def bookshelf_detail(request, library_name, bookshelf_name):
 		'user': request.user,
 	})
 
-###
 ### SOAP
-###
+### ----
 
 class HelloWorldService(DjangoSoapApp):
 
@@ -79,9 +77,8 @@ def wsdl_doc(request):
 	return HttpResponse(client.server.wsdl(''), mimetype='text/xml')
 
 
-###
 ### Forms
-###
+### -----
 
 def create_library(request):
 	if request.method == 'POST':

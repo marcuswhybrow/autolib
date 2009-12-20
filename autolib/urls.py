@@ -1,16 +1,17 @@
 from django.conf.urls.defaults import *
 from django.conf import settings
+from django.views.generic.simple import direct_to_template
 
 from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
 	
-	# RESERVED URLS
-	# -------------
+	### RESERVED URLS
+	### -------------
 	
 	# Site root - Enables the Library List (Index) View
-	(r'^$', 'autolib.books.views.index'),
+	(r'^$', direct_to_template, {'template': 'books/index.html'}),
 
 	# Enable the Books Application URL paths
 	(r'^libraries/', include('autolib.books.urls')),
@@ -19,8 +20,8 @@ urlpatterns = patterns('',
 	(r'^accounts/', include('registration.backends.default.urls')),
 # 	(r'^login/$', 'django.contrib.auth.views.login', {'template_name': 'books/login.html'}),
 	
-	# TOOL AND HELPER URLS
-	# --------------------
+	### TOOL AND HELPER URLS
+	### --------------------
 	
 	# Enable the admin URL paths
 	(r'^admin/', include(admin.site.urls)),
