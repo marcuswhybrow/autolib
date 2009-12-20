@@ -3,9 +3,12 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+
 # Model imports
 from django.contrib.auth.models import User
-from models import Collection, BookForm, Book
+from libraries.models import Collection
+from books.models import Book
+
 # SOAP imports
 from soaplib_handler import DjangoSoapApp, soapmethod, soap_types
 from soaplib.client import make_service_client
@@ -22,20 +25,6 @@ def index(request):
 	return render_to_response('books/index.html', {
 		'user': request.user,
 	})
-
-# Book related views
-def book(request, isbn):
-	return render_to_response('books/book_detail.html', {
-		'book' : get_object_or_404(Book, isbn=isbn),
-		'user': request.user,
-	})
-'''
-@login_required
-def library_list(request):
-	return render_to_response('books/library_list.html', {
-		'libraries': request.user.libraries.all(),
-	}, context_instance=RequestContext(request))
-'''
 
 @login_required
 def library_list(request, template_name):

@@ -1,0 +1,10 @@
+{% extends "users/base.html" %}
+
+{% block content %}
+<div class="section">
+	<div class="inner">
+		<h2>{{ user_detail.username }}</h2>
+		<p>{{ user_detail.get_full_name }}</p>
+	</div>
+</div>
+{% endblock %}

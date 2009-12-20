@@ -9,7 +9,6 @@ import managers
 
 from urllib import quote_plus
 
-
 #########################
 ### Collections Model ###
 #########################
@@ -74,23 +73,9 @@ class Collection(models.Model):
 		
 		super(self.__class__, self).save(*args, **kwargs)
 
-##################
-### Book Model ###
-##################
-
-class Book(models.Model):
-	isbn = models.IntegerField()
-	collection = models.ForeignKey(Collection, related_name="books")
-
-	def __unicode__(self):
-		return '[Book] %s' % self.isbn
-
 #############
 ### Forms ###
 #############
-
-class BookForm(forms.Form):
-	isbn = forms.IntegerField()
 	
 class CollectionForm(forms.ModelForm):
 	class Meta:

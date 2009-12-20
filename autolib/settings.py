@@ -80,25 +80,35 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'autolib.libraries',
+    'autolib.users',
     'autolib.books',
     'django.contrib.admin',
     'autolib.googlehooks',
     'registration',
 )
 
+
 TEMPLATE_CONTEXT_PROCESSORS = (
+	"autolib.context_processors.user",
 	"django.core.context_processors.auth",
 	"django.core.context_processors.debug",
 	"django.core.context_processors.i18n",
 	"django.core.context_processors.media",
 )
 
+# Put a trailing forward slash at the end of every url.
 APPEND_SLASH = True
 
+# The URL redireted to after a user has authenticated.
 LOGIN_REDIRECT_URL = '/libraries/'
 
+# The amount of days a username registration email is valid, before it is
+# made aavailable again.
 ACCOUNT_ACTIVATION_DAYS = 7
 
+
+# Loads any local settings (possibly overriding values here).
 try:
     from local_settings import *
 except ImportError:

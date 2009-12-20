@@ -13,8 +13,11 @@ urlpatterns = patterns('',
 	# Site root - Enables the Library List (Index) View
 	(r'^$', direct_to_template, {'template': 'books/index.html'}),
 
-	# Enable the Books Application URL paths
-	(r'^libraries/', include('autolib.books.urls')),
+	# Enables the Books Application URL paths
+	(r'^libraries/', include('autolib.libraries.urls')),
+	
+	# Enable the Users Application URL paths
+	(r'^users/', include('autolib.users.urls')),
 	
 	# User stuff
 	(r'^accounts/', include('registration.backends.default.urls')),
@@ -30,9 +33,9 @@ urlpatterns = patterns('',
 	(r'^hooks/', include('autolib.googlehooks.urls')),
 
 	# SOAP test
-	(r'^api/', 'autolib.books.views.hello_world_service'),
-	(r'^api/service.wsdl', 'autolib.books.views.hello_world_service'),
-	(r'^api/wsdl/', 'autolib.books.views.wsdl_doc'),
+	(r'^api/', 'autolib.libraries.views.hello_world_service'),
+	(r'^api/service.wsdl', 'autolib.libraries.views.hello_world_service'),
+	(r'^api/wsdl/', 'autolib.libraries.views.wsdl_doc'),
 
 	# Enable media from the same website
 	(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
