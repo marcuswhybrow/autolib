@@ -103,7 +103,7 @@ div#overview #meta #ratings:hover       { opacity:0.6; filter:alpha(opacity=60);
 
 div#overview #meta #tags                { padding: 5px 5px 10px; }
 div#overview #meta #tags ul             { padding: 0; font-family: "Helvetica Neue"; color: #ddd; }
-div#overview #meta #tags ul li          { padding-top: 9px; 
+div#overview #meta #tags ul li          { padding-top: 9px; }
 div#overview #meta #tags ul li.more     { color: #fff; padding-top: 18px; text-transform: uppercase; }
 
 /* Footer */
