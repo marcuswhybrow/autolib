@@ -80,11 +80,11 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'autolib.libraries',
-    'autolib.users',
-    'autolib.books',
+    'libraries',
+    'users',
+    'books',
     'django.contrib.admin',
-    'autolib.googlehooks',
+    'googlehooks',
     'registration',
 )
 

@@ -14,7 +14,7 @@ urlpatterns = patterns('',
 	(r'^$', direct_to_template, {'template': 'books/index.html'}),
 
 	# Enables the Books Application URL paths
-	(r'^libraries/', include('autolib.libraries.urls')),
+	(r'^libraries/', include('libraries.urls')),
 	
 	# Enable the Users Application URL paths
 	(r'^users/', include('autolib.users.urls')),
