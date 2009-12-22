@@ -1,9 +1,0 @@
-{% extends "libraries/base_full.html" %}
-
-{% block content %}
-	<ul id="books">
-		{% for book in books %}
-			<li><a href="{{ book.isbn }}">{{ book.isbn }}</a></li>
-		{% endfor %}
-	</ul>
-{% endblock %}
