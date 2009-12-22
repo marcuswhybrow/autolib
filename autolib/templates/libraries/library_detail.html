@@ -1,0 +1,47 @@
+{% extends "libraries/base_full.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="/media/js/jqtransform/jqtransform.css" />
+<script type="text/javascript" src="/media/js/jqtransform/jquery.jqtransform.js"></script>
+<script type="text/javascript">
+	$(function() {
+		//find all the forms with the class of jqtransform and then apply the plugin
+		$("form.jqtransform").jqTransform();
+	});
+</script>
+{% endblock %}
+
+{% block content %}
+	<div class="section">
+		<div class="inner">
+			<h2>{{ library.name }}</h2>
+			<p>{{ library.description }}</p>
+			{% if library.children.all %}
+			<ul>
+				{% for bookshelf in library.children.all %}
+					<li><a href="{{ bookshelf.get_absolute_url }}">{{ bookshelf.name }}</a></li>
+				{% endfor %}
+			</ul>
+			{% else %}
+			<p class="error">So there are no bookshelves in this library yet, you should be ashamed of yourself!</p>
+			{% endif %}
+		</div>
+	</div>
+	
+	<div class="section">
+		<div class="inner">
+			<h3>Create a new <span class="bookshelf">Bookshelf</span></h3>
+			<form class="jqtransform">
+				<div class="rowElem">
+					<input type="text" />
+				</div>
+				<div class="rowElem">
+					<input type="submit" value="Create" />
+				</div>
+			</form>
+			
+			<h3>Add a <span class="book">Book</span> to this Bookshelf</h3>
+			<p>Click <a href="#">here</a></p>
+		</div>
+	</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "libraries/base_full.html" %}
+
+{% block content %}
+<div class="section">
+	<div class="inner">
+		<h2>Hey {{ user.first_name }}, Your Authenticated</h2>
+		<p>This is the home page, but you should probably check out this kind of control panel thing at <a href="{% url library_list %}">{% url library_list %}</a>.</p>
+	</div>
+</div>
+
+<div class="section">
+	<div class="inner">
+		<dl>
+			<dt>Other places</dt>
+			<dd>Check out other users of the system over at <a href="{% url users.views.user_list %}">{% url users.views.user_list %}</a></dd>
+			<dd><a href="{% url books.views.book_list %}">{% url books.views.book_list %}</a></dd>
+		</dl>
+	</div>
+</div>
+{% endblock %}

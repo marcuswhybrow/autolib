@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import permalink
 from.django import forms
 
 from libraries.models import Collection
@@ -13,6 +14,11 @@ class Book(models.Model):
 
 	def __unicode__(self):
 		return '[Book] %s' % self.isbn
+	
+	def get_absolute_url(self):
+		return ('book_detail', [self.isbn])
+	
+	get_absolute_url = permalink(get_absolute_url)
 
 #############
 ### Forms ###

@@ -24,24 +24,26 @@ from django.views.generic.list_detail import object_list
 ### -----
 
 def index(request):
-	return render_to_response('books/index.html', {
-		'user': request.user,
-	})
+	if request.user.is_authenticated():
+		return render_to_response('libraries/index_authenticated.html', context_instance=RequestContext(request))
+	return render_to_response('libraries/index_anonymous.html')
+
+from libraries.models import CreateCollectionForm
 
 @login_required
 def library_list(request, template_name):
 	queryset = request.user.libraries.all()
-	return object_list(request, queryset=queryset, template_name=template_name)
+	return object_list(request, queryset=queryset, template_name=template_name, extra_context={'form': CreateCollectionForm(collection_type='library'),})
 
 @login_required
 def library_detail(request, library_name):
-	return render_to_response('books/library_detail.html',{
+	return render_to_response('libraries/library_detail.html',{
 		'library': get_object_or_404(Collection, name=unquote_plus(library_name), owner=request.user),
 	}, context_instance=RequestContext(request))
 
 @login_required
 def bookshelf_detail(request, library_name, bookshelf_name):
-	return render_to_response('books/bookshelf_detail.html',{
+	return render_to_response('libraries/bookshelf_detail.html',{
 		'bookshelf': get_object_or_404(request.user.libraries.get(name=unquote_plus(library_name)).children, name=unquote_plus(bookshelf_name)),
 	}, context_instance=RequestContext(request))
 
@@ -64,49 +66,3 @@ hello_world_service = HelloWorldService()
 def wsdl_doc(request):
 	client = make_service_client('http://autolib.marcuswhybrow.net/api/', HelloWorldService())
 	return HttpResponse(client.server.wsdl(''), mimetype='text/xml')
-
-
-### Forms
-### -----
-
-def create_library(request):
-	if request.method == 'POST':
-		form = NewCollectionForm(request.POST)
-		if form.is_valid():
-			collection = form.save(commit=False)
-			collection.owner = request.user
-			collection.type = ''
-			collection.save()
-	else:
-		form = NewCollectionForm()
-	return render_to_response('books/_form.html', {
-		'form': form,
-	})
-	
-def create_bookshelf(request, library):
-	if request.method == 'POST':
-		form = NewCollectionForm(request.POST)
-		if form.is_valid():
-			collection = form.save(commit=False)
-			collection.parent = library
-			collection.type = 'bookshelf'
-			collection.save()
-	else:
-		form = NewCollectionForm()
-	return render_to_response('books/bookshelf_form.html', {
-		'form': form,
-	})
-	
-def create_series(request, bookshelf):
-	if request.method == 'POST':
-		form = NewCollectionForm(request.POST)
-		if form.is_valid():
-			collection = form.save(commit=False)
-			collection.owner = bookshelf
-			collection.type = 'series'
-			collection.save()
-	else:
-		form = NewCollectionForm()
-	return render_to_response('books/series_form.html', {
-		'form': form,
-	})

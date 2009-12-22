@@ -1,4 +1,4 @@
-{% extends "books/base_full.html" %}
+{% extends "libraries/base_full.html" %}
 
 {% block content %}
 	<div class="section">
@@ -8,7 +8,7 @@
 			{% if bookshelf.books.all %}
 			<ul>
 				{% for book in bookshelf.books.all %}
-					<li><a href="{{ book.get_absolute_url }}">{{ book.title }}</a></li>
+					<li><a href="{{ book.get_absolute_url }}">{{ book.isbn }}</a></li>
 				{% endfor %}
 			</ul>
 			{% else %}

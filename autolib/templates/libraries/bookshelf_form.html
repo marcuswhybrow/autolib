@@ -1,0 +1,37 @@
+{% extends 'libraries/base_full.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="/media/js/jqtransform/jqtransform.css" />
+<script type="text/javascript" src="/media/js/jqtransform/jquery.jqtransform.js"></script>
+<script type="text/javascript">
+	$(function() {
+		//find all the forms with the class of jqtransform and then apply the plugin
+		$("form.jqtransform").jqTransform();
+	});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="section">
+	<div class="inner">
+		{% if parent %}
+			<h2>Create a new <span class="bookshelf">Bookshelf</span></h2>
+			{% for error in form.name.errors %}
+		    	<p class="form-error">{{ error }}</p>
+		    {% endfor %}
+			<form method="post" action="" class="jqtransform">
+				<div class="rowElem" class="clearfix">
+					{{ form.name }}
+				</div>
+				<div class="rowElem" class="clearfix">
+					<input type="submit" value="Create" />
+				</div>
+			</form>
+		{% else %}
+			<h2>A parent <span class="library">Library</span> was not specified.</h2>
+			<p>The parent is passed as GET variable, and this technique does not fit well with the structure of the system.</p>
+			<p>This will not be the case when all forms are contained on the page with which they are associated with.</p>
+		{% endif %}
+	</div>
+</div>
+{% endblock %}

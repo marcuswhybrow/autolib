@@ -11,13 +11,20 @@ urlpatterns = patterns('',
 	### -------------
 	
 	# Site root - Enables the Library List (Index) View
-	(r'^$', direct_to_template, {'template': 'books/index.html'}),
+	(r'^$', 'libraries.views.index'),
 
-	# Enables the Books Application URL paths
+	# Enables the Libraries app URL paths
 	(r'^libraries/', include('libraries.urls')),
 	
-	# Enable the Users Application URL paths
+	# Enables the Books app URL paths
+	(r'^books/', include('books.urls')),
+	
+	# Enable the Users app URL paths
 	(r'^users/', include('users.urls')),
+	
+	# Expose forms on their own
+	(r'^forms/create_library', 'libraries.forms.create_collection', {'collection_type': 'library'}),
+	(r'^forms/create_bookshelf', 'libraries.forms.create_collection', {'collection_type': 'bookshelf'}),
 	
 	# User stuff
 	(r'^accounts/', include('registration.backends.default.urls')),

@@ -1,0 +1,10 @@
+{% extends "libraries/base_full.html" %}
+
+{% block content %}
+<div class="section">
+	<div class="inner">
+		<h2>Welcome, we don't know you.</h2>
+		<p>Hey, if you want to keep track of your books then sign up over at <a href="{% url django.contrib.auth.views.login %}">{% url django.contrib.auth.views.login %}</a>.</p>
+	</div>
+</div>
+{% endblock %}

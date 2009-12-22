@@ -7,4 +7,16 @@
 		<p>Listed below will be all the users in the system, with some search features :).</p>
 	</div>
 </div>
+
+<div class="section">
+	<div class="inner">
+		{% if users %}
+		<ul id="users-list">
+			{% for user in users %}
+				<li><a href="{{ user.get_absolute_url }}">{{ user.username }}</a></li>
+			{% endfor %}
+		</ul>
+		{% endif %}
+	</div>
+</div>
 {% endblock %}

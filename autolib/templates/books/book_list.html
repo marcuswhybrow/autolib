@@ -1,9 +1,15 @@
-{% extends "books/base_full.html" %}
+{% extends "libraries/base_full.html" %}
 
 {% block content %}
-	<ul id="books">
-		{% for book in books %}
-			<li><a href="{{ book.isbn }}">{{ book.isbn }}</a></li>
-		{% endfor %}
-	</ul>
+	<div class="section">
+		<div class="inner">
+			<h2>Books</h2>
+			<p>All books in the system.</p>
+			<ul id="books">
+				{% for book in books %}
+					<li><a href="{{ book.isbn }}">{{ book.isbn }}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
 {% endblock %}

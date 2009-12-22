@@ -6,6 +6,6 @@ from users import views
 urlpatterns = patterns('',
 
 	# Enable the Books Application URL paths
-	url(r'^$', direct_to_template, {'template': 'users/user_list.html'}),
+	url(r'^$', views.user_list),
 	url(r'^(?P<username>[^/]+)/$', views.user_detail),
 )

@@ -1,0 +1,31 @@
+{% extends 'libraries/base_full.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="/media/js/jqtransform/jqtransform.css" />
+<script type="text/javascript" src="/media/js/jqtransform/jquery.jqtransform.js"></script>
+<script type="text/javascript">
+	$(function() {
+		//find all the forms with the class of jqtransform and then apply the plugin
+		$("form.jqtransform").jqTransform();
+	});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="section">
+	<div class="inner">
+		<h2>Create a new <span class="library">Library</span></h2>
+		{% for error in form.name.errors %}
+	    	<p class="form-error">{{ error }}</p>
+	    {% endfor %}
+		<form method="post" action="" class="jqtransform">
+			<div class="rowElem" class="clearfix">
+				{{ form.name }}
+			</div>
+			<div class="rowElem" class="clearfix">
+				<input type="submit" value="Create" />
+			</div>
+		</form>
+	</div>
+</div>
+{% endblock %}

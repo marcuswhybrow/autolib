@@ -1,15 +1,21 @@
 body                { font-family: "Lucida Sans Unicode", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif; 
-                      font-size: 13px; background: url(images/page-bg.png) repeat-x; background-color: #fff; }
+                      font-size: 13px; background: url(images/page-bg.png) repeat-x; background-color: #fff;
+                      color: #5e5d5d; }
 strong, em, b, i    { font-family: "Lucida Sans", "Lucida Sans Unicode", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif; }
-p                   { color: #5e5d5d; line-height: 21px; padding-bottom: 9px; }
+p, #content li      { line-height: 21px; }
+p, h1, h2, h3, 
+ul, dl, ol, dt, dd,
+#content li	        { padding-bottom: 9px; }
 p.error             { color: red; padding: 5px; border: 1px red dashed; margin-bottom: 9px; }
 
 /* Titles */
 
-h1, h2, h3          { color: #2e2e2e; padding-bottom: 9px; width: 100%; font-family: "Helvetica"; }
+h1, h2, h3, dt      { color: #2e2e2e; width: 100%; font-family: "Helvetica"; text-transform: capitalize; }
 h1                  { font-size: 32px; }
 h2                  { font-size: 30px; }
-h3                  { font-size: 16px; }
+h3, dt              { font-size: 16px; }
+
+dd                  { margin-left: 9px; }
 
 /* Forms */
 
@@ -32,7 +38,7 @@ div.section div.inner   { padding: 0 18px 18px; }
 
 div.banner              { width: 100%; }
 
-div.stage               { width: 292px; float: left; font-family: "Helvetica Neue"; padding: 10px; background-color: #fafafa; 
+div.stage               { width: 292px; float: left; font-family: "Helvetica"; padding: 10px; background-color: #fafafa; 
                           border-bottom: 1px solid #dfdfdf; }
 div.stage span          { font-size: 60px; float: left; }
 div.stage p             { font-size: 18px; float: left;margin-top: 10px; }
@@ -56,8 +62,11 @@ ul#libraries                            { font-size: 13px; }
 
 /* Links */
 
-a                   { font-style: normal; color: #337; text-decoration: none; }
-a:hover             { text-decoration: underline; }
+a                            { font-style: normal; color: #337; text-decoration: none; }
+a:hover                      { text-decoration: underline; }
+
+#content a                   { color: #fff; background-color: #888; -moz-border-radius: 6px; -webkit-border-radius: 6px; padding: 0 4px; border: 1px solid #888; }
+#content a:hover             { text-decoration: none; background-color: #999; border: 1px solid #777; }
 
 
 div#header-wrap     { width: 100%; height: 200px; }
@@ -102,8 +111,8 @@ div#overview #meta #ratings:hover       { opacity:0.6; filter:alpha(opacity=60);
 /* Sidebar Layout - Meta - Tags */
 
 div#overview #meta #tags                { padding: 5px 5px 10px; }
-div#overview #meta #tags ul             { padding: 0; font-family: "Helvetica Neue"; color: #ddd; }
-div#overview #meta #tags ul li          { padding-top: 9px; }
+div#overview #meta #tags ul             { padding: 0; font-family: "Helvetica"; color: #ddd; }
+div#overview #meta #tags ul li          { padding-top: 9px; line-height: normal; }
 div#overview #meta #tags ul li.more     { color: #fff; padding-top: 18px; text-transform: uppercase; }
 
 /* Footer */
