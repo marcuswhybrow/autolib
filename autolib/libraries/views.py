@@ -27,45 +27,67 @@ from django.views.generic.list_detail import object_list
 ### -----
 
 @login_required
-def library_list(request, template_name):
-	queryset = request.user.libraries.all()
-	return object_list(request, queryset=queryset, template_name=template_name, extra_context={'form': CreateCollectionForm(collection_type='library'),})
-
-@login_required
-def library_detail(request, library_name):
-	return render_to_response('libraries/library_detail.html', {
-		'library': get_object_or_404(request.user.libraries, name=unquote_plus(library_name)),
-	}, context_instance=RequestContext(request))
-
-@login_required
-def bookshelf_detail(request, library_name, bookshelf_name):
-	# The parent library
-	library = get_object_or_404(request.user.libraries, name=unquote_plus(library_name))
-	
-	# If the bookshelf is the unsorted bin, there is no representing collection,
-	# otherwise get the appropriate collection.
-	if bookshelf_name == Config.objects.get(key='unsorted_bin').slug:
-		bookshelf = None
+def library_list(request, username, template_name):
+	if username == request.user.username:
+		queryset = request.user.libraries.all()
+		return object_list(request, queryset=queryset, template_name=template_name, extra_context={'form': CreateCollectionForm(collection_type='library'),})
 	else:
-		bookshelf = get_object_or_404(library.children, name=unquote_plus(bookshelf_name))
-	
-	# Return the library and the bookshelf.
-	return render_to_response('libraries/bookshelf_detail.html', {
-		'library': library,
-		'bookshelf': bookshelf,
-	}, context_instance=RequestContext(request))
+		#In future check other user
+		raise Http404
 
 @login_required
-def book_detail(request, library_name, bookshelf_name, book_isbn):
-	library = get_object_or_404(Collection, name=unquote_plus(library_name), owner=request.user)
-	bookshelf = get_object_or_404(library.children, name=unquote_plus(bookshelf_name)),
-	book = get_object_or_404(bookshelf.children)
-	
-	return render_to_response('libraries/book_detail.html', {
-		'library': library,
-		'bookshelf': bookshelf,
-		'book': book,
-	}, context_instance=RequestContext(request))
+def library_detail(request, username, library_name):
+	if username == request.user.username:
+		return render_to_response('libraries/library_detail.html', {
+			'library': get_object_or_404(request.user.libraries, name=unquote_plus(library_name)),
+		}, context_instance=RequestContext(request))
+	else:
+		raise Http404
+
+@login_required
+def bookshelf_detail(request, username, library_name, bookshelf_name):
+	if username == request.user.username:
+		# The parent library
+		library = get_object_or_404(request.user.libraries, name=unquote_plus(library_name))
+		
+		# If the bookshelf is the unsorted bin, there is no representing collection,
+		# otherwise get the appropriate collection.
+		if bookshelf_name == Config.objects.get(key='unsorted_bin').slug:
+			bookshelf = None
+		else:
+			bookshelf = get_object_or_404(library.children, name=unquote_plus(bookshelf_name))
+		
+		# Return the library and the bookshelf.
+		return render_to_response('libraries/bookshelf_detail.html', {
+			'library': library,
+			'bookshelf': bookshelf,
+		}, context_instance=RequestContext(request))
+	else:
+		raise Http404
+
+@login_required
+def book_detail(request, username, library_name, bookshelf_name, book_isbn, book_title):
+	if username == request.user.username:
+		library = get_object_or_404(Collection, name=unquote_plus(library_name), owner=request.user)
+		
+		if bookshelf_name == Config.objects.get(key='unsorted_bin').slug:
+			bookshelf = None
+			book = get_object_or_404(library.books, isbn=book_isbn, collection=library)
+		else:
+			bookshelf = get_object_or_404(library.children, name=unquote_plus(bookshelf_name))
+			book = get_object_or_404(bookshelf.books, isbn=book_isbn, collection=bookshelf)
+			
+		real_book_title = book.get_slug()
+		if real_book_title != book_title:
+			return HttpResponseRedirect(reverse('libraries.views.book_detail', args=[username, library_name, bookshelf_name, book_isbn, real_book_title]))
+		else:
+			return render_to_response('books/book_detail.html', {
+				'library': library,
+				'bookshelf': bookshelf,
+				'book': book,
+			}, context_instance=RequestContext(request))
+	else:
+		raise Http404
 
 ### !Form Views
 ### ----------

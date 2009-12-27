@@ -5,10 +5,9 @@ from.django import forms
 
 # Allows referencing the user.
 from django.contrib.auth.models import User
-
+from django.utils.http import urlquote_plus
 import managers
-
-from urllib import quote_plus
+import re
 
 #########################
 ### Collections Model ###
@@ -37,10 +36,10 @@ class Collection(models.Model):
 	
 	def get_absolute_url(self):
 		if self.collection_type == 'library':
-			return ('library_detail', [quote_plus(self.name)])
+			return ('library_detail', [self.owner.username, self.get_slug()])
 						
 		elif self.collection_type == 'bookshelf':
-			return ('bookshelf_detail', [quote_plus(self.parent.name), quote_plus(self.name)] )
+			return ('bookshelf_detail', [self.parent.owner.username, self.parent.get_slug(), self.get_slug()])
 	
 	get_absolute_url = permalink(get_absolute_url)
 	
@@ -54,6 +53,9 @@ class Collection(models.Model):
 		else:
 			return '[%s] %s' % (self.get_collection_type_display(), self.name)
 	
+	def get_slug(self):
+		return urlquote_plus(self.name)
+	
 	def save(self, *args, **kwargs):
 		'''
 		Validation assertions ensures:
@@ -61,6 +63,8 @@ class Collection(models.Model):
 		A Bookshelf must: not have an owner but must have a Library for a parent; not have the same name as a sibling bookshelf
 		A Series must: not have an owner but must have a Bookshelf for a parent; not have the same name as a sibling series
 		'''
+		
+		assert re.match('^[a-zA-Z0-9\ \-\_]*$', self.name), 'The collection name can only contain the characters: a-z, A-Z, 0-9, spaces, underscores and dashes.'
 		
 		if self.collection_type == 'library':
 			assert self.parent is None and self.owner is not None, 'A Library can not have a parent, and must have an owner'

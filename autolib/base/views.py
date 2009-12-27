@@ -9,7 +9,6 @@ from books.models import Book
 from libraries.models import Collection
 from base.models import Config
 
-from urllib import unquote_plus
 from django.template import RequestContext
 
 ### !Views

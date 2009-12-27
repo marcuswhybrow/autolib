@@ -14,13 +14,13 @@ urlpatterns = patterns('',
 	
 	# !App base paths
 	(r'^', include('base.urls')),
-	(r'^libraries/', include('libraries.urls')),
+	#(r'^libraries/', include('libraries.urls')),
 	(r'^books/', include('books.urls')),
 	(r'^users/', include('users.urls')),
 	
 	# !Temp forms
-	(r'^forms/create_library', 'libraries.views.create_collection', {'collection_type': 'library'}),
-	(r'^forms/create_bookshelf', 'libraries.views.create_collection', {'collection_type': 'bookshelf'}),
+	(r'^forms/create_library/', 'libraries.views.create_collection', {'collection_type': 'library'}),
+	(r'^forms/create_bookshelf/', 'libraries.views.create_collection', {'collection_type': 'bookshelf'}),
 	
 	# !Registration App
 	(r'^accounts/', include('registration.backends.default.urls')),

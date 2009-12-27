@@ -113,7 +113,7 @@ APPEND_SLASH = True
 
 LOGIN_URL = '/openid/login'
 # The URL redireted to after a user has authenticated.
-LOGIN_REDIRECT_URL = '/libraries/'
+LOGIN_REDIRECT_URL = '/'
 
 # The amount of days a username registration email is valid, before it is
 # made aavailable again.
