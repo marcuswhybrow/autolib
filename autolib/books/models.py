@@ -26,11 +26,11 @@ class Book(models.Model):
 			bookshelf = Config.objects.get(key='unsorted_bin').slug
 			library = self.collection.get_slug()
 			username = self.collection.owner.username
-		elif collection.collection_type == 'bookshelf':
+		elif self.collection.collection_type == 'bookshelf':
 			bookshelf = self.collection.get_slug()
 			library = self.collection.parent.get_slug()
 			username = self.collection.parent.owner.username
-		elif collection.collection_type == 'series':
+		elif self.collection.collection_type == 'series':
 			bookshelf = self.collection.parent.get_slug()
 			library = self.collection.parent.parent.get_slug()
 			username = self.collection.parent.parent.owner.username
