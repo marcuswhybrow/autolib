@@ -3,16 +3,30 @@
 {% block content %}
 	<div class="section">
 		<div class="inner">
-			<h2>{{ bookshelf.name }}</h2>
-			<p>{{ bookshelf.description }}</p>
-			{% if bookshelf.books.all %}
-			<ul>
-				{% for book in bookshelf.books.all %}
-					<li><a href="{{ book.get_absolute_url }}">{{ book.isbn }}</a></li>
-				{% endfor %}
-			</ul>
+			{% if bookshelf %}
+				<h2>{{ bookshelf.name }}</h2>
+				<p>{{ bookshelf.description }}</p>
+				{% if bookshelf.books.all %}
+					<ul>
+						{% for book in bookshelf.books.all %}
+							<li><a href="{{ book.get_absolute_url }}">{{ book.isbn }}</a></li>
+						{% endfor %}
+					</ul>
+				{% else %}
+					<p class="error">So there are no books in this bookshelf yet, you should be ashamed of yourself!</p>
+				{% endif %}
 			{% else %}
-			<p class="error">So there are no books in this bookshelf yet, you should be ashamed of yourself!</p>
+				<h2>{{ unsorted_bin.value }}</h2>
+				<p>{{ unsorted_bin_description.value }}</p>
+				{% if library.books.all %}
+					<ul>
+						{% for book in library.books.all %}
+							<li><a href="{{ book.get_absolute_url }}">{{ book.isbn }}</a></li>
+						{% endfor %}
+					</ul>
+				{% else %}
+					<p class="error">So there are no books in this bookshelf yet, you should be ashamed of yourself!</p>
+				{% endif %}
 			{% endif %}
 		</div>
 	</div>

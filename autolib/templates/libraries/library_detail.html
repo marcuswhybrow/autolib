@@ -16,15 +16,12 @@
 		<div class="inner">
 			<h2>{{ library.name }}</h2>
 			<p>{{ library.description }}</p>
-			{% if library.children.all %}
 			<ul>
+				<li><a href="{{ library.get_absolute_url }}{{ unsorted_bin.slug }}/">{{ unsorted_bin.slug }}</a></li>
 				{% for bookshelf in library.children.all %}
 					<li><a href="{{ bookshelf.get_absolute_url }}">{{ bookshelf.name }}</a></li>
 				{% endfor %}
 			</ul>
-			{% else %}
-			<p class="error">So there are no bookshelves in this library yet, you should be ashamed of yourself!</p>
-			{% endif %}
 		</div>
 	</div>
 	

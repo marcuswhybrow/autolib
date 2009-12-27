@@ -80,12 +80,15 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'base',
     'libraries',
     'users',
     'books',
     'django.contrib.admin',
     'googlehooks',
     'registration',
+    #'django_openidconsumer',
+    #'django_openid_auth',
 )
 
 
@@ -96,10 +99,19 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 	"django.core.context_processors.i18n",
 	"django.core.context_processors.media",
 )
+'''
+AUTHENTICATION_BACKENDS = (
+    'django_openid_auth.auth.OpenIDBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+OPENID_CREATE_USERS = True
+OPENID_UPDATE_DETAILS_FROM_SREG = True
+'''
 
 # Put a trailing forward slash at the end of every url.
 APPEND_SLASH = True
 
+LOGIN_URL = '/openid/login'
 # The URL redireted to after a user has authenticated.
 LOGIN_REDIRECT_URL = '/libraries/'
 
