@@ -123,3 +123,11 @@ div#overview #meta #tags ul li.more     { color: #fff; padding-top: 18px; text-t
 /* Clearfix */
 
 .clearfix:after     { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
+
+
+/* Breadcrumbs */
+
+#breadcrumbs        { position: absolute; bottom: 0; color: white; }
+#breadcrumbs a      { color: white }
+#breadcrumbs ul     {  }
+#breadcrumbs ul li  { display: inline; }

@@ -14,6 +14,8 @@ from libraries.models import Collection
 from base.models import Config
 from libraries.forms import CreateCollectionForm
 
+from libraries.utils import CurrentUser
+
 # SOAP imports
 
 from urllib import unquote_plus
@@ -26,68 +28,92 @@ from django.views.generic.list_detail import object_list
 ### !Views
 ### -----
 
+@CurrentUser
 @login_required
 def library_list(request, username, template_name):
-	if username == request.user.username:
 		queryset = request.user.libraries.all()
-		return object_list(request, queryset=queryset, template_name=template_name, extra_context={'form': CreateCollectionForm(collection_type='library'),})
-	else:
-		#In future check other user
-		raise Http404
+		return object_list(request, queryset=queryset, template_name=template_name, extra_context={
+			'form': CreateCollectionForm(collection_type='library'),
+			'breadcrumbs': [
+				('Profile', reverse('users.views.user_detail', args=[request.user.username])),
+				('Libraries', reverse('libraries.views.library_list', args=[request.user.username])),
+			],
+		})
 
+@CurrentUser
 @login_required
 def library_detail(request, username, library_name):
-	if username == request.user.username:
-		return render_to_response('libraries/library_detail.html', {
-			'library': get_object_or_404(request.user.libraries, name=unquote_plus(library_name)),
-		}, context_instance=RequestContext(request))
-	else:
-		raise Http404
+	library = get_object_or_404(request.user.libraries, name=unquote_plus(library_name))
+	return render_to_response('libraries/library_detail.html', {
+		'library': library,
+		'breadcrumbs': [
+			('Profile', reverse('users.views.user_detail', args=[request.user.username])),
+			('Libraries', reverse('libraries.views.library_list', args=[request.user.username])),
+			(library.name, reverse('libraries.views.library_detail', args=[request.user.username, library.get_slug()])),
+		],
+	}, context_instance=RequestContext(request))
 
+@CurrentUser
 @login_required
 def bookshelf_detail(request, username, library_name, bookshelf_name):
-	if username == request.user.username:
-		# The parent library
-		library = get_object_or_404(request.user.libraries, name=unquote_plus(library_name))
-		
-		# If the bookshelf is the unsorted bin, there is no representing collection,
-		# otherwise get the appropriate collection.
-		if bookshelf_name == Config.objects.get(key='unsorted_bin').slug:
-			bookshelf = None
-		else:
-			bookshelf = get_object_or_404(library.children, name=unquote_plus(bookshelf_name))
-		
-		# Return the library and the bookshelf.
-		return render_to_response('libraries/bookshelf_detail.html', {
-			'library': library,
-			'bookshelf': bookshelf,
-		}, context_instance=RequestContext(request))
+	# The parent library
+	library = get_object_or_404(request.user.libraries, name=unquote_plus(library_name))
+	
+	# If the bookshelf is the unsorted bin, there is no representing collection,
+	# otherwise get the appropriate collection.
+	if bookshelf_name == Config.objects.get(key='unsorted_bin').slug:
+		bookshelf = None
+		bookshelf_new_name = Config.objects.get(key='unsorted_bin').value
+		bookshelf_slug = Config.objects.get(key='unsorted_bin').slug
 	else:
-		raise Http404
+		bookshelf = get_object_or_404(library.children, name=unquote_plus(bookshelf_name))
+		bookshelf_new_name = bookshelf.name
+		bookshelf_slug = bookshelf.get_slug()
+	
+	# Return the library and the bookshelf.
+	return render_to_response('libraries/bookshelf_detail.html', {
+		'library': library,
+		'bookshelf': bookshelf,
+		'breadcrumbs': [
+			('Profile', reverse('users.views.user_detail', args=[request.user.username])),
+			('Libraries', reverse('libraries.views.library_list', args=[request.user.username])),
+			(library.name, reverse('libraries.views.library_detail', args=[request.user.username, library.get_slug()])),
+			(bookshelf_new_name, reverse('libraries.views.bookshelf_detail', args=[request.user.username, library.get_slug(), bookshelf_slug])),
+		],
+	}, context_instance=RequestContext(request))
 
+@CurrentUser
 @login_required
 def book_detail(request, username, library_name, bookshelf_name, book_isbn, book_title):
-	if username == request.user.username:
-		library = get_object_or_404(Collection, name=unquote_plus(library_name), owner=request.user)
-		
-		if bookshelf_name == Config.objects.get(key='unsorted_bin').slug:
-			bookshelf = None
-			book = get_object_or_404(library.books, isbn=book_isbn, collection=library)
-		else:
-			bookshelf = get_object_or_404(library.children, name=unquote_plus(bookshelf_name))
-			book = get_object_or_404(bookshelf.books, isbn=book_isbn, collection=bookshelf)
-			
-		real_book_title = book.get_slug()
-		if real_book_title != book_title:
-			return HttpResponseRedirect(reverse('libraries.views.book_detail', args=[username, library_name, bookshelf_name, book_isbn, real_book_title]))
-		else:
-			return render_to_response('books/book_detail.html', {
-				'library': library,
-				'bookshelf': bookshelf,
-				'book': book,
-			}, context_instance=RequestContext(request))
+	library = get_object_or_404(Collection, name=unquote_plus(library_name), owner=request.user)
+	
+	if bookshelf_name == Config.objects.get(key='unsorted_bin').slug:
+		bookshelf = None
+		bookshelf_new_name = Config.objects.get(key='unsorted_bin').value
+		bookshelf_slug = Config.objects.get(key='unsorted_bin').slug
+		book = get_object_or_404(library.books, isbn=book_isbn, collection=library)
 	else:
-		raise Http404
+		bookshelf = get_object_or_404(library.children, name=unquote_plus(bookshelf_name))
+		bookshelf_new_name = bookshelf.name
+		bookshelf_slug = bookshelf.get_slug()
+		book = get_object_or_404(bookshelf.books, isbn=book_isbn, collection=bookshelf)
+		
+	real_book_title = book.get_slug()
+	if real_book_title != book_title:
+		return HttpResponseRedirect(reverse('libraries.views.book_detail', args=[username, library_name, bookshelf_slug, book_isbn, real_book_title]))
+	else:
+		return render_to_response('books/book_detail.html', {
+			'library': library,
+			'bookshelf': bookshelf,
+			'book': book,
+			'breadcrumbs': [
+				('Profile', reverse('users.views.user_detail', args=[request.user.username])),
+				('Libraries', reverse('libraries.views.library_list', args=[request.user.username])),
+				(library.name, reverse('libraries.views.library_detail', args=[request.user.username, library.get_slug()])),
+				(bookshelf_new_name, reverse('libraries.views.bookshelf_detail', args=[request.user.username, library.get_slug(), bookshelf_slug])),
+				(book.title, reverse('libraries.views.book_detail', args=[request.user.username, library.get_slug(), bookshelf_slug, book_isbn, book_title])),
+			],
+		}, context_instance=RequestContext(request))
 
 ### !Form Views
 ### ----------

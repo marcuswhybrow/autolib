@@ -27,6 +27,14 @@
 						<a href="/accounts/login/">login</a> | <a href="/accounts/register/">register</a>
 					{% endif %}
 				</div>
+				<div id="breadcrumbs" class="clearfix">
+					<ul>
+						<li><a href="/">Home</a></li>
+					{% for crumb, link in breadcrumbs %}
+						<li>{% if not first %} > {% endif %}<a href="{{ link }}">{{ crumb }}</a></li>
+					{% endfor %}
+					</ul>
+				</div>
 			</div>
 			<div id="header-bg">
 				<h1>AutoLibrarian</h1>

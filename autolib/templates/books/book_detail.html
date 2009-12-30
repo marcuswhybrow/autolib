@@ -26,7 +26,8 @@
 <div class="section">
 	<div class="inner">
 		{% if book %}
-			<h2>ISBN: {{ book.isbn }}</h2>
+			<h2>{{ book.title }}</h2>
+			<p>ISBN: {{ book.isbn }}</p>
 		{% else %}
 			<h2>Whoops!</h2>
 			<p>You dont have that book in this library.</p>
