@@ -22,9 +22,9 @@
 			<div id="header" class="clearfix">
 				<div id="auth-box">
 					{% if user.is_authenticated %}
-						<a href="/libraries/">{{ user.username }}</a> | <a href="/accounts/logout/">logout</a>
+						<a href="{% url library_list user.username %}">{{ user.username }}</a> | <a href="{% url django.contrib.auth.views.logout %}">logout</a>
 					{% else %}
-						<a href="/accounts/login/">login</a> | <a href="/accounts/register/">register</a>
+						<a href="{% url django.contrib.auth.views.login %}">login</a> | <a href="{% url registration.views.register %}">register</a>
 					{% endif %}
 				</div>
 				<div id="breadcrumbs" class="clearfix">
