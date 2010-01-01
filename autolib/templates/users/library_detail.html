@@ -1,4 +1,9 @@
-{% extends "libraries/base_full.html" %}
+{% extends "users/library_list.html" %}
+
+{% block breadcrumbs %}
+{{ block.super }}
+<li class="library"> > <a href="{% url library_detail user_detail.username, library.get_slug %}">{{ library.name }}</a></li>
+{% endblock %}
 
 {% block head %}
 <link rel="stylesheet" href="/media/js/jqtransform/jqtransform.css" />
@@ -14,33 +19,30 @@
 {% block content %}
 	<div class="section">
 		<div class="inner">
-			<h2>Your Libraries</h2>
-			<p>Your libraries will all be here one day.</p>
-			{% if object_list %}
+			<h2>{{ library.name }}</h2>
+			<p>{{ library.description }}</p>
 			<ul>
-				{% for library in object_list %}
-					<li><a href="{{ library.get_absolute_url }}">{{ library.name }}</a></li>
+				<li><a href="{{ library.get_absolute_url }}{{ unsorted_bin.slug }}/">{{ unsorted_bin.slug }}</a></li>
+				{% for bookshelf in library.children.all %}
+					<li><a href="{{ bookshelf.get_absolute_url }}">{{ bookshelf.name }}</a></li>
 				{% endfor %}
 			</ul>
-			{% else %}
-			<p class="error">Erm. You do realise you dont have any libraries yet.</p>
-			{% endif %}
 		</div>
 	</div>
 	
 	<div class="section">
 		<div class="inner">
-			<h3>Create a new <span class="library">Library</span></h3>
-			<p>Pick a name for your new library, make sure its not the same as another one and hit create.</p>
-			<form action="" method="post" class="jqtransform">
+			<h3>Create a new <span class="bookshelf">Bookshelf</span></h3>
+			<form class="jqtransform">
 				<div class="rowElem">
-					{{ form.name }}
+					<input type="text" />
 				</div>
 				<div class="rowElem">
 					<input type="submit" value="Create" />
 				</div>
 			</form>
-			<h3>Add a <span class="book">Book</span> to this Library</h3>
+			
+			<h3>Add a <span class="book">Book</span> to this Bookshelf</h3>
 			<p>Click <a href="#">here</a></p>
 		</div>
 	</div>

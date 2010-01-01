@@ -21,6 +21,7 @@ class Book(models.Model):
 	def __unicode__(self):
 		return '[Book] %s' % self.isbn
 	
+	@permalink
 	def get_absolute_url(self):
 		if self.collection.collection_type == 'library':
 			bookshelf = Config.objects.get(key='unsorted_bin').slug
@@ -35,9 +36,7 @@ class Book(models.Model):
 			library = self.collection.parent.parent.get_slug()
 			username = self.collection.parent.parent.owner.username
 		
-		return ('libraries.views.book_detail', [username, library, bookshelf, self.isbn, self.title])
-	
-	get_absolute_url = permalink(get_absolute_url)
+		return ('users.views.book_detail', [username, library, bookshelf, self.isbn, self.get_slug()])
 	
 	def get_slug(self):
 		return urlquote_plus(self.title)

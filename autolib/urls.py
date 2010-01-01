@@ -19,8 +19,8 @@ urlpatterns = patterns('',
 	(r'^users/', include('users.urls')),
 	
 	# !Temp forms
-	(r'^forms/create_library/', 'libraries.views.create_collection', {'collection_type': 'library'}),
-	(r'^forms/create_bookshelf/', 'libraries.views.create_collection', {'collection_type': 'bookshelf'}),
+	(r'^forms/create_library/', 'users.views.create_collection', {'collection_type': 'library'}),
+	(r'^forms/create_bookshelf/', 'users.views.create_collection', {'collection_type': 'bookshelf'}),
 	
 	# !Registration App
 	(r'^accounts/', include('registration.backends.default.urls')),

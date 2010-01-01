@@ -1,4 +1,13 @@
-{% extends "libraries/base_full.html" %}
+{% extends "users/library_detail.html" %}
+
+{% block breadcrumbs %}
+	{{ block.super }}
+	{% if bookshelf %}
+		<li class="bookshelf"> > <a href="{% url bookshelf_detail user_detail.username, library.get_slug, bookshelf.name %}">{{ bookshelf.name }}</a></li>
+	{% else %}
+		<li class="bookshelf"> > <a href="{% url library_detail user_detail.username, library.get_slug %}{{ unsorted_bin.slug }}/">{{ unsorted_bin.value }}</a></li>
+	{% endif %}
+{% endblock %}
 
 {% block content %}
 	<div class="section">

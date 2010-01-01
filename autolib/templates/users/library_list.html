@@ -1,0 +1,52 @@
+{% extends "users/user_detail.html" %}
+
+{% block breadcrumbs %}
+{{ block.super }}
+<li> > <a href="{% url library_list user_detail.username %}">Libraries</a></li>
+{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/media/js/jqtransform/jqtransform.css" />
+<script type="text/javascript" src="/media/js/jqtransform/jquery.jqtransform.js"></script>
+<script type="text/javascript">
+	$(function() {
+		//find all the forms with the class of jqtransform and then apply the plugin
+		$("form.jqtransform").jqTransform();
+	});
+</script>
+{% endblock %}
+
+{% block content %}
+	<div class="section">
+		<div class="inner">
+			<h2>Your Libraries</h2>
+			<p>Your libraries will all be here one day.</p>
+			{% if object_list %}
+			<ul>
+				{% for library in object_list %}
+					<li><a href="{{ library.get_absolute_url }}">{{ library.name }}</a></li>
+				{% endfor %}
+			</ul>
+			{% else %}
+			<p class="error">Erm. You do realise you dont have any libraries yet.</p>
+			{% endif %}
+		</div>
+	</div>
+	
+	<div class="section">
+		<div class="inner">
+			<h3>Create a new <span class="library">Library</span></h3>
+			<p>Pick a name for your new library, make sure its not the same as another one and hit create.</p>
+			<form action="" method="post" class="jqtransform">
+				<div class="rowElem">
+					{{ form.name }}
+				</div>
+				<div class="rowElem">
+					<input type="submit" value="Create" />
+				</div>
+			</form>
+			<h3>Add a <span class="book">Book</span> to this Library</h3>
+			<p>Click <a href="#">here</a></p>
+		</div>
+	</div>
+{% endblock %}

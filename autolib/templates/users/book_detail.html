@@ -1,8 +1,12 @@
-{% extends "books/book_list.html" %}
+{% extends "users/bookshelf_detail.html" %}
 
 {% block breadcrumbs %}
-{{ block.super }}
-<li> > <a href="{% url book_detail book.isbn %}">{{ book.title }}</a></li>
+	{{ block.super }}
+	{% if bookshelf %}
+		<li> > <a href="{% url book_detail user_detail.username library.get_slug bookshelf.get_slug book.isbn book.get_slug %}">{{ book.title }}</a></li>
+	{% else %}
+		<li> > <a href="{% url book_detail user_detail.username library.get_slug unsorted_bin.slug book.isbn book.get_slug %}">{{ book.title }}</a></li>
+	{% endif %}
 {% endblock %}
 
 {% block sidebar %}

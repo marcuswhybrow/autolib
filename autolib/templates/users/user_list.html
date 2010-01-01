@@ -1,5 +1,10 @@
 {% extends "users/base.html" %}
 
+{% block breadcrumbs %}
+{{ block.super }}
+<li> > <a href="{% url users.views.user_list %}">Users</a></li>
+{% endblock %}
+
 {% block content %}
 <div class="section">
 	<div class="inner">

@@ -1,4 +1,4 @@
-{% extends "libraries/base_full.html" %}
+{% extends "users/base_full.html" %}
 
 {% block head %}
 <link rel="stylesheet" href="/media/js/jqtransform/jqtransform.css" />
@@ -9,6 +9,11 @@
 		$("form.jqtransform").jqTransform();
 	});
 </script>
+{% endblock %}
+
+{% block breadcrumbs %}
+{{ block.super }}
+<li> > <a href="{% url registration.urls.register %}">Registration</a></li>
 {% endblock %}
 
 {% block content %}

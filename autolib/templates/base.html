@@ -29,10 +29,9 @@
 				</div>
 				<div id="breadcrumbs" class="clearfix">
 					<ul>
-						<li><a href="/">Home</a></li>
-					{% for crumb, link in breadcrumbs %}
-						<li>{% if not first %} > {% endif %}<a href="{{ link }}">{{ crumb }}</a></li>
-					{% endfor %}
+						{% block breadcrumbs %}
+						<li><a href="{% url home %}">Home</a></li>
+						{% endblock %}
 					</ul>
 				</div>
 			</div>

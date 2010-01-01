@@ -11,7 +11,7 @@ apipatterns = patterns('base.views',
 urlpatterns = patterns('base.views',
 
 	# !Views
-	(r'^$', 'index'),
+	url(r'^$', 'index', name='home'),
 
 	# !SOAP
 	(r'^api/', include(apipatterns)),
