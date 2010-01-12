@@ -111,7 +111,7 @@ OPENID_UPDATE_DETAILS_FROM_SREG = True
 # Put a trailing forward slash at the end of every url.
 APPEND_SLASH = True
 
-LOGIN_URL = '/openid/login'
+LOGIN_URL = '/accounts/login'
 # The URL redireted to after a user has authenticated.
 LOGIN_REDIRECT_URL = '/'
 
