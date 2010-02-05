@@ -13,7 +13,7 @@ urlpatterns = patterns('',
 	### -------------
 	
 	# !App base paths
-	(r'^', include('base.urls')),
+	url(r'^$', 'base.views.index', name='home'),
 	#(r'^libraries/', include('libraries.urls')),
 	(r'^books/', include('books.urls')),
 	(r'^users/', include('users.urls')),
@@ -25,6 +25,8 @@ urlpatterns = patterns('',
 	# !Registration App
 	(r'^accounts/', include('registration.backends.default.urls')),
 # 	(r'^login/$', 'django.contrib.auth.views.login', {'template_name': 'books/login.html'}),
+
+	(r'^api/', include('api.urls')),
 	
 	### !TOOL AND HELPER URLS
 	### --------------------

@@ -1,0 +1,14 @@
+{ {% if object_lists %} {% for name, object_list in object_lists.items %}
+  "{{name}}":
+  [{% for object in object_list %}
+    { {% for field, value in object.items %} "{{field}}": "{{value}}"{% if not forloop.last %},{% endif %}
+      {% endfor %}}{% if not forloop.last %},{% endif %}{% endfor %}
+  ]{% if not forloop.last %},{% else %}{% if objects %},{% endif %}{% endif %}
+{% endfor %}
+{% endif %}
+{% if objects %}
+{% for key, val in objects.items %}
+  "{{key}}": "{{val}}"{% if not forloop.last %},{% endif %}
+{% endfor %}
+{% endif %}
+}
