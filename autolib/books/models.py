@@ -14,12 +14,33 @@ import re
 ##################
 
 class Book(models.Model):
-	isbn = models.IntegerField()
-	collection = models.ForeignKey(Collection, related_name="books")
+	isbn = models.IntegerField(primary_key=True)
 	title = models.CharField(max_length=200)
+	description = models.TextField()
+	author = models.CharField(max_length=200)
+	publisher = models.CharField(max_length=200)
+	published = models.DateField()
 
 	def __unicode__(self):
 		return '[Book] %s' % self.isbn
+	
+# 	def save(self, *args, **kwargs):
+# 		assert re.match('^[a-zA-Z0-9\ \-\_]*$', self.title), 'A title can only contain the characters: a-z, A-Z, 0-9, spaces, underscores and dashes.'
+# 		super(self.__class__, self).save(*args, **kwargs)
+	
+	@permalink
+	def get_absolute_url(self):
+		return ('books.views.book_detail', [self.isbn])
+
+class BookProfile(models.Model):
+	book_instance = models.ForeignKey(Book, related_name='instances')
+	collection = models.ForeignKey(Collection, related_name='books')
+	
+	def __unicode__(self):
+		return '[BookProfile] %s' % self.book_instance.isbn
+	
+	def get_slug(self):
+		return re.sub('\ ', '-', re.sub('[^a-zA-Z0-9\ \-\_]', '', self.book_instance.title))
 	
 	@permalink
 	def get_absolute_url(self):
@@ -36,18 +57,32 @@ class Book(models.Model):
 			library = self.collection.parent.parent.get_slug()
 			username = self.collection.parent.parent.owner.username
 		
-		return ('users.views.book_detail', [username, library, bookshelf, self.isbn, self.get_slug()])
+		return ('users.views.book_detail', [username, library, bookshelf, self.book_instance.isbn, self.get_slug()])
 	
-	def get_slug(self):
-		return urlquote_plus(self.title)
+	def isbn(self):
+		return self.book_instance.isbn
 	
-	def save(self, *args, **kwargs):
-		assert re.match('^[a-zA-Z0-9\ \-\_]*$', self.title), 'A title can only contain the characters: a-z, A-Z, 0-9, spaces, underscores and dashes.'
-		super(self.__class__, self).save(*args, **kwargs)
-
+	def title(self):
+		return self.book_instance.title
+	
+	def description(self):
+		return self.book_instance.description
+	
+	def author(self):
+		return self.book_instance.author
+		
+	def publisher(self):
+		return self.book_instance.publisher
+	
+	def published(self):
+		return self.book_instance.published
+		
 #############
 ### Forms ###
 #############
 
-class BookForm(forms.Form):
-	isbn = forms.IntegerField()
+class BookForm(forms.ModelForm):
+	
+	class Meta:
+		model = Book
+	

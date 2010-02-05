@@ -18,7 +18,7 @@
 				{% if bookshelf.books.all %}
 					<ul>
 						{% for book in bookshelf.books.all %}
-							<li><a href="{{ book.get_absolute_url }}">{{ book.isbn }}</a></li>
+							<li><a href="{{ book.get_absolute_url }}">{{ book.title }}</a> by {{ book.author }}</li>
 						{% endfor %}
 					</ul>
 				{% else %}
@@ -30,7 +30,7 @@
 				{% if library.books.all %}
 					<ul>
 						{% for book in library.books.all %}
-							<li><a href="{{ book.get_absolute_url }}">{{ book.isbn }}</a></li>
+							<li><a href="{{ book.get_absolute_url }}">{{ book.title }}</a> by {{ book.author }}</li>
 						{% endfor %}
 					</ul>
 				{% else %}

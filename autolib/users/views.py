@@ -80,12 +80,12 @@ def book_detail(request, username, library_name, bookshelf_name, book_isbn, book
 		bookshelf = None
 		bookshelf_new_name = Config.objects.get(key='unsorted_bin').value
 		bookshelf_slug = Config.objects.get(key='unsorted_bin').slug
-		book = get_object_or_404(library.books, isbn=book_isbn, collection=library)
+		book = get_object_or_404(library.books, book_instance=Book.objects.get(isbn=book_isbn), collection=library)
 	else:
 		bookshelf = get_object_or_404(library.children, name=unquote_plus(bookshelf_name))
 		bookshelf_new_name = bookshelf.name
 		bookshelf_slug = bookshelf.get_slug()
-		book = get_object_or_404(bookshelf.books, isbn=book_isbn, collection=bookshelf)
+		book = get_object_or_404(bookshelf.books, book_instance=Book.objects.get(isbn=book_isbn), collection=bookshelf)
 		
 	real_book_title = book.get_slug()
 	if real_book_title != book_title:

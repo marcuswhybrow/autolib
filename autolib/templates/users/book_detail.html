@@ -37,6 +37,10 @@
 		{% if book %}
 			<h2>{{ book.title }}</h2>
 			<p>ISBN: {{ book.isbn }}</p>
+			<p>Author: {{ book.author }}</p>
+			<p>Publisher: {{ book.publisher }}</p>
+			<p>Published Date: {{ book.published }}</p>
+			<p>Description: {{ book.description }}</p>
 		{% else %}
 			<h2>Whoops!</h2>
 			<p>You dont have that book in this library.</p>
