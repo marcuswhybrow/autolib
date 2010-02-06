@@ -1,6 +1,7 @@
+html                { background: url(images/page-bg.png) repeat-x; background-color: #fff; }
+
 body                { font-family: "Lucida Sans Unicode", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif; 
-                      font-size: 13px; background: url(images/page-bg.png) repeat-x; background-color: #fff;
-                      color: #5e5d5d; }
+                      font-size: 13px; color: #5e5d5d; background: url(images/header-bg.png) no-repeat top center; background-position-x: -30px; }
 strong, em, b, i    { font-family: "Lucida Sans", "Lucida Sans Unicode", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif; }
 p, #content li      { line-height: 21px; }
 p, h1, h2, h3, 
@@ -16,6 +17,15 @@ h2                  { font-size: 30px; }
 h3, dt              { font-size: 16px; }
 
 dd                  { margin-left: 9px; }
+
+/* Editable Stuff */
+
+div.editable input.focus.H2 { color: #2e2e2e; font-family: "Helvetica"; text-transform: capitalize; font-size: 30px; font-weight: bold; padding: 0; margin: 0; border: 0; }
+
+div.editable input.focus.P { color: #5E5D5D; font-size: 13px; line-height: 21px; margin: 0; border: 0; }
+
+.editable .edit		{ background-color: yellow; cursor: pointer; }
+
 
 /* Forms */
 
@@ -41,7 +51,7 @@ div.banner              { width: 100%; }
 div.stage               { width: 292px; float: left; font-family: "Helvetica"; padding: 10px; background-color: #fafafa; 
                           border-bottom: 1px solid #dfdfdf; }
 div.stage span          { font-size: 60px; float: left; }
-div.stage p             { font-size: 18px; float: left;margin-top: 10px; }
+div.stage p             { font-size: 18px; float: left; margin-top: 10px; }
 div.stage.one           { -moz-border-radius-topleft: 6px; -webkit-border-top-left-radius: 6px; }
 div.stage.two           { background-color: #f5f5f5; }
 div.stage.three         { -moz-border-radius-topright: 6px; -webkit-border-top-right-radius: 6px; background-color: #f0f0f0; }
@@ -73,7 +83,7 @@ div#header-wrap     { width: 100%; height: 200px; }
 
 div#header          { width: 936px; margin: 0 auto; position: absolute; left: 50%; margin-left: -468px; height: 200px; }
 
-div#header-bg       { background: url(images/header-bg.png) no-repeat; background-position-x: -30px; width: 1300px; height: 406px; 
+div#header-bg       {  width: 1300px; height: 406px; 
                       position: relative; margin: 0 auto; z-index: -10; }
 div#header-bg h1    { display: none; }
 

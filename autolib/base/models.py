@@ -14,3 +14,12 @@ class Config(models.Model):
 	
 	def __unicode__(self):
 		return '%s : %s' % (self.key, self.value)
+
+
+class Syncable(models.Model):
+	
+	added = models.DateTimeField(auto_now_add=True)
+	last_modified = models.DateTimeField(auto_now=True)
+	
+	class Meta:
+		abstract = True

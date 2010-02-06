@@ -1,7 +1,7 @@
 # Allows classes to extend the models amd forms classes.
 from django.db import models
 from django.db.models import permalink
-from.django import forms
+from django import forms
 
 # Allows referencing the user.
 from django.contrib.auth.models import User
@@ -19,7 +19,9 @@ COLLECTION_TYPE_CHOICES = (
 	('series', 'Series'),
 )
 
-class Collection(models.Model):
+from base.models import Syncable
+
+class Collection(Syncable):
 	class Meta:
 		unique_together = (('collection_type', 'owner', 'name'),('collection_type', 'parent', 'name'))
 	
@@ -34,12 +36,15 @@ class Collection(models.Model):
 	bookshelves = managers.BookshelfManager()
 	series = managers.SeriesManager()
 	
+
 	def get_absolute_url(self):
 		if self.collection_type == 'library':
 			return ('library_detail', [self.owner.username, self.get_slug()])
 						
 		elif self.collection_type == 'bookshelf':
 			return ('bookshelf_detail', [self.parent.owner.username, self.parent.get_slug(), self.get_slug()])
+		
+		return None
 	
 	get_absolute_url = permalink(get_absolute_url)
 	
@@ -79,3 +84,13 @@ class Collection(models.Model):
 			raise AssertionError, 'A Collection must be of type "library", "bookshelf" or "series"'
 		
 		super(self.__class__, self).save(*args, **kwargs)
+	
+	def get_owner(self):
+		if self.collection_type == 'library':
+			return self.owner
+		elif self.collection_type == 'bookshelf':
+			return self.parent.owner
+		elif self.collection_type == 'series':
+			return self.parent.parent.owner
+			
+		return None

@@ -13,7 +13,9 @@ import re
 ### Book Model ###
 ##################
 
-class Book(models.Model):
+from base.models import Syncable
+
+class Book(Syncable):
 	isbn = models.IntegerField(primary_key=True)
 	title = models.CharField(max_length=200)
 	description = models.TextField()
@@ -32,7 +34,7 @@ class Book(models.Model):
 	def get_absolute_url(self):
 		return ('books.views.book_detail', [self.isbn])
 
-class BookProfile(models.Model):
+class BookProfile(Syncable):
 	book_instance = models.ForeignKey(Book, related_name='instances')
 	collection = models.ForeignKey(Collection, related_name='books')
 	

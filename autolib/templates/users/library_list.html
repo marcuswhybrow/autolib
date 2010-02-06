@@ -12,6 +12,30 @@
 	$(function() {
 		//find all the forms with the class of jqtransform and then apply the plugin
 		$("form.jqtransform").jqTransform();
+		
+		$("form#new-library-form").submit(function() {
+			
+			var form = $(this);
+			
+			form.find().attr('disabled', 'disabled');
+			
+			$.post('{% url api_insert_library %}', form.serialize(), function(data) {
+				if (data.success == 'True') {
+					var name = data.name;
+					var description = data.description;
+					var url = data.url;
+					$("ul#library-list").append('<li><a href="' + url + '">' + name + '</a></li>');
+				} else if(data.success == 'False') {
+					var error = data.error;
+					alert(error);
+				}
+			}, "json");
+			
+			form.find().attr('disabled', '');
+			form.find(':input').val('');
+			
+			return false;
+		});
 	});
 </script>
 {% endblock %}
@@ -22,7 +46,7 @@
 			<h2>Your Libraries</h2>
 			<p>Your libraries will all be here one day.</p>
 			{% if object_list %}
-			<ul>
+			<ul id="library-list">
 				{% for library in object_list %}
 					<li><a href="{{ library.get_absolute_url }}">{{ library.name }}</a></li>
 				{% endfor %}
@@ -37,7 +61,7 @@
 		<div class="inner">
 			<h3>Create a new <span class="library">Library</span></h3>
 			<p>Pick a name for your new library, make sure its not the same as another one and hit create.</p>
-			<form action="" method="post" class="jqtransform">
+			<form id="new-library-form" action="" method="post" class="jqtransform">
 				<div class="rowElem">
 					{{ form.name }}
 				</div>

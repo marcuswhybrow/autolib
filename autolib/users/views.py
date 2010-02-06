@@ -36,7 +36,7 @@ def library_list(request, username, template_name):
 		queryset = request.user.libraries.all()
 		return object_list(request, queryset=queryset, template_name=template_name, extra_context={
 			'user_detail': User.objects.get(username=username),
-			'form': CreateCollectionForm(collection_type='library'),
+			'form': CreateCollectionForm(),
 		})
 
 @CurrentUser
@@ -116,7 +116,7 @@ def create_collection(request, collection_type):
 	if collection_type == 'library' or 'bookshelf' or 'series':
 		if request.method == 'POST':
 			# Collection.objects.get(name=parent, owner=request.user, type)
-			form = CreateCollectionForm(request.POST, collection_type=collection_type, user=request.user)
+			form = CreateCollectionForm(request.POST)
 			if form.is_valid():
 				form.save()
 		else:

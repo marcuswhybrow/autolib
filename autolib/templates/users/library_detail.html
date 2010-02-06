@@ -12,6 +12,71 @@
 	$(function() {
 		//find all the forms with the class of jqtransform and then apply the plugin
 		$("form.jqtransform").jqTransform();
+		
+		$("div.editable .detail").hover(function() {
+			$(this).addClass('edit');
+		}, function() {
+			$(this).removeClass('edit');
+		});
+				
+		$("div.editable .detail").click(editClick);
+		
+		function editClick() {
+			var detail = $(this);
+			var box = detail.parent();
+
+			box.html('<form></form>');			
+			var form = box.find('form');
+			
+			form.html('<input class="focus ' + detail[0].tagName + '" type="text" id="' + detail.attr('id') + '" name="' + detail.attr('id') + '" value="' + detail.text() + '" />' + 
+					  '<input type="hidden" id="library_id" name="library_id" value="{{ library.pk }}" />' +
+					  '<input type="submit" value="submit" />' +
+					  '<input type="button" value="cancel" />');
+			
+			form.find(':first').focus();
+			
+			var cancel = form.find(':button');
+			
+			cancel.click(function() {
+				detail.hover(function() {
+					$(this).addClass('edit');
+				}, function() {
+					$(this).removeClass('edit');
+				});
+				detail.click(editClick);
+				box.html(detail);
+			});
+					  
+			form.submit(function() {
+				
+				var form = $(this);
+				
+				$.post('{% url api_update_library %}', form.serialize(), function(data) {
+					if (data.success == 'True') {
+						var name = data.name;
+						var description = data.description;
+						
+						if (name) {
+							detail.text(name);
+						} else if (description) {
+							detail.text(description);
+						}
+						
+					} else if(data.success == 'False') {
+						var error = data.error;
+						alert(error);
+					}
+				}, "json");
+				detail.hover(function() {
+					$(this).addClass('edit');
+				}, function() {
+					$(this).removeClass('edit');;
+				});
+				detail.click(editClick);
+				box.html(detail);
+				return false;
+			});
+		}
 	});
 </script>
 {% endblock %}
@@ -19,8 +84,12 @@
 {% block content %}
 	<div class="section">
 		<div class="inner">
-			<h2>{{ library.name }}</h2>
-			<p>{{ library.description }}</p>
+			<div class="editable">
+				<h2 id="name" class="detail">{{ library.name }}</h2>
+			</div>
+			<div class="editable">
+				<p id="description" class="detail">{{ library.description }}</p>
+			</div>
 			<ul>
 				<li><a href="{{ library.get_absolute_url }}{{ unsorted_bin.slug }}/">{{ unsorted_bin.slug }}</a></li>
 				{% for bookshelf in library.children.all %}
@@ -33,7 +102,7 @@
 	<div class="section">
 		<div class="inner">
 			<h3>Create a new <span class="bookshelf">Bookshelf</span></h3>
-			<form class="jqtransform">
+			<form class="jqtransform"  method="post">
 				<div class="rowElem">
 					<input type="text" />
 				</div>
