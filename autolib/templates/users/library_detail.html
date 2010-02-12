@@ -2,7 +2,7 @@
 
 {% block breadcrumbs %}
 {{ block.super }}
-<li class="library"> > <a href="{% url library_detail user_detail.username, library.get_slug %}">{{ library.name }}</a></li>
+<li class="library"> > <a href="{% url library_detail user_detail.username, library.slug %}">{{ library.name }}</a></li>
 {% endblock %}
 
 {% block head %}
@@ -12,6 +12,8 @@
 	$(function() {
 		//find all the forms with the class of jqtransform and then apply the plugin
 		$("form.jqtransform").jqTransform();
+		
+		// Editing Details
 		
 		$("div.editable .detail").hover(function() {
 			$(this).addClass('edit');
@@ -52,9 +54,11 @@
 				var form = $(this);
 				
 				$.post('{% url api_update_library %}', form.serialize(), function(data) {
-					if (data.success == 'True') {
-						var name = data.name;
-						var description = data.description;
+					alert('posted');
+					if (data.meta.success == true) {
+						alert('worked');
+						var name = data.library.name;
+						var description = data.library.description;
 						
 						if (name) {
 							detail.text(name);
@@ -62,9 +66,8 @@
 							detail.text(description);
 						}
 						
-					} else if(data.success == 'False') {
-						var error = data.error;
-						alert(error);
+					} else if(data.meta.success == false) {
+						alert(data.meta.error);
 					}
 				}, "json");
 				detail.hover(function() {
@@ -77,6 +80,31 @@
 				return false;
 			});
 		}
+		
+		// Adding Bookshelves
+		
+		$("form#new-bookshelf-form").submit(function() {
+			
+			var form = $(this);
+			
+			form.find().attr('disabled', 'disabled');
+			
+			$.post('{% url api_insert_bookshelf %}', form.serialize(), function(data) {
+				if (data.meta.success == true) {
+					var name = data.bookshelf.name;
+					var description = data.bookshelf.description;
+					var url = data.bookshelf.url;
+					$("ul#bookshelf-list").append('<li><a href="' + url + '">' + name + '</a></li>');
+				} else if(data.meta.success == false) {
+					alert(data.meta.error);
+				}
+			}, "json");
+			
+			form.find().attr('disabled', '');
+			form.find(':input').val('');
+			
+			return false;
+		});
 	});
 </script>
 {% endblock %}
@@ -90,7 +118,7 @@
 			<div class="editable">
 				<p id="description" class="detail">{{ library.description }}</p>
 			</div>
-			<ul>
+			<ul id="bookshelf-list">
 				<li><a href="{{ library.get_absolute_url }}{{ unsorted_bin.slug }}/">{{ unsorted_bin.slug }}</a></li>
 				{% for bookshelf in library.children.all %}
 					<li><a href="{{ bookshelf.get_absolute_url }}">{{ bookshelf.name }}</a></li>
@@ -102,15 +130,15 @@
 	<div class="section">
 		<div class="inner">
 			<h3>Create a new <span class="bookshelf">Bookshelf</span></h3>
-			<form class="jqtransform"  method="post">
+			<form id="new-bookshelf-form" action="" method="post" class="jqtransform">
+				<input type="hidden" name="parent" value="{{ library.pk }}" />
 				<div class="rowElem">
-					<input type="text" />
+					{{ form.name }}
 				</div>
 				<div class="rowElem">
 					<input type="submit" value="Create" />
 				</div>
-			</form>
-			
+			</form>			
 			<h3>Add a <span class="book">Book</span> to this Bookshelf</h3>
 			<p>Click <a href="#">here</a></p>
 		</div>

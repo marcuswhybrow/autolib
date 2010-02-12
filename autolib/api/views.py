@@ -10,7 +10,7 @@ from libraries.models import Collection
 
 from books.models import BookProfile
 
-import utils
+import api.utils
 import re
 
 from django.http import HttpResponse
@@ -488,12 +488,17 @@ from datetime import datetime
 
 from books.models import Book, BookProfile
 
+from base.models import Update
+
 from django.db.models import Q
+
+from django.core import serializers
+import simplejson
 
 def sync_update(request):
 	
-	objects = {'success': False}
-	object_lists = {}
+	
+	json = {'success': False}
 	
 	token_id = request.GET.get('token_id', None) or request.GET.get('t', None)
 	last_sync = request.GET.get('last_sync', None)
@@ -509,104 +514,72 @@ def sync_update(request):
 			
 			try:
 				time = utils.parseDateTime(last_sync)
-					
-				object_lists['libraries'] = []
-			
-				for library in user.libraries.filter(last_modified__gte=time):
-					object_lists['libraries'].append({
-						'id': library.pk,
-						'name': library.name,
-						'description': library.description,
-						'url': library.get_absolute_url(),
-						'added': str(library.added),
-						'last_modified': str(library.last_modified),
-						'owner_id': library.owner.pk,
-					})
 				
-# 				if not len(object_lists['libraries']):
-# 					del object_lists['libraries']
+				updates = Update.objects.filter(user=user, time__gte=last_sync).order_by('-time')
 				
-				object_lists['bookshelves'] = []
+				delete = {}
+				update = {}
+				insert = {}
 				
-				for bookshelf in Collection.objects.filter(parent__owner=user, last_modified__gte=time, collection_type='bookshelf'):
-					object_lists['bookshelves'].append({
-						'id': bookshelf.pk,
-						'name': bookshelf.name,
-						'description': bookshelf.description,
-						'url': bookshelf.get_absolute_url(),
-						'added': str(bookshelf.added),
-						'last_modified': str(bookshelf.last_modified),
-						'parent_id': bookshelf.parent.pk,
-					})
-				
-# 				if not len(object_lists['bookshelves']):
-# 					del object_lists['bookshelves']
-				
-				object_lists['series'] = []
-				
-				for series in Collection.objects.filter(parent__parent__owner=user, last_modified__gte=time, collection_type='series'):
-					object_lists['series'].append({
-						'id': series.pk,
-						'name': series.name,
-						'description': series.description,
-						'added': str(series.added),
-						'last_modified': str(series.last_modified),
-						'parent_id': series.parent.pk,
-					})
-				
-# 				if not len(object_lists['series']):
-# 					del object_lists['series']
-				
-				object_lists['books'] = []
-				
-				for book in Book.objects.filter(last_modified__gte=time):
-					object_lists['books'].append({
-						'isbn': book.isbn,
-						'title': book.title,
-						'description': book.description,
-						'added': str(series.added),
-						'last_modified': str(series.last_modified),
-						'author': book.author,
-						'publisher': book.publisher,
-						'published_date': book.published,
-					})
-				
-# 				if not len(object_lists['books']):
-# 					del object_lists['books']
-				
-				object_lists['profiles'] = []
-				
-				for profile in BookProfile.objects.filter(\
-				Q(last_modified__gte=time) & ( \
-				Q(collection__owner=user) | \
-				Q(collection__parent__owner=user) | \
-				Q(collection__parent__parent__owner=user)) ):	
+				for u in updates:
+					if u.action == 'delete':
+						delete[u.uuid] = u
+					elif u.action == 'update':
+						if u.uuid not in delete:
+							update[u.uuid] = u
+					elif u.action == 'insert':
+						try:
+							del delete[u.uuid]
+						except KeyError:
+							try:
+								del update[u.uuid]
+							except KeyError:
+								pass
+							insert[u.uuid] = u
 							
-					object_lists['profiles'].append({
-						'book_instance': profile.book_instance.pk,
-						'collection_id': profile.collection.pk,
-						'added': profile.added,
-						'last_modified': profile.last_modified,
+				print delete
+				print update
+				print insert
+				
+				json['delete'] = []
+				object_list = []
+				
+				for uuid,d in delete.items():
+					json['delete'].append({
+						'uuid': uuid,
+						'object': d.object_type.split('.')[1],
+						'time': str(d.time),
 					})
 				
-# 				if not len(object_lists['profiles']):
-# 					del object_lists['profiles']
+				for uuid,u in update.items():
+					object_list.append(u.get_object())
 				
-				objects['sync_time'] = str(datetime.now())
-				objects['success'] = True
+				json['update'] = simplejson.loads(serializers.serialize("json", object_list))
+				
+				object_list = []
+				for uuid,i in insert.items():
+					object_list.append(i.get_object())
+				
+				json['insert'] = simplejson.loads(serializers.serialize("json", object_list))
+				
+				json['sync_time'] = str(datetime.now())
+				json['success'] = True
+
 			except ValueError:
-				objects['error'] = "last_sync was not in the format YYYY-MM-DD HH:MM:SS"
+				json['error'] = "last_sync was not in the format YYYY-MM-DD HH:MM:SS"
 			
 		else:
-			objects['error'] = "last_sync time not found"
+			json['error'] = "last_sync time not found"
 			
 	else:
-		objects['error'] = "Invalid token"
+		json['error'] = "Invalid token"
+	
+	return HttpResponse(simplejson.dumps(json), mimetype='application/json')
 		
-	return render_to_response('api/serialiser.html',{
-		'object_lists': object_lists,
-		'objects': objects,
-	}, mimetype='application/json')
+# 	return render_to_response('api/serialiser.html',{
+# 		'object_lists': object_lists,
+# 		'objects': objects,
+# 	}, mimetype='application/json')
 
 
 ### ----------

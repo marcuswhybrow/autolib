@@ -42,16 +42,17 @@ def library_list(request, username, template_name):
 @CurrentUser
 @login_required
 def library_detail(request, username, library_name):
-	library = get_object_or_404(request.user.libraries, name=unquote_plus(library_name))
+	library = get_object_or_404(request.user.libraries, slug=library_name)
 	return render_to_response('users/library_detail.html', {
 		'user_detail': User.objects.get(username=username),
 		'library': library,
+		'form': CreateCollectionForm(),
 	}, context_instance=RequestContext(request))
 
 @CurrentUser
 @login_required
 def bookshelf_detail(request, username, library_name, bookshelf_name):
-	library = get_object_or_404(request.user.libraries, name=unquote_plus(library_name))
+	library = get_object_or_404(request.user.libraries, slug=library_name)
 	
 	# If the bookshelf is the unsorted bin, there is no collection object,
 	# otherwise get the appropriate collection.
@@ -60,9 +61,9 @@ def bookshelf_detail(request, username, library_name, bookshelf_name):
 		bookshelf_new_name = Config.objects.get(key='unsorted_bin').value
 		bookshelf_slug = Config.objects.get(key='unsorted_bin').slug
 	else:
-		bookshelf = get_object_or_404(library.children, name=unquote_plus(bookshelf_name))
+		bookshelf = get_object_or_404(library.children, slug=bookshelf_name)
 		bookshelf_new_name = bookshelf.name
-		bookshelf_slug = bookshelf.get_slug()
+		bookshelf_slug = bookshelf.slug
 	
 	# Return the library and the bookshelf.
 	return render_to_response('users/bookshelf_detail.html', {
@@ -74,7 +75,7 @@ def bookshelf_detail(request, username, library_name, bookshelf_name):
 @CurrentUser
 @login_required
 def book_detail(request, username, library_name, bookshelf_name, book_isbn, book_title=None):
-	library = get_object_or_404(Collection, name=unquote_plus(library_name), owner=request.user)
+	library = get_object_or_404(Collection, slug=library_name, owner=request.user)
 	
 	if bookshelf_name == Config.objects.get(key='unsorted_bin').slug:
 		bookshelf = None
@@ -84,10 +85,10 @@ def book_detail(request, username, library_name, bookshelf_name, book_isbn, book
 	else:
 		bookshelf = get_object_or_404(library.children, name=unquote_plus(bookshelf_name))
 		bookshelf_new_name = bookshelf.name
-		bookshelf_slug = bookshelf.get_slug()
+		bookshelf_slug = bookshelf.slug
 		book = get_object_or_404(bookshelf.books, book_instance=Book.objects.get(isbn=book_isbn), collection=bookshelf)
 		
-	real_book_title = book.get_slug()
+	real_book_title = book.slug
 	if real_book_title != book_title:
 		return HttpResponseRedirect(reverse('users.views.book_detail', args=[
 			username, 

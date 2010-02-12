@@ -13,10 +13,11 @@ import re
 ### Book Model ###
 ##################
 
-from base.models import Syncable
+from base.models import UUIDSyncable
 
-class Book(Syncable):
-	isbn = models.IntegerField(primary_key=True)
+class Book(UUIDSyncable):
+	
+	isbn = models.IntegerField(db_index=True)
 	title = models.CharField(max_length=200)
 	description = models.TextField()
 	author = models.CharField(max_length=200)
@@ -33,33 +34,39 @@ class Book(Syncable):
 	@permalink
 	def get_absolute_url(self):
 		return ('books.views.book_detail', [self.isbn])
+	
+	def get_owner(self):
+		return None
 
-class BookProfile(Syncable):
+class BookProfile(UUIDSyncable):
 	book_instance = models.ForeignKey(Book, related_name='instances')
 	collection = models.ForeignKey(Collection, related_name='books')
+	
+	class Meta:
+		unique_together = ('book_instance', 'collection')
 	
 	def __unicode__(self):
 		return '[BookProfile] %s' % self.book_instance.isbn
 	
-	def get_slug(self):
+	def slug(self):
 		return re.sub('\ ', '-', re.sub('[^a-zA-Z0-9\ \-\_]', '', self.book_instance.title))
 	
 	@permalink
 	def get_absolute_url(self):
 		if self.collection.collection_type == 'library':
 			bookshelf = Config.objects.get(key='unsorted_bin').slug
-			library = self.collection.get_slug()
+			library = self.collection.slug
 			username = self.collection.owner.username
 		elif self.collection.collection_type == 'bookshelf':
-			bookshelf = self.collection.get_slug()
-			library = self.collection.parent.get_slug()
+			bookshelf = self.collection.slug
+			library = self.collection.parent.slug
 			username = self.collection.parent.owner.username
 		elif self.collection.collection_type == 'series':
-			bookshelf = self.collection.parent.get_slug()
-			library = self.collection.parent.parent.get_slug()
+			bookshelf = self.collection.parent.slug
+			library = self.collection.parent.parent.slug
 			username = self.collection.parent.parent.owner.username
 		
-		return ('users.views.book_detail', [username, library, bookshelf, self.book_instance.isbn, self.get_slug()])
+		return ('users.views.book_detail', [username, library, bookshelf, self.book_instance.isbn, self.slug])
 	
 	def isbn(self):
 		return self.book_instance.isbn
@@ -78,6 +85,16 @@ class BookProfile(Syncable):
 	
 	def published(self):
 		return self.book_instance.published
+	
+	def get_owner(self):
+		if self.collection.collection_type == 'library':
+			return self.collection.owner
+		elif self.collection.collection_type == 'bookshelf':
+			return self.collection.parent.owner
+		elif self.collection.collection_type == 'series':
+			return self.collection.parent.parent.owner
+		else:
+			return None
 		
 #############
 ### Forms ###

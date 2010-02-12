@@ -3,18 +3,126 @@
 {% block breadcrumbs %}
 	{{ block.super }}
 	{% if bookshelf %}
-		<li class="bookshelf"> > <a href="{% url bookshelf_detail user_detail.username, library.get_slug, bookshelf.name %}">{{ bookshelf.name }}</a></li>
+		<li class="bookshelf"> > <a href="{% url bookshelf_detail user_detail.username, library.slug, bookshelf.name %}">{{ bookshelf.name }}</a></li>
 	{% else %}
-		<li class="bookshelf"> > <a href="{% url library_detail user_detail.username, library.get_slug %}{{ unsorted_bin.slug }}/">{{ unsorted_bin.value }}</a></li>
+		<li class="bookshelf"> > <a href="{% url library_detail user_detail.username, library.slug %}{{ unsorted_bin.slug }}/">{{ unsorted_bin.value }}</a></li>
 	{% endif %}
+{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/media/js/jqtransform/jqtransform.css" />
+<script type="text/javascript" src="/media/js/jqtransform/jquery.jqtransform.js"></script>
+<script type="text/javascript">
+	$(function() {
+		// Find all the forms with the class of jqtransform and then apply the plugin
+		$("form.jqtransform").jqTransform();
+		
+		// Editing Details
+		
+		$("div.editable .detail").hover(function() {
+			$(this).addClass('edit');
+		}, function() {
+			$(this).removeClass('edit');
+		});
+				
+		$("div.editable .detail").click(editClick);
+		
+		function editClick() {
+			var detail = $(this);
+			var box = detail.parent();
+
+			box.html('<form></form>');			
+			var form = box.find('form');
+			
+			form.html('<input class="focus ' + detail[0].tagName + '" type="text" id="' + detail.attr('id') + '" name="' + detail.attr('id') + '" value="' + detail.text() + '" />' + 
+					  '<input type="hidden" id="library_id" name="library_id" value="{{ library.pk }}" />' +
+					  '<input type="submit" value="submit" />' +
+					  '<input type="button" value="cancel" />');
+			
+			form.find(':first').focus();
+			
+			var cancel = form.find(':button');
+			
+			cancel.click(function() {
+				detail.hover(function() {
+					$(this).addClass('edit');
+				}, function() {
+					$(this).removeClass('edit');
+				});
+				detail.click(editClick);
+				box.html(detail);
+			});
+					  
+			form.submit(function() {
+				
+				var form = $(this);
+				
+				$.post('{% url api_update_bookshelf %}', form.serialize(), function(data) {
+					if (data.meta.success == true) {
+						alert('works');
+						var name = data.bookshelf.name;
+						var description = data.bookshelf.description;
+						
+						if (name) {
+							detail.text(name);
+						} else if (description) {
+							detail.text(description);
+						}
+						
+					} else if(data.meta.success == false) {
+						var error = data.meta.error;
+						alert(error);
+					}
+				}, "json");
+				detail.hover(function() {
+					$(this).addClass('edit');
+				}, function() {
+					$(this).removeClass('edit');;
+				});
+				detail.click(editClick);
+				box.html(detail);
+				return false;
+			});
+		}
+		
+		// Adding Bookshelves
+		
+		$("form#new-bookshelf-form").submit(function() {
+			
+			var form = $(this);
+			
+			form.find().attr('disabled', 'disabled');
+			
+			$.post('{% url api_insert_bookshelf %}', form.serialize(), function(data) {
+				if (data.meta.success == true) {
+					var name = data.bookshelf.name;
+					var description = data.bookshelf.description;
+					var url = data.bookshelf.url;
+					$("ul#bookshelf-list").append('<li><a href="' + url + '">' + name + '</a></li>');
+				} else if(data.meta.success == false) {
+					alert(data.meta.error);
+				}
+			}, "json");
+			
+			form.find().attr('disabled', '');
+			form.find(':input').val('');
+			
+			return false;
+		});
+	});
+</script>
 {% endblock %}
 
 {% block content %}
 	<div class="section">
 		<div class="inner">
 			{% if bookshelf %}
-				<h2>{{ bookshelf.name }}</h2>
-				<p>{{ bookshelf.description }}</p>
+				<div class="editable">
+					<h2 id="name" class="detail">{{ bookshelf.name }}</h2>
+				</div>
+				<div class="editable">
+					<p id="description" class="detail">{{ bookshelf.description }}</p>
+				</div>
 				{% if bookshelf.books.all %}
 					<ul>
 						{% for book in bookshelf.books.all %}

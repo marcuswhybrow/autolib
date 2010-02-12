@@ -20,14 +20,13 @@
 			form.find().attr('disabled', 'disabled');
 			
 			$.post('{% url api_insert_library %}', form.serialize(), function(data) {
-				if (data.success == 'True') {
-					var name = data.name;
-					var description = data.description;
-					var url = data.url;
+				if (data.meta.success == true) {
+					var name = data.library.name;
+					var description = data.library.description;
+					var url = data.library.url;
 					$("ul#library-list").append('<li><a href="' + url + '">' + name + '</a></li>');
-				} else if(data.success == 'False') {
-					var error = data.error;
-					alert(error);
+				} else if(data.meta.success == false) {
+					alert(data.meta.error);
 				}
 			}, "json");
 			
