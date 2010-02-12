@@ -43,7 +43,7 @@ def update_library(request):
 	
 	if user and user.is_authenticated():
 		
-		if library_id is not None:
+		if library_pk is not None:
 		
 			try:
 				library = Collection.objects.get(pk=library_pk, collection_type='library', owner=user)
@@ -107,7 +107,7 @@ def update_bookshelf(request):
 	
 	if user and user.is_authenticated():
 		
-		if library_id is not None:
+		if bookshelf_pk is not None:
 		
 			try:
 				bookshelf = Collection.objects.get(pk=bookshelf_pk, collection_type='bookshelf', parent__owner=user)
