@@ -33,7 +33,7 @@ import simplejson
 def sync_update(request):
 	
 	
-	json = {'success': False}
+	data = {'meta': {'success': False}}
 	
 	token_id = request.GET.get('token_id', None) or request.GET.get('t', None)
 	last_sync = request.GET.get('last_sync', None)
@@ -76,11 +76,11 @@ def sync_update(request):
 				print update
 				print insert
 				
-				json['delete'] = []
+				data['delete'] = []
 				object_list = []
 				
 				for uuid,d in delete.items():
-					json['delete'].append({
+					data['delete'].append({
 						'uuid': uuid,
 						'object': d.object_type.split('.')[1],
 						'time': str(d.time),
@@ -89,7 +89,7 @@ def sync_update(request):
 				for uuid,u in update.items():
 					object_list.append(u.get_object())
 				
-				json['update'] = simplejson.loads(serializers.serialize("json", object_list))
+				data['update'] = simplejson.loads(serializers.serialize("json", object_list))
 				
 				for obj in json['update']:
 					obj['model'] = obj['model'].split('.')[1]
@@ -102,7 +102,7 @@ def sync_update(request):
 				for uuid,i in insert.items():
 					object_list.append(i.get_object())
 				
-				json['insert'] = simplejson.loads(serializers.serialize("json", object_list))
+				data['insert'] = simplejson.loads(serializers.serialize("json", object_list))
 				
 				for obj in json['insert']:
 					obj['model'] = obj['model'].split('.')[1]
@@ -111,16 +111,16 @@ def sync_update(request):
 					except KeyError:
 						pass
 				
-				json['sync_time'] = str(datetime.now())
-				json['success'] = True
+				data['sync_time'] = str(datetime.now())
+				data['success'] = True
 
 			except ValueError:
-				json['error'] = "last_sync was not in the format YYYY-MM-DD HH:MM:SS"
+				data['error'] = "last_sync was not in the format YYYY-MM-DD HH:MM:SS"
 			
 		else:
-			json['error'] = "last_sync time not found"
+			data['error'] = "last_sync time not found"
 			
 	else:
-		json['error'] = "Invalid token"
+		data['error'] = "Invalid token"
 	
-	return HttpResponse(simplejson.dumps(json), mimetype='application/json')
+	return HttpResponse(simplejson.dumps(data), mimetype='application/json')

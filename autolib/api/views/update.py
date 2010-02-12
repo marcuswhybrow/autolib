@@ -26,9 +26,8 @@ def update_library(request):
 		- Description
 	"""
 	
-	data = {}
-	data['meta']['success'] = False
-	
+	data = {'meta': {'success': False}}
+		
 	token_id = request.POST.get('token_id', None) or request.POST.get('t', None)
 	library_pk = request.POST.get('library_pk', None) or request.POST.get('pk', None)
 	
@@ -82,6 +81,8 @@ def update_library(request):
 	
 	return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
+
+
 def update_bookshelf(request):
 	"""
 	Update an existing Bookshelf Collection's following attributes:
@@ -89,8 +90,7 @@ def update_bookshelf(request):
 		- Description
 	"""
 	
-	data = {}
-	data['meta']['success'] = False
+	data = {'meta': {'success': False}}
 	
 	token_id = request.POST.get('token_id', None) or request.POST.get('t', None)
 	bookshelf_pk = request.POST.get('bookshelf_pk', None) or request.POST.get('pk', None)
@@ -144,6 +144,8 @@ def update_bookshelf(request):
 		data['meta']['error'] = "Invalid token"
 	
 	return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+
+
 	
 def update_series(request):
 	pass

@@ -26,9 +26,7 @@ from django.db import IntegrityError
 
 def insert_library(request):
 	
-	data = {}
-	
-	data['meta'] = {'success': False}
+	data = {'meta': {'success': False}}
 	
 	token_id = request.GET.get('token_id', None) or request.GET.get('t', None)
 	
@@ -71,9 +69,7 @@ def insert_library(request):
 	
 def insert_bookshelf(request):
 	
-	data = {}
-	
-	data['meta'] = {'success': False}
+	data = {'meta': {'success': False}}
 	
 	token_id = request.GET.get('token_id', None) or request.GET.get('t', None)
 	parent_pk = request.POST.get('parent', None) or request.GET.get('p', None)
@@ -131,9 +127,7 @@ def insert_bookshelf(request):
 
 def insert_series(request):
 	
-	data = {}
-	
-	data['meta'] = {'success': False}
+	data = {'meta': {'success': False}}
 	
 	token_id = request.GET.get('token_id', None) or request.GET.get('t', None)
 	parent_pk = request.POST.get('parent', None) or request.GET.get('p', None)

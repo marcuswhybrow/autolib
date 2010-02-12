@@ -55,9 +55,7 @@ def get_library_detail(request):
 	Gets details regarding a single library, which must be owned by the current request.user (or user token)
 	"""
 	
-	data = {}
-	data['meta'] = {}
-	data['meta']['success'] = False
+	data = {'meta': {'success': False}}
 	
 	token_id = request.GET.get('token_id', None) or request.GET.get('t', None)
 	library_pk = request.GET.get('library_pk', None) or request.GET.get('pk', None)
@@ -102,9 +100,7 @@ def get_bookshelf_list(request):
 	such that the library must be owned by the current request.user (or request token)
 	"""
 	
-	data = {}
-	data['meta'] = {}
-	data['meta']['success'] = False
+	data = {'meta': {'success': False}}
 	
 	token_id = request.GET.get('token_id', None) or request.GET.get('t', None)
 	library_pk = request.GET.get('library_pk', None) or request.GET.get('pk', None)
@@ -315,12 +311,12 @@ def get_collection_book_profile_list(request):
 	
 	return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
-def get_book_profile_detail(request, book_profile_id):
+def get_book_profile_detail(request):
 	
-	objects = {'success': False}
-	object_lists = {}
+	data = {'meta': {'success': False}}
 	
 	token_id = request.GET.get('token_id', None) or request.GET.get('t', None)
+	profile_pk = request.GET.get('profile_pk', None) or request.GET.get('pk', None)
 	
 	if token_id is not None:
 		user = utils.get_user_from_token(token_id)
@@ -329,30 +325,29 @@ def get_book_profile_detail(request, book_profile_id):
 	
 	if user and user.is_authenticated():
 		
-		try:
-			profile = BookProfile.objects.get(pk=book_profile_id)
-			
-			if profile.collection.get_owner() == user:
+		if profile_pk is not None:
+		
+			try:
+				profile = BookProfile.objects.get(Q(pk=profile_pk) & (Q(collection__owner=user) | Q(collection__parent__owner=user) | Q(collection__parent__parent__owner=user)))
 				
-				objects['isbn'] = profile.book_instance.isbn
-				objects['title'] = profile.book_instance.title
-				objects['description'] = profile.book_instance.description
-				objects['author'] = profile.book_instance.author
-				objects['publisher'] = profile.book_instance.publisher
-				objects['published'] = profile.book_instance.published
-				
-				objects['success'] = True
-				
-			else:
-				objects['error'] = "You do not have permission to access this BookProfile"
-							
-		except BookProfile.DoesNotExist:
-			objects['error'] = "BookProfile with that ID not found"
+				data['profile'] = {
+					'pk': profile.book_instance.pk,
+					'isbn': profile.book_instance.isbn,
+					'title': profile.book_instance.title,
+					'author': profile.book_instance.author,
+					'published': profile.book_instance.published,
+					'publisher': profile.book_instance.publisher,
+					'description': profile.book_instance.description,
+				}
+				data['meta']['success'] = True
+						
+			except BookProfile.DoesNotExist:
+				data['meta']['error'] = "BookProfile with that primary key does not exist, for this user"
+		
+		else:
+			data['meta']['error'] = "profile_pk not found"
 		
 	else:
-		objects['error'] = "Invalid token"
+		data['meta']['error'] = "Invalid token"
 	
-	return render_to_response('api/serialiser.html',{
-		'object_lists': object_lists,
-		'objects': objects,
-	}, mimetype='application/json')
+	return HttpResponse(simplejson.dumps(data), mimetype='application/json')
