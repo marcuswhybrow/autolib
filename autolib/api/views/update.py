@@ -48,27 +48,23 @@ def update_library(request):
 			try:
 				library = Collection.objects.get(pk=library_pk, collection_type='library', owner=user)
 				
-				data['library'] = []
+				data['library'] = {}
+
+				if name is not None:
+					if re.match('^[a-zA-Z0-9\ \-\_]*$', name):
+						library.name = name
+						data['library']['name'] = library.name
+					else:
+						data['meta']['error'] = 'The Library name can only contain the characters: a-z, A-Z, 0-9, spaces, underscores and dashes.'
+						error = True
 				
-				try:
-					if name is not None:
-						if re.match('^[a-zA-Z0-9\ \-\_]*$', name):
-							library.name = name
-							data['library']['name'] = library.name
-						else:
-							data['meta']['error'] = 'The Library name can only contain the characters: a-z, A-Z, 0-9, spaces, underscores and dashes.'
-							error = True
-					
-					if description is not None:
-						library.description = description
-						data['library']['description'] = library.description
-					
-					if not error:
-						library.save()
-						data['meta']['success'] = True
-					
-				except forms.ValidationError:
-					data['meta']['error'] = "Validation Error"
+				if description is not None:
+					library.description = description
+					data['library']['description'] = library.description
+				
+				if not error:
+					library.save()
+					data['meta']['success'] = True
 				
 			except Collection.DoesNotExist:
 				data['meta']['error'] = "A Library with that pk does not exist"
