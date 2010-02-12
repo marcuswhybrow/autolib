@@ -31,7 +31,7 @@
 			var form = box.find('form');
 			
 			form.html('<input class="focus ' + detail[0].tagName + '" type="text" id="' + detail.attr('id') + '" name="' + detail.attr('id') + '" value="' + detail.text() + '" />' + 
-					  '<input type="hidden" id="library_id" name="library_id" value="{{ library.pk }}" />' +
+					  '<input type="hidden" id="library_pk" name="library_pk" value="{{ library.pk }}" />' +
 					  '<input type="submit" value="submit" />' +
 					  '<input type="button" value="cancel" />');
 			
@@ -54,9 +54,7 @@
 				var form = $(this);
 				
 				$.post('{% url api_update_library %}', form.serialize(), function(data) {
-					alert('posted');
 					if (data.meta.success == true) {
-						alert('worked');
 						var name = data.library.name;
 						var description = data.library.description;
 						
@@ -131,7 +129,7 @@
 		<div class="inner">
 			<h3>Create a new <span class="bookshelf">Bookshelf</span></h3>
 			<form id="new-bookshelf-form" action="" method="post" class="jqtransform">
-				<input type="hidden" name="parent" value="{{ library.pk }}" />
+				<input type="hidden" name="parent" id="parent" value="{{ library.pk }}" />
 				<div class="rowElem">
 					{{ form.name }}
 				</div>
