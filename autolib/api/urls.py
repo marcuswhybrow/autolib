@@ -14,8 +14,8 @@ getpatterns = patterns('api.views.get',
 	url(r'^series/$', 'get_series_list', name='api_get_series_list'),
 	url(r'^series_detail/$', 'get_series_detail', name='api_get_series_detail'),
 	
-	url(r'^bookprofiles/$', 'get_collection_book_profile_list', name='api_get_collection_book_profile_list'),
-	url(r'^bookprofile_detail/$', 'get_book_profile_detail', name='api_get_book_profile_detail'),
+	url(r'^profiles/$', 'get_profile_list', name='api_get_profile_list'),
+	url(r'^profile_detail/$', 'get_profile_detail', name='api_get_profile_detail'),
 )
 
 insertpatterns = patterns('api.views.insert',
@@ -24,7 +24,7 @@ insertpatterns = patterns('api.views.insert',
 	url(r'^bookshelf/$', 'insert_bookshelf', name='api_insert_bookshelf'),	
 	url(r'^series/$', 'insert_series', name='api_insert_series'),
 	
-	url(r'^book/$', 'insert_book', name='api_insert_book'),
+	url(r'^profile/$', 'insert_profile', name='api_insert_profile'),
 )
 
 updatepatterns = patterns('api.views.update',
@@ -33,7 +33,7 @@ updatepatterns = patterns('api.views.update',
 	url(r'^bookshelf/$', 'update_bookshelf', name='api_update_bookshelf'),	
 	url(r'^series/$', 'update_series', name='api_update_series'),
 	
-# 	url(r'^book/$', 'update_room', name='api_insert_book'),
+	url(r'^profile/$', 'update_profile', name='api_update_profile'),
 )
 
 authpatterns = patterns('api.views.auth',

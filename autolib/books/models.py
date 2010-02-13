@@ -17,7 +17,7 @@ from base.models import UUIDSyncable
 
 class Book(UUIDSyncable):
 	
-	isbn = models.IntegerField(db_index=True)
+	isbn = models.IntegerField(db_index=True, unique=True, editable=False)
 	title = models.CharField(max_length=200)
 	description = models.TextField()
 	author = models.CharField(max_length=200)
@@ -104,4 +104,9 @@ class BookForm(forms.ModelForm):
 	
 	class Meta:
 		model = Book
+
+class BookProfileForm(forms.ModelForm):
+	
+	class Meta:
+		model = BookProfile
 	

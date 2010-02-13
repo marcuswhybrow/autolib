@@ -24,11 +24,20 @@ import simplejson
 
 from django.db import IntegrityError
 
+# Library
+
 def insert_library(request):
+	"""
+	Insert a new Library Collection into the database for this user,
+	collection_type and owner are assigned automatically, but the following can be specified:
+		- name (Derived slug must be unique with collection_type and owner)
+		- description (May be NULL)
+	Accepts all arguments as POST data.
+	"""
 	
 	data = {'meta': {'success': False}}
 	
-	token_id = request.GET.get('token_id', None) or request.GET.get('t', None)
+	token_id = request.POST.get('token_id', None) or request.POST.get('t', None)
 	
 	if token_id is not None:
 		user = utils.get_user_from_token(token_id)
@@ -66,13 +75,23 @@ def insert_library(request):
 		data['meta']['error'] = "Invalid token"
 	
 	return HttpResponse(simplejson.dumps(data), mimetype='application/json')
-	
+
+# Bookshelf
+
 def insert_bookshelf(request):
+	"""
+	Insert a new Bookshelf Collection into the database for this user,
+	collection_type is assigned automatically, but the following can be specified:
+		- name (Derived slug must be unique with collection_type and parent_pk)
+		- parent_pk (Must be unique with collection_type and slug)
+		- description (May be NULL)
+	Accepts all arguments as POST data.
+	"""
 	
 	data = {'meta': {'success': False}}
 	
-	token_id = request.GET.get('token_id', None) or request.GET.get('t', None)
-	parent_pk = request.POST.get('parent', None) or request.GET.get('p', None)
+	token_id = request.POST.get('token_id', None) or request.POST.get('t', None)
+	parent_pk = request.POST.get('parent_pk', None) or request.POST.get('pk', None)
 	
 	if token_id is not None:
 		user = utils.get_user_from_token(token_id)
@@ -125,12 +144,22 @@ def insert_bookshelf(request):
 	
 	return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
+# Series
+
 def insert_series(request):
+	"""
+	Insert a new Series Collection into the database for this user,
+	collection_type is assigned automatically, but the following can be specified:
+		- name (Derived slug must be unique with collection_type and parent_pk)
+		- parent_pk (Must be unique with collection_type and slug)
+		- description (May be NULL)
+	Accepts all arguments as POST data.
+	"""
 	
 	data = {'meta': {'success': False}}
 	
-	token_id = request.GET.get('token_id', None) or request.GET.get('t', None)
-	parent_pk = request.POST.get('parent', None) or request.GET.get('p', None)
+	token_id = request.POST.get('token_id', None) or request.POST.get('t', None)
+	parent_pk = request.POST.get('parent_pk', None) or request.POST.get('pk', None)
 	
 	if token_id is not None:
 		user = utils.get_user_from_token(token_id)
@@ -182,5 +211,54 @@ def insert_series(request):
 	
 	return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
-def insert_book(request):
-	pass
+def insert_profile(request):
+	
+	data = {'meta': {'success': False}}
+	
+	token_id = request.POST.get('token_id', None) or request.POST.get('t', None)
+	collection_pk = request.POST.get('collection_pk', None)
+	book_pk = request.POST.get('book_pk', None)
+	
+	if token_id is not None:
+		user = utils.get_user_from_token(token_id)
+	else:
+		user = request.user
+	
+	if user and user.is_authenticated():
+		
+		if collection_pk is not None:
+			
+			if book_pk is not None:
+				
+				try:
+					
+					collection = Collection.objects.get(Q(pk=collection_pk) & (Q(owner=user) | Q(parent__owner=user) | Q(parent__parent__owner=user)))
+			
+					try:
+						
+						book = Book.objects.get(pk=book_pk)
+						
+						try:
+						
+							BookProfile(book_instance=book, collection=collection).save()
+							data['meta']['success'] = True
+							
+						except IntegrityError:
+							data['meta']['error'] = "BookProfile could not be created"
+						
+					except Book.DoesNotExist:
+						data['meta']['error'] = "A Book with that pk was not found"
+				
+				except Collection.DoesNotExist:
+					data['meta']['error'] = "A Collection with that pk does not exist for this user"
+			
+			else:
+				data['meta']['error'] = "book_pk was not found"
+		
+		else:
+			data['meta']['error'] = "collection_pk was not found"
+		
+	else:
+		data['meta']['error'] = "Invalid token"
+	
+	return HttpResponse(simplejson.dumps(data), mimetype='application/json')

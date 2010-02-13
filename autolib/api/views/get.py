@@ -50,6 +50,7 @@ def get_library_list(request):
 	
 	return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
+
 def get_library_detail(request):
 	"""
 	Gets details regarding a single library, which must be owned by the current request.user (or user token)
@@ -226,6 +227,7 @@ def get_series_list(request):
 	
 	return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 	
+
 def get_series_detail(request):
 	"""
 	Gets details regarding a single series, such that the parent bookshelves parent library
@@ -273,7 +275,7 @@ def get_series_detail(request):
 
 from django.db.models import Q
 
-def get_collection_book_profile_list(request):
+def get_profile_list(request):
 	
 	data = {'meta': {'success': False}}
 	
@@ -311,7 +313,7 @@ def get_collection_book_profile_list(request):
 	
 	return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
-def get_book_profile_detail(request):
+def get_profile_detail(request):
 	
 	data = {'meta': {'success': False}}
 	

@@ -67,7 +67,7 @@ def update_library(request):
 					data['meta']['success'] = True
 				
 			except Collection.DoesNotExist:
-				data['meta']['error'] = "A Library with that pk does not exist"
+				data['meta']['error'] = "A Library with that pk does not exist for this user"
 				
 		else:
 			data['meta']['error'] = "library_pk was not found"
@@ -131,7 +131,7 @@ def update_bookshelf(request):
 					data['meta']['error'] = "Validation Error"
 				
 			except Collection.DoesNotExist:
-				data['meta']['error'] = "A Bookshelf with that pk does not exist"
+				data['meta']['error'] = "A Bookshelf with that pk does not exist for this user"
 				
 		else:
 			data['meta']['error'] = "bookshelf_pk was not found"
@@ -142,6 +142,124 @@ def update_bookshelf(request):
 	return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
 
+# Series
 	
 def update_series(request):
-	pass
+	"""
+	Update an existing Series Collection's following attributes:
+		- Name
+		- Description
+	"""
+	
+	data = {'meta': {'success': False}}
+	
+	token_id = request.POST.get('token_id', None) or request.POST.get('t', None)
+	series_pk = request.POST.get('series_pk', None) or request.POST.get('pk', None)
+	
+	name = request.POST.get('name', None) or request.POST.get('n', None)
+	description = request.POST.get('description', None) or request.POST.get('d', None)
+	
+	error = False
+	
+	if token_id is not None:
+		user = utils.get_user_from_token(token_id)
+	else:
+		user = request.user
+	
+	if user and user.is_authenticated():
+		
+		if series_pk is not None:
+		
+			try:
+				series = Collection.objects.get(pk=series_pk, collection_type='series', parent__parent__owner=user)
+				
+				data['series'] = []
+				
+				try:
+					if name is not None:
+						if re.match('^[a-zA-Z0-9\ \-\_]*$', name):
+							series.name = name
+							data['series']['name'] = series.name
+						else:
+							data['meta']['error'] = 'The Bookshelf name can only contain the characters: a-z, A-Z, 0-9, spaces, underscores and dashes.'
+							error = True
+					
+					if description is not None:
+						series.description = description
+						data['series']['description'] = series.description
+					
+					if not error:
+						series.save()
+						data['meta']['success'] = True
+					
+				except forms.ValidationError:
+					data['meta']['error'] = "Validation Error"
+				
+			except Collection.DoesNotExist:
+				data['meta']['error'] = "A Series with that pk does not exist for this user"
+				
+		else:
+			data['meta']['error'] = "series_pk was not found"
+		
+	else:
+		data['meta']['error'] = "Invalid token"
+	
+	return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+
+
+# BookProfile
+
+def update_profile(request):
+	"""
+	Update an existing BookProfile's following attributes:
+		- Collection
+	"""
+	
+	data = {'meta': {'success': False}}
+	
+	token_id = request.POST.get('token_id', None) or request.POST.get('t', None)
+	profile_pk = request.POST.get('profile_pk', None) or request.POST.get('pk', None)
+	
+	collection_pk = request.POST.get('collection_pk', None) or request.POST.get('c_pk', None)
+	
+	if token_id is not None:
+		user = utils.get_user_from_token(token_id)
+	else:
+		user = request.user
+	
+	if user and user.is_authenticated():
+		
+		if profile_pk is not None:
+		
+			try:
+				
+				profile = BookProfile.objects.get(Q(pk=profile_pk) & (Q(collection__owner=user) | Q(collection__parent__owner=user) | Q(collection__parent__parent__owner=user)))
+					
+				if collection_pk is not None:
+					
+					try:
+					
+						collection = Collecion.objects.get(Q(pk=collection_pk) & (Q(owner=user) | Q(parent__owner=user) | Q(parent__parent__owner=user)))
+						
+						profile.collection = collection
+						profile = profile.save()
+						
+						data['profile']['collection'] = profile.collection.pk
+						data['meta']['success'] = True
+					
+					except:
+						data['meta']['error'] = "Collection with that pk does not exists for this user"
+				
+				else:
+					data['meta']['error'] = "collection_pk not found"
+				
+			except BookProfile.DoesNotExist:
+				data['meta']['error'] = "A BookProfile with that pk does not exist for this user"
+				
+		else:
+			data['meta']['error'] = "series_pk was not found"
+		
+	else:
+		data['meta']['error'] = "Invalid token"
+	
+	return HttpResponse(simplejson.dumps(data), mimetype='application/json')
