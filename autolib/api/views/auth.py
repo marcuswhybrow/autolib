@@ -1,13 +1,11 @@
 # api.views.auth
 
 from django.contrib.auth.models import User
-from django.shortcuts import render_to_response
 
 from django.contrib import auth
 from django.contrib.sessions.models import Session
 
 from libraries.models import Collection
-
 from books.models import BookProfile
 
 import api.utils
@@ -17,43 +15,40 @@ from django.http import HttpResponse
 
 from django.core import serializers
 
+import simplejson
+
 def auth_get_token(request):
 	
-	objects = {'success': False}
-	object_lists = {}
+	data = {'meta': {'success': False}}
 	
 	if request.user and request.user.is_authenticated():
-		objects['token_id'] = request.session._get_session_key()
-		objects['success'] = True
+		data['token_id'] = request.session._get_session_key()
+		data['meta']['success'] = True
 	else:
 	
-		username = request.GET.get('username', None) or request.GET.get('u', None)
-		password = request.GET.get('password', None) or request.GET.get('p', None)
+		username = request.POST.get('username', None) or request.POST.get('u', None)
+		password = request.POST.get('password', None) or request.POST.get('p', None)
 		
 		if username is not None and password is not None:
 			user = auth.authenticate(username=username, password=password)
 			if user is not None and user.is_active:
 				auth.login(request, user)
 				
-				objects['token_id'] = request.session._get_session_key()
+				data['token_id'] = request.session._get_session_key()
 				
-				objects['success'] = True
+				data['meta']['success'] = True
 		else:
-			objects['error'] = "Username and Password not supplied"
+			data['meta']['error'] = "Username and Password not supplied"
 	
 	
-	return render_to_response('api/serialiser.html',{
-		'object_lists': object_lists,
-		'objects': objects,
-	}, mimetype='application/json')
+	return HttpResponse(simplejson.dumps(data), mimetype='application/json')
 
 
 def auth_destroy_token(request):
 	
-	objects = {'success': False}
-	object_lists = {}
+	data = {'meta': {'success': False}}
 	
-	token_id = request.GET.get('token_id', None) or request.GET.get('t', None)
+	token_id = request.POST.get('token_id', None) or request.POST.get('t', None)
 	
 	try:
 		if token_id is not None:
@@ -62,16 +57,9 @@ def auth_destroy_token(request):
 			session = Session.objects.get(session_key=request.session._get_session_key())
 		
 		session.delete()
-		objects['success'] = True
+		data['meta']['success'] = True
 			
 	except Session.DoesNotExist:
-		objects['error'] = "Invalid token"
+		data['meta']['error'] = "Invalid token"
 	
-	return render_to_response('api/serialiser.html',{
-		'object_lists': object_lists,
-		'objects': objects,
-	}, mimetype='application/json')
-
-
-def test(request):
-	return HttpResponse('test')
+	return HttpResponse(simplejson.dumps(data), mimetype='application/json')

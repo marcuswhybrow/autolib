@@ -104,7 +104,7 @@ div#header-wrap div#auth-box a      { color: #fff; }
 div#content-wrap                    { width: 100%; }
 
 div#content                         { width: 936px; background-color: #fff; margin: 0 auto; min-height: 350px; -moz-border-radius-topleft: 6px; 
-                                      -moz-border-radius-topright: 6px; -webkit-border-top-left-radius: 6px; -webkit-border-top-right-radius: 6px; }
+                                      -moz-border-radius-topright: 6px; -webkit-border-top-left-radius: 6px; -webkit-border-top-right-radius: 6px; text-align: left; }
 
 /* Sidebar Layout */
 
