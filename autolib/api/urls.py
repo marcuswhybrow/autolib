@@ -47,6 +47,15 @@ syncpatterns = patterns('api.views.sync',
 	url(r'^update/$', 'sync_update', name='api_sync_update')
 )
 
+deletepatterns = patterns('api.views.delete',
+
+	url(r'^library/$', 'delete_library', name='api_delete_library'),
+	url(r'^bookshelf/$', 'delete_bookshelf', name='api_delete_bookshelf'),	
+	url(r'^series/$', 'delete_series', name='api_delete_series'),
+	
+	url(r'^profile/$', 'delete_profile', name='api_delete_profile'),
+)
+
 urlpatterns = patterns('api.views',
 
 	(r'^auth/', include(authpatterns)),
@@ -54,5 +63,6 @@ urlpatterns = patterns('api.views',
 	(r'^insert/', include(insertpatterns)),
 	(r'^update/', include(updatepatterns)),
 	(r'^sync/', include(syncpatterns)),
+	(r'^delete/', include(deletepatterns)),
 
 )

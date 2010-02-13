@@ -8,7 +8,7 @@ import simplejson
 
 # Library
 
-delete_library(request):
+def delete_library(request):
 	
 	data = {'meta': {'success': False}}
 	
@@ -26,14 +26,14 @@ delete_library(request):
 			
 			try:
 				
-				library = Collecion.objects.get(pk=bookshelf_pk, owner=user, collection_type='library')
+				library = Collection.objects.get(pk=library_pk, owner=user, collection_type='library')
 				
 				if not library.children.all():
 					
 					if not library.books.all():
 						
 						data['library'] = {
-							'pk': series.pk
+							'pk': library.pk
 						}
 						library.delete()
 						data['meta']['success'] = True
@@ -42,13 +42,13 @@ delete_library(request):
 						data['meta']['error'] = "This Library cannot be deleted as it contains books"
 					
 				else:
-					data['meta']['error'] = "This Library cannot be deleted as it contains Bookshelves (other that the unsorted bin)"
+					data['meta']['error'] = "This Library cannot be deleted as it contains Bookshelves (other than the unsorted bin)"
 			
 			except Collection.DoesNotExist:
 				data['meta']['error'] = "A Library Collection with that pk does not exist for this user"
 			
 		else:
-			data['meta']['error'] = "bookshelf_pk not found"
+			data['meta']['error'] = "library_pk not found"
 		
 	else:
 		data['meta']['error'] = "Invalid token"
@@ -57,7 +57,7 @@ delete_library(request):
 
 # Bookshelf
 
-delete_bookshelf(request):
+def delete_bookshelf(request):
 	
 	data = {'meta': {'success': False}}
 	
@@ -82,7 +82,7 @@ delete_bookshelf(request):
 					if not bookshelf.books.all():
 						
 						data['bookshelf'] = {
-							'pk': series.pk
+							'pk': bookshelf.pk
 						}
 						bookshelf.delete()
 						data['meta']['success'] = True
@@ -106,7 +106,7 @@ delete_bookshelf(request):
 
 # Series
 
-delete_series(request):
+def delete_series(request):
 	
 	data = {'meta': {'success': False}}
 	
@@ -157,7 +157,7 @@ delete_series(request):
 
 from django.db.models import Q
 
-delete_profile(request):
+def delete_profile(request):
 	
 	data = {'meta': {'success': False}}
 	

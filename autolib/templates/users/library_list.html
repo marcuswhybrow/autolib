@@ -14,6 +14,60 @@
 		//find all the forms with the class of jqtransform and then apply the plugin
 		$("form.jqtransform").jqTransform();
 		
+		function library_hover_over() {
+			$(this).find('span.delete').css('display', 'inline');
+		}
+		
+		function library_hover_out() {
+			$(this).find('span.delete').css('display', 'none');
+		}
+		
+		function library_click_delete() {
+			var library_row = $(this).parent();
+			var library_pk = library_row.attr("id");
+			
+			var delete_library_dialog = $("div#library-delete").dialog({
+				bgiframe: true,
+				resizable: false,
+				modal: true,
+				overlay: {
+					backgroundColor: '#000',
+					opacity: 0.5
+				},
+				buttons: {
+					'Delete': function() {
+						$.get('{% url api_delete_library %}', {library_pk: library_pk}, function(data) {
+							if (data.meta.success == true) {
+								delete_library_dialog.dialog('close');
+								library_row.remove();
+							} else if(data.meta.success == false) {
+								delete_library_dialog.dialog('close');
+								
+								$("div#library-delete-error p.error-message").append(data.meta.error);
+								$("div#library-delete-error").dialog({
+									bgiframe: true,
+									resizable: false,
+									modal: true,
+									overlay: {
+										backgroundColor: '#000',
+										opacity: 0.5
+									},
+									buttons: {
+										Ok: function() {
+											$(this).dialog('close');
+										}
+									}
+								})
+							}
+						}, "json");
+					},
+					Cancel: function() {
+						$(this).dialog('close');
+					}
+				}
+			})
+		}
+		
 		$("form#new-library-form").submit(function() {
 			
 			var form = $(this);
@@ -25,7 +79,12 @@
 					var name = data.library.name;
 					var description = data.library.description;
 					var url = data.library.url;
-					$("ul#library-list").append('<li><a href="' + url + '">' + name + '</a></li>');
+					var pk = data.library.pk;
+					$("ul#library-list").append('<li id="' + pk + '"><a href="' + url + '">' + name + '</a><span class="delete">delete</span></li>');
+					
+					$("#" + pk).hover(library_hover_over, library_hover_out);
+					$("#" + pk + " span.delete").click(library_click_delete);
+					
 				} else if(data.meta.success == false) {
 					alert(data.meta.error);
 				}
@@ -39,17 +98,9 @@
 		
 		$("ul#library-list li").append('<span class="delete">delete</span>');
 		
-		$("ul#library-list li").hover(function() {
-			$(this).find('span.delete').css('display', 'inline');
-		}, function() {
-			$(this).find('span.delete').css('display', 'none');
-		});
+		$("ul#library-list li").hover(library_hover_over, library_hover_out);
 		
-		$("ul#library-list li span.delete").click(function() {
-			var library_pk = $(this).parent().attr("id");
-			
-			$("div#library-delete").dialog()
-		});
+		$("ul#library-list li span.delete").click(library_click_delete);
 	});
 </script>
 {% endblock %}
@@ -89,6 +140,10 @@
 	</div>
 	
 	<div id="library-delete" class="dialog" title="Delete this Library?">
-		<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>This library will be permanently deleted. Are you sure?</p>
+		<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 7px 0;"></span>This library will be permanently deleted. Are you sure?</p>
+	</div>
+	
+	<div id="library-delete-error" class="dialog" title="Problem deleting Library!">
+		<p class="error-message"><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 7px 0;"></span></p>
 	</div>
 {% endblock %}

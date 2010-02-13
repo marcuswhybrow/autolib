@@ -91,7 +91,7 @@ def sync_update(request):
 				
 				data['update'] = simplejson.loads(serializers.serialize("json", object_list))
 				
-				for obj in json['update']:
+				for obj in data['update']:
 					obj['model'] = obj['model'].split('.')[1]
 					try:
 						del obj['fields']['owner']
@@ -104,23 +104,23 @@ def sync_update(request):
 				
 				data['insert'] = simplejson.loads(serializers.serialize("json", object_list))
 				
-				for obj in json['insert']:
+				for obj in data['insert']:
 					obj['model'] = obj['model'].split('.')[1]
 					try:
 						del obj['fields']['owner']
 					except KeyError:
 						pass
 				
-				data['sync_time'] = str(datetime.now())
-				data['success'] = True
+				data['meta']['sync_time'] = str(datetime.now())
+				data['meta']['success'] = True
 
 			except ValueError:
-				data['error'] = "last_sync was not in the format YYYY-MM-DD HH:MM:SS"
+				data['meta']['error'] = "last_sync was not in the format YYYY-MM-DD HH:MM:SS"
 			
 		else:
-			data['error'] = "last_sync time not found"
+			data['meta']['error'] = "last_sync time not found"
 			
 	else:
-		data['error'] = "Invalid token"
+		data['meta']['error'] = "Invalid token"
 	
 	return HttpResponse(simplejson.dumps(data), mimetype='application/json')

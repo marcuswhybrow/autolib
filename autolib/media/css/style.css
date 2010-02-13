@@ -1,7 +1,7 @@
-html                { background: url(images/page-bg.png) repeat-x; background-color: #fff; }
+html                { background: url(/media/images/page-bg.png) repeat-x; background-color: #fff; }
 
 body                { font-family: "Lucida Sans Unicode", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif; 
-                      font-size: 13px; color: #5e5d5d; background: url(images/header-bg.png) no-repeat top center; }
+                      font-size: 13px; color: #5e5d5d; background: url(/media/images/header-bg.png) no-repeat top center; }
                       
 strong, em, b, i    { font-family: "Lucida Sans", "Lucida Sans Unicode", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif; }
 p, #content li      { line-height: 21px; }
