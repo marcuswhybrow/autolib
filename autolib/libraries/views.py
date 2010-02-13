@@ -27,7 +27,7 @@ def library_list(request, template_name):
 @login_required
 def library_detail(request, library_name):
 	library = get_object_or_404(request.user.libraries, slug=library_name)
-	return render_to_response('users/library_detail.html', {
+	return render_to_response('libraries/library_detail.html', {
 		'library': library,
 		'form': CreateCollectionForm(),
 	}, context_instance=RequestContext(request))
@@ -48,7 +48,7 @@ def bookshelf_detail(request, library_name, bookshelf_name):
 		bookshelf_slug = bookshelf.slug
 	
 	# Return the library and the bookshelf.
-	return render_to_response('users/bookshelf_detail.html', {
+	return render_to_response('libraries/bookshelf_detail.html', {
 		'library': library,
 		'bookshelf': bookshelf,
 	}, context_instance=RequestContext(request))
