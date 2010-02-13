@@ -73,7 +73,9 @@ ul#libraries                            { font-size: 13px; }
 
 /* Library List */
 
-ul#library-list li span.delete 	{ display: none; margin-left: 10px; cursor: pointer; color: #fff; background-color: #e21a1a; -moz-border-radius: 6px; -webkit-border-radius: 6px; padding: 0 4px; border: 1px solid #9d1414; }
+ul.collection-list li span.delete		{ display: none; margin-left: 10px; cursor: pointer; color: #ccc; background-color: #fafafa; 
+                                          -moz-border-radius: 6px; -webkit-border-radius: 6px; padding: 0 4px; border: 1px solid #f0f0f0; }
+ul.collection-list li span.delete:hover { text-decoration: none; background-color: #e21a1a; border: 1px solid #9d1414; color: #fff; }
 
 /* Links */
 

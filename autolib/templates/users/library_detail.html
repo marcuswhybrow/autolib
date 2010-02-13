@@ -8,6 +8,7 @@
 {% block head %}
 <link rel="stylesheet" href="/media/js/jqtransform/jqtransform.css" />
 <script type="text/javascript" src="/media/js/jqtransform/jquery.jqtransform.js"></script>
+<script type="text/javascript" src="/media/js/jquery-ui-1.8rc1.custom.min.js"></script>
 <script type="text/javascript">
 	$(function() {
 		//find all the forms with the class of jqtransform and then apply the plugin
@@ -92,17 +93,85 @@
 					var name = data.bookshelf.name;
 					var description = data.bookshelf.description;
 					var url = data.bookshelf.url;
-					$("ul#bookshelf-list").append('<li><a href="' + url + '">' + name + '</a></li>');
+					var pk = data.bookshelf.pk;
+					
+					$("ul#bookshelf-list").append('<li id="' + pk + '"><a href="' + url + '">' + name + '</a><span class="delete">delete</span></li>');
+					
+					$("#" + pk).hover(bookshelf_hover_over, bookshelf_hover_out);
+					$("#" + pk + " span.delete").click(bookshelf_click_delete);
+					
 				} else if(data.meta.success == false) {
 					alert(data.meta.error);
 				}
 			}, "json");
 			
 			form.find().attr('disabled', '');
-			form.find(':input').val('');
+			form.find(':input[name="name"]').val('');
 			
 			return false;
 		});
+		
+		// Bookshelf List
+		
+		function bookshelf_hover_over() {
+			$(this).find('span.delete').css('display', 'inline');
+		}
+		
+		function bookshelf_hover_out() {
+			$(this).find('span.delete').css('display', 'none');
+		}
+		
+		function bookshelf_click_delete() {
+			var bookshelf_row = $(this).parent();
+			var bookshelf_pk = bookshelf_row.attr("id");
+			
+			var delete_bookshelf_dialog = $("div#bookshelf-delete").dialog({
+				bgiframe: true,
+				resizable: false,
+				modal: true,
+				overlay: {
+					backgroundColor: '#000',
+					opacity: 0.5
+				},
+				buttons: {
+					'Delete': function() {
+						$.get('{% url api_delete_bookshelf %}', {bookshelf_pk: bookshelf_pk}, function(data) {
+							if (data.meta.success == true) {
+								delete_bookshelf_dialog.dialog('close');
+								bookshelf_row.remove();
+							} else if(data.meta.success == false) {
+								delete_bookshelf_dialog.dialog('close');
+								
+								$("div#bookshelf-delete-error p.error-message").append(data.meta.error);
+								$("div#bookshelf-delete-error").dialog({
+									bgiframe: true,
+									resizable: false,
+									modal: true,
+									overlay: {
+										backgroundColor: '#000',
+										opacity: 0.5
+									},
+									buttons: {
+										Ok: function() {
+											$(this).dialog('close');
+										}
+									}
+								})
+							}
+						}, "json");
+					},
+					Cancel: function() {
+						$(this).dialog('close');
+					}
+				}
+			});
+		}
+		
+		$("ul#bookshelf-list li").append('<span class="delete">delete</span>');
+			  
+		$("ul#bookshelf-list li").hover(bookshelf_hover_over, bookshelf_hover_out);
+			  
+		$("ul#bookshelf-list li span.delete").click(bookshelf_click_delete);
 	});
 </script>
 {% endblock %}
@@ -116,10 +185,10 @@
 			<div class="editable">
 				<p id="description" class="detail">{{ library.description }}</p>
 			</div>
-			<ul id="bookshelf-list">
+			<ul id="bookshelf-list" class="collection-list">
 				<li><a href="{{ library.get_absolute_url }}{{ unsorted_bin.slug }}/">{{ unsorted_bin.slug }}</a></li>
 				{% for bookshelf in library.children.all %}
-					<li><a href="{{ bookshelf.get_absolute_url }}">{{ bookshelf.name }}</a></li>
+					<li id="{{ bookshelf.pk }}"><a href="{{ bookshelf.get_absolute_url }}">{{ bookshelf.name }}</a></li>
 				{% endfor %}
 			</ul>
 		</div>
@@ -129,7 +198,7 @@
 		<div class="inner">
 			<h3>Create a new <span class="bookshelf">Bookshelf</span></h3>
 			<form id="new-bookshelf-form" action="" method="post" class="jqtransform">
-				<input type="hidden" name="parent" id="parent" value="{{ library.pk }}" />
+				<input type="hidden" name="parent_pk" id="parent_pk" value="{{ library.pk }}" />
 				<div class="rowElem">
 					{{ form.name }}
 				</div>
@@ -140,5 +209,13 @@
 			<h3>Add a <span class="book">Book</span> to this Bookshelf</h3>
 			<p>Click <a href="#">here</a></p>
 		</div>
+	</div>
+	
+	<div id="bookshelf-delete" class="dialog" title="Delete this Bookshelf?">
+		<p><span class="ui-icon ui-icon-alert" style="float:left; margin:3px 7px 30px 0;"></span>This bookshelf will be permanently deleted. Are you sure?</p>
+	</div>
+	
+	<div id="bookshelf-delete-error" class="dialog" title="Problem deleting Library!">
+		<p class="error-message"><span class="ui-icon ui-icon-alert" style="float:left; margin:2px 7px 30px 0;"></span></p>
 	</div>
 {% endblock %}

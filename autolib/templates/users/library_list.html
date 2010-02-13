@@ -14,6 +14,8 @@
 		//find all the forms with the class of jqtransform and then apply the plugin
 		$("form.jqtransform").jqTransform();
 		
+		// Library List
+		
 		function library_hover_over() {
 			$(this).find('span.delete').css('display', 'inline');
 		}
@@ -65,8 +67,16 @@
 						$(this).dialog('close');
 					}
 				}
-			})
+			});
 		}
+		
+		$("ul#library-list li").append('<span class="delete">delete</span>');
+		
+		$("ul#library-list li").hover(library_hover_over, library_hover_out);
+		
+		$("ul#library-list li span.delete").click(library_click_delete);
+		
+		// Add New Library
 		
 		$("form#new-library-form").submit(function() {
 			
@@ -95,12 +105,6 @@
 			
 			return false;
 		});
-		
-		$("ul#library-list li").append('<span class="delete">delete</span>');
-		
-		$("ul#library-list li").hover(library_hover_over, library_hover_out);
-		
-		$("ul#library-list li span.delete").click(library_click_delete);
 	});
 </script>
 {% endblock %}
@@ -111,7 +115,7 @@
 			<h2>Your Libraries</h2>
 			<p>Your libraries will all be here one day.</p>
 			{% if object_list %}
-			<ul id="library-list">
+			<ul id="library-list" class="collection-list">
 				{% for library in object_list %}
 					<li id="{{ library.pk }}"><a href="{{ library.get_absolute_url }}">{{ library.name }}</a></li>
 				{% endfor %}
@@ -140,10 +144,10 @@
 	</div>
 	
 	<div id="library-delete" class="dialog" title="Delete this Library?">
-		<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 7px 0;"></span>This library will be permanently deleted. Are you sure?</p>
+		<p><span class="ui-icon ui-icon-alert" style="float:left; margin:3px 7px 30px 0;"></span>This library will be permanently deleted. Are you sure?</p>
 	</div>
 	
 	<div id="library-delete-error" class="dialog" title="Problem deleting Library!">
-		<p class="error-message"><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 7px 0;"></span></p>
+		<p class="error-message"><span class="ui-icon ui-icon-alert" style="float:left; margin:3px 7px 30px 0;"></span></p>
 	</div>
 {% endblock %}

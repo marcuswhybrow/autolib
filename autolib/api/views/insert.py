@@ -137,7 +137,7 @@ def insert_bookshelf(request):
 				data['meta']['error'] = "parent library does not exist"
 		
 		else:
-			data['meta']['error'] = "parent was not found"
+			data['meta']['error'] = "parent_pk was not found"
 		
 	else:
 		data['meta']['error'] = "Invalid token"

@@ -75,7 +75,7 @@ def delete_bookshelf(request):
 			
 			try:
 				
-				bookshelf = Collecion.objects.get(pk=bookshelf_pk, parent__owner=user, collection_type='bookshelf')
+				bookshelf = Collection.objects.get(pk=bookshelf_pk, parent__owner=user, collection_type='bookshelf')
 				
 				if not bookshelf.children.all():
 					
@@ -124,7 +124,7 @@ def delete_series(request):
 			
 			try:
 				
-				series = Collecion.objects.get(pk=series_pk, parent__parent__owner=user, collection_type='series')
+				series = Collection.objects.get(pk=series_pk, parent__parent__owner=user, collection_type='series')
 				
 				if not series.children.all():
 					
