@@ -41,10 +41,10 @@ class Collection(UUIDSyncable):
 
 	def get_absolute_url(self):
 		if self.collection_type == 'library':
-			return ('library_detail', [self.owner.username, self.slug])
+			return ('library_detail', [self.slug])
 						
 		elif self.collection_type == 'bookshelf':
-			return ('bookshelf_detail', [self.parent.owner.username, self.parent.slug, self.slug])
+			return ('bookshelf_detail', [self.parent.slug, self.slug])
 		
 		return None
 	

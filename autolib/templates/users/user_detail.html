@@ -2,14 +2,14 @@
 
 {% block breadcrumbs %}
 {{ block.super }}
-<li> > <a href="{% url users.views.user_detail user_detail.username %}">{{ user_detail.username }}</a></li>
+<li> > <a href="{% url users.views.user_detail user.username %}">{{ user.username }}</a></li>
 {% endblock %}
 
 {% block content %}
 <div class="section">
 	<div class="inner">
-		<h2>{{ user_detail.username }}</h2>
-		<p>{{ user_detail.get_full_name }}</p>
+		<h2>{{ user.username }}</h2>
+		<p>{{ user.get_full_name }}</p>
 	</div>
 </div>
 {% endblock %}

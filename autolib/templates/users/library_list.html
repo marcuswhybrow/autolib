@@ -1,8 +1,8 @@
-{% extends "users/user_detail.html" %}
+{% extends "users/base_full.html" %}
 
 {% block breadcrumbs %}
 {{ block.super }}
-<li> > <a href="{% url library_list user_detail.username %}">Libraries</a></li>
+<li> > <a href="{% url library_list %}">Libraries</a></li>
 {% endblock %}
 
 {% block head %}

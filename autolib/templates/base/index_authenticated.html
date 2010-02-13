@@ -5,7 +5,7 @@
 <div class="section">
 	<div class="inner">
 		<h2>Hey{% if user.first_name %} {{ user.first_name }}{% endif %}, You're Authenticated</h2>
-		<p>This is the home page, but you should probably check out this kind of control panel thing at <a href="{% url library_list user.username %}">{% url library_list user.username %}</a>.</p>
+		<p>This is the home page, but you should probably check out this kind of control panel thing at <a href="{% url library_list %}">{% url library_list %}</a>.</p>
 	</div>
 </div>
 

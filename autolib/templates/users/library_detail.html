@@ -2,7 +2,7 @@
 
 {% block breadcrumbs %}
 {{ block.super }}
-<li class="library"> > <a href="{% url library_detail user_detail.username, library.slug %}">{{ library.name }}</a></li>
+<li class="library"> > <a href="{% url library_detail library.slug %}">{{ library.name }}</a></li>
 {% endblock %}
 
 {% block head %}
