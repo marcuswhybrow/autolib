@@ -8,6 +8,7 @@
 {% block head %}
 <link rel="stylesheet" href="/media/js/jqtransform/jqtransform.css" />
 <script type="text/javascript" src="/media/js/jqtransform/jquery.jqtransform.js"></script>
+<script type="text/javascript" src="/media/js/jquery-ui-1.8rc1.custom.min.js"></script>
 <script type="text/javascript">
 	$(function() {
 		//find all the forms with the class of jqtransform and then apply the plugin
@@ -35,6 +36,20 @@
 			
 			return false;
 		});
+		
+		$("ul#library-list li").append('<span class="delete">delete</span>');
+		
+		$("ul#library-list li").hover(function() {
+			$(this).find('span.delete').css('display', 'inline');
+		}, function() {
+			$(this).find('span.delete').css('display', 'none');
+		});
+		
+		$("ul#library-list li span.delete").click(function() {
+			var library_pk = $(this).parent().attr("id");
+			
+			$("div#library-delete").dialog()
+		});
 	});
 </script>
 {% endblock %}
@@ -47,7 +62,7 @@
 			{% if object_list %}
 			<ul id="library-list">
 				{% for library in object_list %}
-					<li><a href="{{ library.get_absolute_url }}">{{ library.name }}</a></li>
+					<li id="{{ library.pk }}"><a href="{{ library.get_absolute_url }}">{{ library.name }}</a></li>
 				{% endfor %}
 			</ul>
 			{% else %}
@@ -71,5 +86,9 @@
 			<h3>Add a <span class="book">Book</span> to this Library</h3>
 			<p>Click <a href="#">here</a></p>
 		</div>
+	</div>
+	
+	<div id="library-delete" class="dialog" title="Delete this Library?">
+		<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>This library will be permanently deleted. Are you sure?</p>
 	</div>
 {% endblock %}
