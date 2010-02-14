@@ -64,8 +64,8 @@ def insert_library(request):
 					data['library']['slug'] = library.slug
 					data['library']['description'] = library.description
 					data['library']['url'] = library.get_absolute_url()
-					data['library']['added'] = library.added
-					data['library']['last_modified'] = library.last_modified
+					data['library']['added'] = str(library.added)
+					data['library']['last_modified'] = str(library.last_modified)
 					
 					data['meta']['success'] = True
 			else:
@@ -125,8 +125,8 @@ def insert_bookshelf(request):
 							data['bookshelf']['pk'] = bookshelf.pk
 							data['bookshelf']['parent'] = bookshelf.parent.pk
 							data['bookshelf']['slug'] = bookshelf.slug
-							data['bookshelf']['added'] = library.added
-							data['bookshelf']['last_modified'] = library.last_modified
+							data['bookshelf']['added'] = str(library.added)
+							data['bookshelf']['last_modified'] = str(library.last_modified)
 							
 							
 							data['meta']['success'] = True
@@ -196,8 +196,8 @@ def insert_series(request):
 							data['series']['pk'] = series.pk
 							data['series']['parent'] = series.parent.pk
 							data['series']['slug'] = series.parent.pk
-							data['series']['added'] = library.added
-							data['series']['last_modified'] = library.last_modified
+							data['series']['added'] = str(library.added)
+							data['series']['last_modified'] = str(library.last_modified)
 							
 							data['meta']['success'] = True
 						
@@ -250,7 +250,13 @@ def insert_profile(request):
 						
 						try:
 						
-							BookProfile(book_instance=book, collection=collection).save()
+							profile = BookProfile(book_instance=book, collection=collection).save()
+							data['profile'] = {
+								'book_instance' = profile.book_instance.pk,
+								'collection' = profile.collection.pk,
+								'added' = str(profile.added),
+								'last_modified' = str(profile.last_modified),
+							}
 							data['meta']['success'] = True
 							
 						except IntegrityError:
