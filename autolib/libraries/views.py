@@ -18,11 +18,15 @@ from django.template import RequestContext
 from django.views.generic.list_detail import object_list
 
 @login_required
+def add_books(request):
+	return render_to_response('libraries/addbooks.html', context_instance=RequestContext(request))
+
+@login_required
 def library_list(request, template_name):
-		queryset = request.user.libraries.all()
-		return object_list(request, queryset=queryset, template_name=template_name, extra_context={
-			'form': CreateCollectionForm(),
-		})
+	queryset = request.user.libraries.all()
+	return object_list(request, queryset=queryset, template_name=template_name, extra_context={
+		'form': CreateCollectionForm(),
+	})
 
 @login_required
 def library_detail(request, library_name):

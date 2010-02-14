@@ -18,3 +18,68 @@ class CurrentUser(object):
 			raise Http404
 		else:
 			return self.f(request, username, *args, **kwargs)
+
+class Adapter(object):
+	"""
+	An interface for other adapters
+	"""
+	
+	def __init__(self, isbn):
+		raise NotImplementedError
+	
+	def get_name(self):
+		raise NotImplementedError
+	
+	def get_isbn(self):
+		raise NotImplementedError
+		
+	def get_name(self):
+		raise NotImplementedError
+	
+	def get_description(self):
+		raise NotImplementedError
+	
+	def get_publisher(self):
+		raise NotImplementedError
+	
+	def get_published(self):
+		raise NotImplementedError
+	
+	def get_author(self):
+		raise NotImplementedError
+	
+	def get_length(self):
+		raise NotImplementedError
+
+class GoogleAdapter(Adapter):
+	"""
+	Gets information regarding books using Google's books API
+	"""
+	
+	def __init__(self, isbn):
+		pass
+	
+	def get_name(self):
+		pass
+		
+	def get_isbn(self):
+		pass
+		
+	def get_name(self):
+		pass
+	
+	def get_description(self):
+		pass
+	
+	def get_publisher(self):
+		pass
+	
+	def get_published(self):
+		pass
+	
+	def get_author(self):
+		pass
+	
+	def get_length(self):
+		pass
+	

@@ -25,8 +25,8 @@ urlpatterns = patterns('',
 	# API
 	(r'^api/', include('api.urls')),
 	
-	# Libraries
-	(r'^libraries/', include('libraries.urls')),
+	# Profile
+	(r'^profile/', include('libraries.urls')),
 	
 	# Books
 	(r'^books/', include('books.urls')),

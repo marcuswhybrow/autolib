@@ -1,0 +1,39 @@
+{% extends 'libraries/base.html' %}
+
+{% block breadcrumbs %}
+{{ block.super }}
+<li> > <a href="{% url add_books %}">Add Books</a></li>
+{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="/media/js/jqtransform/jqtransform.css" />
+<script type="text/javascript" src="/media/js/jqtransform/jquery.jqtransform.js"></script>
+<script type="text/javascript" src="/media/js/jquery-ui-1.8rc1.custom.min.js"></script>
+<script type="text/javascript">
+	$(function() {
+		$("form#add-books").jqTransform();
+		
+		$("form#add-books").submit(function() {
+			
+			alert("submitted");
+			return false;
+		});
+	});
+</script>
+{% endblock %}
+
+{% block content %}
+	<div class="section">
+		<div class="inner">
+			<h1>Add Some Books</h1>
+			<form id="add-books" action="" method="post" class="jqTransform">
+				<div class="rowElem">
+					<input type="text" id="isbn" name="isbn" value="" />
+				</div>
+				<div class="rowElem">
+					<input type="submit" value="Add" />
+				</div>
+			</form>
+		</div>
+	</div>
+{% endblock %}
