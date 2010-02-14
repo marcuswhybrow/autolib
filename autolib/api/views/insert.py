@@ -252,10 +252,10 @@ def insert_profile(request):
 						
 							profile = BookProfile(book_instance=book, collection=collection).save()
 							data['profile'] = {
-								'book_instance' = profile.book_instance.pk,
-								'collection' = profile.collection.pk,
-								'added' = str(profile.added),
-								'last_modified' = str(profile.last_modified),
+								'book_instance': profile.book_instance.pk,
+								'collection': profile.collection.pk,
+								'added': str(profile.added),
+								'last_modified': str(profile.last_modified),
 							}
 							data['meta']['success'] = True
 							
