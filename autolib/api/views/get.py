@@ -41,6 +41,7 @@ def get_library_list(request):
 			data['libraries'].append({
 				'pk': library.pk,
 				'name': library.name,
+				'slug': library.slug,
 				'description': library.description,
 				'url': library.get_absolute_url(),
 			})
@@ -123,6 +124,7 @@ def get_bookshelf_list(request):
 					data['bookshelves'].append({
 						'pk': bookshelf.pk,
 						'name': bookshelf.name,
+						'parent': bookshelf.parent.pk,
 						'slug': bookshelf.slug,
 						'description': bookshelf.description,
 						'url': bookshelf.get_absolute_url(),
@@ -166,6 +168,7 @@ def get_bookshelf_detail(request):
 				data['bookshelf'] = {
 					'pk': bookshelf.pk,
 					'name': bookshelf.name,
+					'parent': bookshelf.parent.pk,
 					'description': bookshelf.description,
 					'url': bookshelf.get_absolute_url(),
 					'slug': bookshelf.slug,
@@ -210,6 +213,7 @@ def get_series_list(request):
 					data['series'].append({
 						'pk': series.pk,
 						'name': series.name,
+						'parent': series.parent.pk,
 						'slug': series.slug,
 						'description': series.description,
 					})
@@ -253,6 +257,7 @@ def get_series_detail(request):
 				data['series'] = {
 					'pk': series.pk,
 					'name': series.name,
+					'parent': series.parent.pk,
 					'description': series.description,
 					'slug': series.slug,
 				}
@@ -340,6 +345,7 @@ def get_profile_detail(request):
 					'published': profile.book_instance.published,
 					'publisher': profile.book_instance.publisher,
 					'description': profile.book_instance.description,
+					'collection': profile.collection.pk,
 				}
 				data['meta']['success'] = True
 						
