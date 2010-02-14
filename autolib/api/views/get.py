@@ -44,6 +44,8 @@ def get_library_list(request):
 				'slug': library.slug,
 				'description': library.description,
 				'url': library.get_absolute_url(),
+				'added': library.added,
+				'last_modified': library.last_modified,
 			})
 		data['meta']['success'] = True
 	else:
@@ -79,6 +81,8 @@ def get_library_detail(request):
 					'description': library.description,
 					'url': library.get_absolute_url(),
 					'slug': library.slug,
+					'added': library.added,
+					'last_modified': library.last_modified,
 				}
 				
 				data['meta']['success'] = True
@@ -128,6 +132,8 @@ def get_bookshelf_list(request):
 						'slug': bookshelf.slug,
 						'description': bookshelf.description,
 						'url': bookshelf.get_absolute_url(),
+						'added': bookshelf.added,
+						'last_modified': bookshelf.last_modified,
 					})
 				
 				data['meta']['success'] = True
@@ -172,6 +178,8 @@ def get_bookshelf_detail(request):
 					'description': bookshelf.description,
 					'url': bookshelf.get_absolute_url(),
 					'slug': bookshelf.slug,
+					'added': bookshelf.added,
+					'last_modified': bookshelf.last_modified,
 				}
 				
 				data['meta']['success'] = True
@@ -216,6 +224,8 @@ def get_series_list(request):
 						'parent': series.parent.pk,
 						'slug': series.slug,
 						'description': series.description,
+						'added': series.added,
+						'last_modified': series.last_modified,
 					})
 				
 				data['meta']['success'] = True
@@ -260,6 +270,8 @@ def get_series_detail(request):
 					'parent': series.parent.pk,
 					'description': series.description,
 					'slug': series.slug,
+					'added': series.added,
+					'last_modified': series.last_modified,
 				}
 				
 				data['meta']['success'] = True
@@ -304,6 +316,8 @@ def get_profile_list(request):
 					data['profiles'].append({
 						'collection': profile.collection.pk,
 						'book': profile.book_instance.pk,
+						'added': profile.added,
+						'last_modified': profile.last_modified,
 					})
 				data['meta']['success'] = True
 						
@@ -346,6 +360,8 @@ def get_profile_detail(request):
 					'publisher': profile.book_instance.publisher,
 					'description': profile.book_instance.description,
 					'collection': profile.collection.pk,
+					'added': profile.added,
+					'last_modified': profile.last_modified,
 				}
 				data['meta']['success'] = True
 						

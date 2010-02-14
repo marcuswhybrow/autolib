@@ -63,7 +63,8 @@ def update_library(request):
 					data['library']['description'] = library.description
 				
 				if not error:
-					library.save()
+					library = library.save()
+					data['library']['last_modified'] = library.last_modified
 					data['meta']['success'] = True
 				
 			except Collection.DoesNotExist:
@@ -124,7 +125,8 @@ def update_bookshelf(request):
 						data['bookshelf']['description'] = bookshelf.description
 					
 					if not error:
-						bookshelf.save()
+						bookshelf = bookshelf.save()
+						data['bookshelf']['last_modified'] = bookshelf.last_modified
 						data['meta']['success'] = True
 					
 				except forms.ValidationError:
@@ -189,7 +191,8 @@ def update_series(request):
 						data['series']['description'] = series.description
 					
 					if not error:
-						series.save()
+						series = series.save()
+						data['series']['last_modified'] = series.last_modified
 						data['meta']['success'] = True
 					
 				except forms.ValidationError:
@@ -245,6 +248,7 @@ def update_profile(request):
 						profile = profile.save()
 						
 						data['profile']['collection'] = profile.collection.pk
+						data['profile']['last_modified'] = profile.last_modified
 						data['meta']['success'] = True
 					
 					except:

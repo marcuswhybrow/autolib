@@ -64,6 +64,8 @@ def insert_library(request):
 					data['library']['slug'] = library.slug
 					data['library']['description'] = library.description
 					data['library']['url'] = library.get_absolute_url()
+					data['library']['added'] = library.added
+					data['library']['last_modified'] = library.last_modified
 					
 					data['meta']['success'] = True
 			else:
@@ -123,6 +125,8 @@ def insert_bookshelf(request):
 							data['bookshelf']['pk'] = bookshelf.pk
 							data['bookshelf']['parent'] = bookshelf.parent.pk
 							data['bookshelf']['slug'] = bookshelf.slug
+							data['bookshelf']['added'] = library.added
+							data['bookshelf']['last_modified'] = library.last_modified
 							
 							
 							data['meta']['success'] = True
@@ -192,6 +196,8 @@ def insert_series(request):
 							data['series']['pk'] = series.pk
 							data['series']['parent'] = series.parent.pk
 							data['series']['slug'] = series.parent.pk
+							data['series']['added'] = library.added
+							data['series']['last_modified'] = library.last_modified
 							
 							data['meta']['success'] = True
 						
