@@ -35,8 +35,8 @@ def sync_update(request):
 	
 	data = {'meta': {'success': False}}
 	
-	token_id = request.GET.get('token_id', None) or request.GET.get('t', None)
-	last_sync = request.GET.get('last_sync', None)
+	token_id = request.POST.get('token_id', None) or request.POST.get('t', None)
+	last_sync = request.POST.get('last_sync', None)
 	
 	if token_id is not None:
 		user = utils.get_user_from_token(token_id)

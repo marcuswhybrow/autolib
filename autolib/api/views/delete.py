@@ -12,8 +12,8 @@ def delete_library(request):
 	
 	data = {'meta': {'success': False}}
 	
-	token_id = request.GET.get('token_id', None) or request.GET.get('t', None)
-	library_pk = request.GET.get('library_pk', None) or request.GET.get('pk', None)
+	token_id = request.POST.get('token_id', None) or request.POST.get('t', None)
+	library_pk = request.POST.get('library_pk', None) or request.POST.get('pk', None)
 	
 	if token_id is not None:
 		user = utils.get_user_from_token(token_id)
@@ -61,8 +61,8 @@ def delete_bookshelf(request):
 	
 	data = {'meta': {'success': False}}
 	
-	token_id = request.GET.get('token_id', None) or request.GET.get('t', None)
-	bookshelf_pk = request.GET.get('bookshelf_pk', None) or request.GET.get('pk', None)
+	token_id = request.POST.get('token_id', None) or request.POST.get('t', None)
+	bookshelf_pk = request.POST.get('bookshelf_pk', None) or request.POST.get('pk', None)
 	
 	if token_id is not None:
 		user = utils.get_user_from_token(token_id)
@@ -110,8 +110,8 @@ def delete_series(request):
 	
 	data = {'meta': {'success': False}}
 	
-	token_id = request.GET.get('token_id', None) or request.GET.get('t', None)
-	series_pk = request.GET.get('series_pk', None) or request.GET.get('pk', None)
+	token_id = request.POST.get('token_id', None) or request.POST.get('t', None)
+	series_pk = request.POST.get('series_pk', None) or request.POST.get('pk', None)
 	
 	if token_id is not None:
 		user = utils.get_user_from_token(token_id)
@@ -161,8 +161,8 @@ def delete_profile(request):
 	
 	data = {'meta': {'success': False}}
 	
-	token_id = request.GET.get('token_id', None) or request.GET.get('t', None)
-	profile_pk = request.GET.get('profile_pk', None) or request.GET.get('pk', None)
+	token_id = request.POST.get('token_id', None) or request.POST.get('t', None)
+	profile_pk = request.POST.get('profile_pk', None) or request.POST.get('pk', None)
 	
 	if token_id is not None:
 		user = utils.get_user_from_token(token_id)

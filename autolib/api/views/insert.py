@@ -45,35 +45,31 @@ def insert_library(request):
 		user = request.user
 	
 	if user and user.is_authenticated():
-		
-		try:
-			form = CreateCollectionForm(request.POST)
-			if form.is_valid():
-				library = form.save(commit=False)
-				library.collection_type='library'
-				library.owner = user
-				
-				try:
-					Collection.objects.get(name=library.name, owner=user, collection_type='library')
-					data['meta']['error'] = 'There is already a library of that name for this user!'
-				except Collection.DoesNotExist:
-					library.save()
-					data['library'] = {}
-					data['library']['pk'] = library.pk
-					data['library']['name'] = library.name
-					data['library']['slug'] = library.slug
-					data['library']['description'] = library.description
-					data['library']['url'] = library.get_absolute_url()
-					data['library']['added'] = str(library.added)
-					data['library']['last_modified'] = str(library.last_modified)
-					
-					data['meta']['success'] = True
-			else:
-				data['meta']['error'] = "There was a validation error"
+
+		form = CreateCollectionForm(request.POST)
+		if form.is_valid():
+			library = form.save(commit=False)
+			library.collection_type='library'
+			library.owner = user
 			
-		except forms.ValidationError:
-			data['meta']['error'] = "Validation Error"
-		
+			try:
+				Collection.objects.get(name=library.name, owner=user, collection_type='library')
+				data['meta']['error'] = 'There is already a library of that name for this user!'
+			except Collection.DoesNotExist:
+				library.save()
+				data['library'] = {}
+				data['library']['pk'] = library.pk
+				data['library']['name'] = library.name
+				data['library']['slug'] = library.slug
+				data['library']['description'] = library.description
+				data['library']['url'] = library.get_absolute_url()
+				data['library']['added'] = str(library.added)
+				data['library']['last_modified'] = str(library.last_modified)
+				
+				data['meta']['success'] = True
+		else:
+			data['meta']['error'] = "There was a validation error"
+			
 	else:
 		data['meta']['error'] = "Invalid token"
 	
@@ -106,39 +102,34 @@ def insert_bookshelf(request):
 		if parent_pk is not None:
 			
 			try: # Collection get
+					
+				try: # save new collection
 				
-				try: # Validation errors
-					
-					try: # save new collection
-					
-						form = CreateCollectionForm(request.POST)
-						if form.is_valid():
-							bookshelf = form.save(commit=False)
-							bookshelf.collection_type='bookshelf'
-							bookshelf.parent = Collection.objects.get(pk=parent_pk, collection_type='library', owner=user)
+					form = CreateCollectionForm(request.POST)
+					if form.is_valid():
+						bookshelf = form.save(commit=False)
+						bookshelf.collection_type='bookshelf'
+						bookshelf.parent = Collection.objects.get(pk=parent_pk, collection_type='library', owner=user)
 
-							bookshelf.save()
-							data['bookshelf'] = {}
-							data['bookshelf']['name'] = bookshelf.name
-							data['bookshelf']['description'] = bookshelf.description
-							data['bookshelf']['url'] = bookshelf.get_absolute_url()
-							data['bookshelf']['pk'] = bookshelf.pk
-							data['bookshelf']['parent'] = bookshelf.parent.pk
-							data['bookshelf']['slug'] = bookshelf.slug
-							data['bookshelf']['added'] = str(library.added)
-							data['bookshelf']['last_modified'] = str(library.last_modified)
-							
-							
-							data['meta']['success'] = True
+						bookshelf.save()
+						data['bookshelf'] = {}
+						data['bookshelf']['name'] = bookshelf.name
+						data['bookshelf']['description'] = bookshelf.description
+						data['bookshelf']['url'] = bookshelf.get_absolute_url()
+						data['bookshelf']['pk'] = bookshelf.pk
+						data['bookshelf']['parent'] = bookshelf.parent.pk
+						data['bookshelf']['slug'] = bookshelf.slug
+						data['bookshelf']['added'] = str(library.added)
+						data['bookshelf']['last_modified'] = str(library.last_modified)
 						
-						else:
-							data['meta']['error'] = "There was a validation error"
 						
-					except IntegrityError:
-						data['meta']['error'] = "A Bookshelf of that name in this Library already exists for this User"
+						data['meta']['success'] = True
 					
-				except forms.ValidationError:
-					data['meta']['error'] = "Validation Error"
+					else:
+						data['meta']['error'] = "There was a validation error"
+					
+				except IntegrityError:
+					data['meta']['error'] = "A Bookshelf of that name in this Library already exists for this User"
 				
 			except Collection.DoesNotExist:
 				data['meta']['error'] = "parent library does not exist"
@@ -178,43 +169,38 @@ def insert_series(request):
 		if parent_pk is not None:
 			
 			try: # Collection get
+					
+				try: # save new collection
 				
-				try: # Validation errors
-					
-					try: # save new collection
-					
-						form = CreateCollectionForm(request.POST)
-						if form.is_valid():
-							series = form.save(commit=False)
-							series.collection_type='series'
-							series.parent = Collection.objects.get(pk=parent_pk, collection_type='bookshelf', parent__owner=user)
+					form = CreateCollectionForm(request.POST)
+					if form.is_valid():
+						series = form.save(commit=False)
+						series.collection_type='series'
+						series.parent = Collection.objects.get(pk=parent_pk, collection_type='bookshelf', parent__owner=user)
 
-							series.save()
-							data['series'] = {}
-							data['series']['name'] = series.name
-							data['series']['description'] = series.description
-							data['series']['pk'] = series.pk
-							data['series']['parent'] = series.parent.pk
-							data['series']['slug'] = series.parent.pk
-							data['series']['added'] = str(library.added)
-							data['series']['last_modified'] = str(library.last_modified)
-							
-							data['meta']['success'] = True
+						series.save()
+						data['series'] = {}
+						data['series']['name'] = series.name
+						data['series']['description'] = series.description
+						data['series']['pk'] = series.pk
+						data['series']['parent'] = series.parent.pk
+						data['series']['slug'] = series.parent.pk
+						data['series']['added'] = str(library.added)
+						data['series']['last_modified'] = str(library.last_modified)
 						
-						else:
-							data['meta']['error'] = "There was a validation error"
-						
-					except IntegrityError:
-						data['meta']['error'] = "A Series of that name in this Bookshelf already exists for this User"
+						data['meta']['success'] = True
 					
-				except forms.ValidationError:
-					data['meta']['error'] = "Validation Error"
+					else:
+						data['meta']['error'] = "There was a validation error"
+					
+				except IntegrityError:
+					data['meta']['error'] = "A Series of that name in this Bookshelf already exists for this User"
 				
 			except Collection.DoesNotExist:
 				data['meta']['error'] = "parent Bookshelf does not exist"
 		
 		else:
-			data['meta']['error'] = "parent was not found"
+			data['meta']['error'] = "parent_pk was not found"
 		
 	else:
 		data['meta']['error'] = "Invalid token"
