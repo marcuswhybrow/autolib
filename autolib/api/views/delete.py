@@ -1,195 +1,46 @@
-from django.http import HttpResponse
-from api import utils
-
 from books.models import BookProfile
 from libraries.models import Collection
 
-import simplejson
-
-# Library
-
-def delete_library(request):
-	
-	data = {'meta': {'success': False}}
-	
-	token_id = request.POST.get('token_id', None) or request.POST.get('t', None)
-	library_pk = request.POST.get('library_pk', None) or request.POST.get('pk', None)
-	
-	if token_id is not None:
-		user = utils.get_user_from_token(token_id)
-	else:
-		user = request.user
-	
-	if user and user.is_authenticated():
-		
-		if library_pk is not None:
-			
-			try:
-				
-				library = Collection.objects.get(pk=library_pk, owner=user, collection_type='library')
-				
-				if not library.children.all():
-					
-					if not library.books.all():
-						
-						data['library'] = {
-							'pk': library.pk
-						}
-						library.delete()
-						data['meta']['success'] = True
-						
-					else:
-						data['meta']['error'] = "This Library cannot be deleted as it contains books"
-					
-				else:
-					data['meta']['error'] = "This Library cannot be deleted as it contains Bookshelves (other than the unsorted bin)"
-			
-			except Collection.DoesNotExist:
-				data['meta']['error'] = "A Library Collection with that pk does not exist for this user"
-			
-		else:
-			data['meta']['error'] = "library_pk not found"
-		
-	else:
-		data['meta']['error'] = "Invalid token"
-	
-	return HttpResponse(simplejson.dumps(data), mimetype='application/json')
-
-# Bookshelf
-
-def delete_bookshelf(request):
-	
-	data = {'meta': {'success': False}}
-	
-	token_id = request.POST.get('token_id', None) or request.POST.get('t', None)
-	bookshelf_pk = request.POST.get('bookshelf_pk', None) or request.POST.get('pk', None)
-	
-	if token_id is not None:
-		user = utils.get_user_from_token(token_id)
-	else:
-		user = request.user
-	
-	if user and user.is_authenticated():
-		
-		if bookshelf_pk is not None:
-			
-			try:
-				
-				bookshelf = Collection.objects.get(pk=bookshelf_pk, parent__owner=user, collection_type='bookshelf')
-				
-				if not bookshelf.children.all():
-					
-					if not bookshelf.books.all():
-						
-						data['bookshelf'] = {
-							'pk': bookshelf.pk
-						}
-						bookshelf.delete()
-						data['meta']['success'] = True
-						
-					else:
-						data['meta']['error'] = "This Bookshelf cannot be deleted as it contains books"
-					
-				else:
-					data['meta']['error'] = "This Bookshelf cannot be deleted as it contains Series"
-			
-			except Collection.DoesNotExist:
-				data['meta']['error'] = "A Bookshelf Collection with that pk does not exist for this user"
-			
-		else:
-			data['meta']['error'] = "bookshelf_pk not found"
-		
-	else:
-		data['meta']['error'] = "Invalid token"
-	
-	return HttpResponse(simplejson.dumps(data), mimetype='application/json')
-
-# Series
-
-def delete_series(request):
-	
-	data = {'meta': {'success': False}}
-	
-	token_id = request.POST.get('token_id', None) or request.POST.get('t', None)
-	series_pk = request.POST.get('series_pk', None) or request.POST.get('pk', None)
-	
-	if token_id is not None:
-		user = utils.get_user_from_token(token_id)
-	else:
-		user = request.user
-	
-	if user and user.is_authenticated():
-		
-		if series_pk is not None:
-			
-			try:
-				
-				series = Collection.objects.get(pk=series_pk, parent__parent__owner=user, collection_type='series')
-				
-				if not series.children.all():
-					
-					if not series.books.all():
-						
-						data['series'] = {
-							'pk': series.pk
-						}
-						series.delete()
-						data['meta']['success'] = True
-						
-					else:
-						data['meta']['error'] = "This Series cannot be deleted as it contains books"
-					
-				else:
-					data['meta']['error'] = "This Series cannot be deleted as it has children Collection's (which should never happen)"
-			
-			except Collection.DoesNotExist:
-				data['meta']['error'] = "A Series Collection with that pk does not exist for this user"
-			
-		else:
-			data['meta']['error'] = "series_pk not found"
-		
-	else:
-		data['meta']['error'] = "Invalid token"
-	
-	return HttpResponse(simplejson.dumps(data), mimetype='application/json')
-
-# BookProfile
-
+from api.views import APIAuthView
 from django.db.models import Q
 
-def delete_profile(request):
-	
-	data = {'meta': {'success': False}}
-	
-	token_id = request.POST.get('token_id', None) or request.POST.get('t', None)
-	profile_pk = request.POST.get('profile_pk', None) or request.POST.get('pk', None)
-	
-	if token_id is not None:
-		user = utils.get_user_from_token(token_id)
-	else:
-		user = request.user
-	
-	if user and user.is_authenticated():
-		
-		if profile_pk is not None:
-			
+class DeleteCollection(APIAuthView):
+	def process(self, request):
+		collection_pk = request.POST.get('collection_pk', None) or request.POST.get('pk', None)
+		if collection_pk is not None:
 			try:
-				
-				profile = BookProfile.objects.get(Q(pk=profile_pk) & (Q(collection__owner=user) | Q(collection__parent__owner=user) | Q(collection__parent__parent__owner=user)))
-						
-				data['profile'] = {
+				collection = Collection.objects.get(Q(pk=collection_pk) & (Q(owner=self.user) | Q(parent__owner=self.user) | Q(parent__parent__owner=self.user)))
+				if not collection.children.all():
+					if not collection.books.all():
+						self.data['collection'] = {
+							'pk': collection.pk
+						}
+						collection.delete()
+						self.data['meta']['success'] = True
+					else:
+						self.data['meta']['error'] = "This Collection cannot be deleted as it contains books"
+				else:
+					self.data['meta']['error'] = "This Collection cannot be deleted as it contains child Collections"
+			except Collection.DoesNotExist:
+				self.data['meta']['error'] = "A Collection with that pk does not exist for this User"
+		else:
+			self.data['meta']['error'] = "collection_pk not found in POST data"
+			
+class DeleteBookProfile(APIAuthView):
+	def process(self, request):
+		profile_pk = request.POST.get('profile_pk', None) or request.POST.get('pk', None)
+		if profile_pk is not None:
+			try:
+				profile = BookProfile.objects.get(Q(pk=profile_pk) & (Q(collection__owner=self.user) | Q(collection__parent__owner=self.user) | Q(collection__parent__parent__owner=self.user)))
+				self.data['profile'] = {
 					'pk': series.pk
 				}
 				profile.delete()
-				data['meta']['success'] = True
-			
+				self.data['meta']['success'] = True
 			except Collection.DoesNotExist:
-				data['meta']['error'] = "A Profile with that pk does not exist for this user"
-			
+				self.data['meta']['error'] = "A Profile with that pk does not exist for this User"
 		else:
-			data['meta']['error'] = "profile_pk not found"
-		
-	else:
-		data['meta']['error'] = "Invalid token"
-	
-	return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+			sellf.data['meta']['error'] = "profile_pk not found"
+
+delete_collection = DeleteCollection()
+delete_profile = DeleteBookProfile()

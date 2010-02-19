@@ -45,7 +45,7 @@ class CollectionForm(forms.ModelForm):
 				
 class CreateCollectionForm(CollectionForm):
 	class Meta(CollectionForm.Meta):
-		exclude = ['owner', 'description', 'collection_type', 'parent']
+		exclude = ['owner']
 
 class UpdateCollectionForm(CollectionForm):
 	class Meta(CollectionForm.Meta):

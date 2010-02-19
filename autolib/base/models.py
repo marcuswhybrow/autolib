@@ -44,37 +44,6 @@ class Update(models.Model):
 			print self
 			return None
 
-# class Syncable(models.Model):
-# 	
-# 	# The time the object was INSERTed
-# 	added = models.DateTimeField(auto_now_add=True)
-# 	# The last time the object was UPDATEd
-# 	last_modified = models.DateTimeField(auto_now=True)
-# 	
-# 	class Meta:
-# 		abstract = True
-# 	
-# 	def get_owner(self):
-# 		raise NotImplementedError
-# 	
-# 	def save(self, *args, **kwargs):
-# 		
-# 		# Determin INSERT of UPDATE via UUID presence
-# 		if not self.pk:
-# 			action = 'insert'
-# 		else:
-# 			action = 'update'
-# 		
-# 		# do the rest of save as normal and log the insert in update
-# 		super(Syncable, self).save(*args, **kwargs)
-# 		
-# 		Update(uuid=self.pk, object_type=self.__module__.split('.')[0] + '.' + self.__class__.__name__, action=action).save()
-# 	
-# 	def delete(self, *args, **kwargs):
-# 				
-# 		Update(uuid=self.pk, object_type=self.__module__.split('.')[0] + '.' + self.__class__.__name__, action='delete', user=self.get_owner()).save()
-# 		super(Syncable, self).delete(*args, **kwargs)
-
 from uuid import uuid4
 
 class UUIDSyncable(models.Model):

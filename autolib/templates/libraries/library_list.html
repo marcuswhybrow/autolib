@@ -38,14 +38,14 @@
 				},
 				buttons: {
 					'Delete': function() {
-						$.get('{% url api_delete_library %}', {library_pk: library_pk}, function(data) {
+						$.post('{% url api_delete_collection %}', {collection_pk: library_pk}, function(data) {
 							if (data.meta.success == true) {
 								delete_library_dialog.dialog('close');
 								library_row.remove();
 							} else if(data.meta.success == false) {
 								delete_library_dialog.dialog('close');
 								
-								$("div#library-delete-error p.error-message").append(data.meta.error);
+								$("div#library-delete-error p.error-message").text(data.meta.error);
 								$("div#library-delete-error").dialog({
 									bgiframe: true,
 									resizable: false,
@@ -84,12 +84,12 @@
 			
 			form.find().attr('disabled', 'disabled');
 			
-			$.post('{% url api_insert_library %}', form.serialize(), function(data) {
+			$.post('{% url api_save_collection %}', form.serialize(), function(data) {
 				if (data.meta.success == true) {
-					var name = data.library.name;
-					var description = data.library.description;
-					var url = data.library.url;
-					var pk = data.library.pk;
+					var name = data.collection.name;
+					var description = data.collection.description;
+					var url = data.collection.url;
+					var pk = data.collection.pk;
 					$("ul#library-list").append('<li id="' + pk + '"><a href="' + url + '">' + name + '</a><span class="delete">delete</span></li>');
 					
 					$("#" + pk).hover(library_hover_over, library_hover_out);
@@ -101,7 +101,7 @@
 			}, "json");
 			
 			form.find().attr('disabled', '');
-			form.find(':input').val('');
+			form.find(':input[name="name"]').val('');
 			
 			return false;
 		});
@@ -131,6 +131,7 @@
 			<h3>Create a new <span class="library">Library</span></h3>
 			<p>Pick a name for your new library, make sure its not the same as another one and hit create.</p>
 			<form id="new-library-form" action="" method="post" class="jqtransform">
+				<input type="hidden" name="collection_type" value="library" />
 				<div class="rowElem">
 					{{ form.name }}
 				</div>

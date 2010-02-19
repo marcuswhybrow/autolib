@@ -38,15 +38,23 @@ class Collection(UUIDSyncable):
 	bookshelves = managers.BookshelfManager()
 	series = managers.SeriesManager()
 	
+	def get_user(self):
+		if self.collection_type == 'library':
+			return self.owner
+		elif self.collection_type == 'bookshelf':
+			return self.parent.owner
+		elif self.collection_type == 'series':
+			return self.parent.parent.owner
+	
+	user = property(get_user)
 
 	def get_absolute_url(self):
 		if self.collection_type == 'library':
 			return ('library_detail', [self.slug])
-						
 		elif self.collection_type == 'bookshelf':
 			return ('bookshelf_detail', [self.parent.slug, self.slug])
-		
-		return None
+		else:
+			return None
 	
 	get_absolute_url = permalink(get_absolute_url)
 	
@@ -84,7 +92,7 @@ class Collection(UUIDSyncable):
 		else:
 			raise AssertionError, 'A Collection must be of type "library", "bookshelf" or "series"'
 		
-		super(self.__class__, self).save(*args, **kwargs)
+		super(Collection, self).save(*args, **kwargs)
 	
 	def get_owner(self):
 		if self.collection_type == 'library':

@@ -41,6 +41,7 @@ class Book(UUIDSyncable):
 class BookProfile(UUIDSyncable):
 	book_instance = models.ForeignKey(Book, related_name='instances')
 	collection = models.ForeignKey(Collection, related_name='books')
+	slug = models.CharField(max_length=200, editable=False)
 	
 	class Meta:
 		unique_together = ('book_instance', 'collection')
@@ -48,42 +49,36 @@ class BookProfile(UUIDSyncable):
 	def __unicode__(self):
 		return '[BookProfile] %s' % self.book_instance.isbn
 	
-	def slug(self):
-		return re.sub('\ ', '-', re.sub('[^a-zA-Z0-9\ \-\_]', '', self.book_instance.title))
-	
 	@permalink
 	def get_absolute_url(self):
 		if self.collection.collection_type == 'library':
 			bookshelf = Config.objects.get(key='unsorted_bin').slug
 			library = self.collection.slug
-			username = self.collection.owner.username
 		elif self.collection.collection_type == 'bookshelf':
 			bookshelf = self.collection.slug
 			library = self.collection.parent.slug
-			username = self.collection.parent.owner.username
 		elif self.collection.collection_type == 'series':
 			bookshelf = self.collection.parent.slug
 			library = self.collection.parent.parent.slug
-			username = self.collection.parent.parent.owner.username
 		
-		return ('users.views.book_detail', [username, library, bookshelf, self.book_instance.isbn, self.slug])
+		return ('profile_detail', [library, bookshelf, self.isbn, self.slug])
 	
-	def isbn(self):
+	def get_isbn(self):
 		return self.book_instance.isbn
 	
-	def title(self):
+	def get_title(self):
 		return self.book_instance.title
 	
-	def description(self):
+	def get_description(self):
 		return self.book_instance.description
 	
-	def author(self):
+	def get_author(self):
 		return self.book_instance.author
 		
-	def publisher(self):
+	def get_publisher(self):
 		return self.book_instance.publisher
 	
-	def published(self):
+	def get_published(self):
 		return self.book_instance.published
 	
 	def get_owner(self):
@@ -95,6 +90,18 @@ class BookProfile(UUIDSyncable):
 			return self.collection.parent.parent.owner
 		else:
 			return None
+	
+	isbn = property(get_isbn)
+	title = property(get_title)
+	description = property(get_description)
+	author = property(get_author)
+	publisher = property(get_publisher)
+	published = property(get_published)
+	user = property(get_owner)
+	
+	def save(self, *args, **kwagrs):
+		self.slug = slugify(self.title)
+		super(BookProfile, self).save(*args, **kwargs)
 		
 #############
 ### Forms ###

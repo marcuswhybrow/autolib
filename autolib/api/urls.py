@@ -1,40 +1,6 @@
-
 # api urls.py
 
 from django.conf.urls.defaults import *
-
-getpatterns = patterns('api.views.get',
-
-	url(r'^libraries/$', 'get_library_list', name='api_get_library_list'),
-	url(r'^library_detail/$', 'get_library_detail', name='api_get_library_detail'),
-	
-	url(r'^bookshelves/$', 'get_bookshelf_list', name='api_get_bookshelf_list'),	
-	url(r'^bookshelf_detail/$', 'get_bookshelf_detail', name='api_get_bookshelf_detail'),
-	
-	url(r'^series/$', 'get_series_list', name='api_get_series_list'),
-	url(r'^series_detail/$', 'get_series_detail', name='api_get_series_detail'),
-	
-	url(r'^profiles/$', 'get_profile_list', name='api_get_profile_list'),
-	url(r'^profile_detail/$', 'get_profile_detail', name='api_get_profile_detail'),
-)
-
-insertpatterns = patterns('api.views.insert',
-
-	url(r'^library/$', 'insert_library', name='api_insert_library'),
-	url(r'^bookshelf/$', 'insert_bookshelf', name='api_insert_bookshelf'),	
-	url(r'^series/$', 'insert_series', name='api_insert_series'),
-	
-	url(r'^profile/$', 'insert_profile', name='api_insert_profile'),
-)
-
-updatepatterns = patterns('api.views.update',
-
-	url(r'^library/$', 'update_library', name='api_update_library'),
-	url(r'^bookshelf/$', 'update_bookshelf', name='api_update_bookshelf'),	
-	url(r'^series/$', 'update_series', name='api_update_series'),
-	
-	url(r'^profile/$', 'update_profile', name='api_update_profile'),
-)
 
 authpatterns = patterns('api.views.auth',
 	
@@ -47,12 +13,24 @@ syncpatterns = patterns('api.views.sync',
 	url(r'^update/$', 'sync_update', name='api_sync_update')
 )
 
+getpatterns = patterns('api.views.get',
+
+	url(r'^collection/?$', 'get_collection_list', name='api_get_collection_list'),
+	url(r'^collection_detail/?$', 'get_collection_detail', name='api_get_collection_detail'),
+	
+	url(r'^profiles/$', 'get_profile_list', name='api_get_profile_list'),
+	url(r'^profile_detail/$', 'get_profile_detail', name='api_get_profile_detail'),
+)
+
+savepatterns = patterns('api.views.save',
+
+	url(r'^collection/$', 'save_collection', name='api_save_collection'),
+	url(r'^profile/$', 'save_profile', name='api_save_profile'),
+)
+
 deletepatterns = patterns('api.views.delete',
 
-	url(r'^library/$', 'delete_library', name='api_delete_library'),
-	url(r'^bookshelf/$', 'delete_bookshelf', name='api_delete_bookshelf'),	
-	url(r'^series/$', 'delete_series', name='api_delete_series'),
-	
+	url(r'^collection/$', 'delete_collection', name='api_delete_collection'),
 	url(r'^profile/$', 'delete_profile', name='api_delete_profile'),
 )
 
@@ -60,8 +38,7 @@ urlpatterns = patterns('api.views',
 
 	(r'^auth/', include(authpatterns)),
 	(r'^get/', include(getpatterns)),
-	(r'^insert/', include(insertpatterns)),
-	(r'^update/', include(updatepatterns)),
+	(r'^save/', include(savepatterns)),
 	(r'^sync/', include(syncpatterns)),
 	(r'^delete/', include(deletepatterns)),
 
