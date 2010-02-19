@@ -11,7 +11,7 @@ class APIView(object):
 		self.data = {'meta': {'success': False}}
 		try:
 			self.process(request, *args, **kwargs)
-		except Exception as e:
+		except Exception, e:
 			self.data = {'meta': {'success': False, 'error': str(e)}}
 		return HttpResponse(simplejson.dumps(self.data), mimetype='application/json')
 	
@@ -32,7 +32,7 @@ class APIAuthView(APIView):
 		if self.user and self.user.is_authenticated():
 			try:
 				self.process(request, *args, **kwargs)
-			except Exception as e:
+			except Exception, e:
 				self.data = {'meta': {'success': False, 'error': str(e)}}
 		else:
 			self.data['meta']['error'] = 'Invalid token_id'
