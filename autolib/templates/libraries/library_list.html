@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="/media/js/jqtransform/jqtransform.css" />
 <script type="text/javascript" src="/media/js/jqtransform/jquery.jqtransform.js"></script>
 <script type="text/javascript" src="/media/js/jquery-ui-1.8rc1.custom.min.js"></script>
+<script type="text/javascript" src="/media/js/jquery.blockUI.js"></script>
 <script type="text/javascript">
 	$(function() {
 		//find all the forms with the class of jqtransform and then apply the plugin
@@ -17,57 +18,54 @@
 		// Library List
 		
 		function library_hover_over() {
-			$(this).find('span.delete').css('display', 'inline');
+			$(this).find('span.delete, span.really').css('display', 'inline');
 		}
 		
 		function library_hover_out() {
 			$(this).find('span.delete').css('display', 'none');
+			$(this).find('span.really').remove();
 		}
 		
 		function library_click_delete() {
 			var library_row = $(this).parent();
 			var library_pk = library_row.attr("id");
 			
-			var delete_library_dialog = $("div#library-delete").dialog({
-				bgiframe: true,
-				resizable: false,
-				modal: true,
-				overlay: {
-					backgroundColor: '#000',
-					opacity: 0.5
-				},
-				buttons: {
-					'Delete': function() {
-						$.post('{% url api_delete_collection %}', {collection_pk: library_pk}, function(data) {
-							if (data.meta.success == true) {
-								delete_library_dialog.dialog('close');
-								library_row.remove();
-							} else if(data.meta.success == false) {
-								delete_library_dialog.dialog('close');
-								
-								$("div#library-delete-error p.error-message").text(data.meta.error);
-								$("div#library-delete-error").dialog({
-									bgiframe: true,
-									resizable: false,
-									modal: true,
-									overlay: {
-										backgroundColor: '#000',
-										opacity: 0.5
-									},
-									buttons: {
-										Ok: function() {
-											$(this).dialog('close');
-										}
-									}
-								})
-							}
-						}, "json");
-					},
-					Cancel: function() {
-						$(this).dialog('close');
-					}
-				}
-			});
+			if (library_row.find('span.really').length == 0) {
+				
+				library_row.append('<span class="really">really</spa>');
+			
+				var really = library_row.find('span.really');
+				
+				really.css('display', 'inline');
+				
+				really.click(function() {
+					$.post('{% url api_delete_collection %}', {collection_pk: library_pk}, function(data) {
+						if (data.meta.success == true) {
+							library_row.slideUp('200', function() {
+								$(this).remove();
+							});
+							$.growlUI('Library Deleted', 'Your library was deleted successfully');
+						} else if(data.meta.success == false) {
+							$.blockUI({ css: {
+								'class': 'specialclass',
+					            border: 'none', 
+					            padding: '15px', 
+					            backgroundColor: '#000', 
+					            '-webkit-border-radius': '10px', 
+					            '-moz-border-radius': '10px', 
+					            opacity: .5, 
+					            color: '#fff' 
+					        }, message: '<h1>There was an error deleting the Library</h1><p>' + data.meta.error + '</p><input type="button" value="OK" id="blockUI-OK" />' });
+					        
+					        $("#blockUI-OK").click(function() {
+					        	$.unblockUI();
+					        	return false;
+					        });
+						}
+					}, "json");
+				});
+				
+			}
 		}
 		
 		$("ul#library-list li").append('<span class="delete">delete</span>');
@@ -82,25 +80,58 @@
 			
 			var form = $(this);
 			
-			form.find().attr('disabled', 'disabled');
+			var formData = form.serialize();
 			
-			$.post('{% url api_save_collection %}', form.serialize(), function(data) {
+			form.block({ 
+				fadeIn: 10,
+				fadeOut: 10,
+				css: { 
+		            border: 'none', 
+		            padding: '15px', 
+		            backgroundColor: '#000', 
+		            '-webkit-border-radius': '10px', 
+		            '-moz-border-radius': '10px', 
+		            opacity: .5, 
+		            color: '#fff' 
+		        }, 
+		        message: 'Adding Library' 
+		    });
+			
+			$.post('{% url api_save_collection %}', formData, function(data) {
 				if (data.meta.success == true) {
 					var name = data.collection.name;
 					var description = data.collection.description;
 					var url = data.collection.url;
 					var pk = data.collection.pk;
-					$("ul#library-list").append('<li id="' + pk + '"><a href="' + url + '">' + name + '</a><span class="delete">delete</span></li>');
+					$("ul#library-list").append('<li id="' + pk + '" style="display: none"><a href="' + url + '">' + name + '</a><span class="delete">delete</span></li>');
+					$("li#" + pk).slideDown('200');
 					
 					$("#" + pk).hover(library_hover_over, library_hover_out);
 					$("#" + pk + " span.delete").click(library_click_delete);
 					
+					$.growlUI('Library Added', 'Your new library was added successfully');
+					
+					form.unblock();
+					
 				} else if(data.meta.success == false) {
-					alert(data.meta.error);
+					form.unblock();
+					$.blockUI({ css: { 
+			            border: 'none', 
+			            padding: '15px', 
+			            backgroundColor: '#000', 
+			            '-webkit-border-radius': '10px', 
+			            '-moz-border-radius': '10px', 
+			            opacity: .5, 
+			            color: '#fff' 
+			        }, message: '<h1>There was an error adding the Library</h1><p>' + data.meta.error + '</p><input type="button" value="OK" id="blockUI-OK" />' });
+			        
+			        $("#blockUI-OK").click(function() {
+			        	$.unblockUI();
+			        	return false;
+			        });
 				}
 			}, "json");
 			
-			form.find().attr('disabled', '');
 			form.find(':input[name="name"]').val('');
 			
 			return false;

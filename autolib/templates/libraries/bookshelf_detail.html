@@ -12,6 +12,8 @@
 {% block head %}
 <link rel="stylesheet" href="/media/js/jqtransform/jqtransform.css" />
 <script type="text/javascript" src="/media/js/jqtransform/jquery.jqtransform.js"></script>
+<script type="text/javascript" src="/media/js/jquery.jeditable.mini.js"></script>
+<script type="text/javascript" src="/media/js/jquery.blockUI.js"></script>
 <script type="text/javascript">
 	$(function() {
 		// Find all the forms with the class of jqtransform and then apply the plugin
@@ -19,70 +21,41 @@
 		
 		// Editing Details
 		
-		$("div.editable .detail").hover(function() {
-			$(this).addClass('edit');
-		}, function() {
-			$(this).removeClass('edit');
-		});
-				
-		$("div.editable .detail").click(editClick);
-		
-		function editClick() {
+		$("div.editable .detail").editable(function(value, settings) {
 			var detail = $(this);
-			var box = detail.parent();
-
-			box.html('<form></form>');			
-			var form = box.find('form');
+			if (detail.attr('id') == 'name') {
+				postData = {name: value, pk: '{{ bookshelf.pk }}'}
+			} else if (detail.attr('id') == 'description') {
+				postData = {description: value, pk: '{{ bookshelf.pk }}'}
+			}
+			var result = '';
 			
-			form.html('<input class="focus ' + detail[0].tagName + '" type="text" id="' + detail.attr('id') + '" name="' + detail.attr('id') + '" value="' + detail.text() + '" />' + 
-					  '<input type="hidden" id="pk" name="pk" value="{{ bookshelf.pk }}" />' +
-					  '<input type="submit" value="submit" />' +
-					  '<input type="button" value="cancel" />');
+			detail.block();
 			
-			form.find(':first').focus();
-			
-			var cancel = form.find(':button');
-			
-			cancel.click(function() {
-				detail.hover(function() {
-					$(this).addClass('edit');
-				}, function() {
-					$(this).removeClass('edit');
-				});
-				detail.click(editClick);
-				box.html(detail);
-			});
-					  
-			form.submit(function() {
-				
-				var form = $(this);
-				
-				$.post('{% url api_save_collection %}', form.serialize(), function(data) {
+			$.ajax({
+				url: '{% url api_save_collection %}',
+				data: postData,
+				async: false,
+				dataType: 'json',
+				type: 'POST',
+				success: function(data) {
 					if (data.meta.success == true) {
-						var name = data.collection.name;
-						var description = data.collection.description;
-						
 						if (detail.attr('id') == 'name') {
-							detail.text(name);
+							result = data.collection.name;
 						} else if (detail.attr('id') == 'description') {
-							detail.text(description);
+							result = data.collection.description;
 						}
 						
 					} else if(data.meta.success == false) {
-						var error = data.meta.error;
-						alert(error);
+						alert(data.meta.error);
 					}
-				}, "json");
-				detail.hover(function() {
-					$(this).addClass('edit');
-				}, function() {
-					$(this).removeClass('edit');;
-				});
-				detail.click(editClick);
-				box.html(detail);
-				return false;
+				}
 			});
-		}
+			
+			detail.unblock();
+			
+			return result;
+		});
 		
 		// Adding Bookshelves
 		

@@ -74,8 +74,13 @@ ul#libraries                            { font-size: 13px; }
 /* Library List */
 
 ul.collection-list li span.delete		{ display: none; margin-left: 10px; cursor: pointer; color: #ccc; background-color: #fafafa; 
-                                          -moz-border-radius: 6px; -webkit-border-radius: 6px; padding: 0 4px; border: 1px solid #f0f0f0; }
-ul.collection-list li span.delete:hover { text-decoration: none; background-color: #e21a1a; border: 1px solid #9d1414; color: #fff; }
+                                          -moz-border-radius: 6px; -webkit-border-radius: 6px; padding: 0 4px; border: 1px solid #f0f0f0; z-index: 200; position: relative; }
+ul.collection-list li span.delete:hover { background-color: #bbb; border: 1px solid #666; color: #fff; }
+
+ul.collection-list li span.really		{ display: none; margin-left: 10px; cursor: pointer; color: #fff; background-color: #e21a1a;
+                                          -moz-border-radius: 6px; -webkit-border-radius: 6px; padding: 0 4px; border: 1px solid #9d1414; z-index: 100;
+                                          padding-left: 15px; left: -20px; position: relative; }
+ul.collection-list li span.really:hover { text-decoration: none; }
 
 /* Links */
 
@@ -152,3 +157,18 @@ div#overview #meta #tags ul li.more     { color: #fff; padding-top: 18px; text-t
 /* jQuery */
 
 div.dialog			{ display: none; }
+
+/* BlockUI */
+
+div.blockUI h1 {
+	color: white;
+	opacity: 1; !important
+}
+
+/* GrowlUI */
+
+div.growlUI						{ background: url(check48.png) no-repeat 10px 10px }
+div.growlUI h1, div.growlUI h2 	{ color: white; padding: 5px 5px 5px 75px; text-align: left; width: auto; }
+
+div.growlUI h1					{ font-size: 18px; }
+div.growlUI h2					{ font-size: 13px; }
