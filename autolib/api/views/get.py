@@ -12,9 +12,9 @@ class GetCollectionList(APIAuthView):
 		if parent_pk is not None:
 			try:
 				collection = Collection.objects.get(Q(pk=parent_pk)& (Q(owner=self.user) | Q(parent__owner=self.user) | Q(parent__parent__owner=self.user)))
-				self.data['bookshelves'] = []
+				self.data['collections'] = []
 				for c in collection.children.all():
-					self.data['bookshelves'].append({
+					self.data['collections'].append({
 						'pk': c.pk,
 						'name': c.name,
 						'parent': c.parent.pk if c.parent is not None else None,
