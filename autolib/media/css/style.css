@@ -172,3 +172,13 @@ div.growlUI h1, div.growlUI h2 	{ color: white; padding: 5px 5px 5px 75px; text-
 
 div.growlUI h1					{ font-size: 18px; }
 div.growlUI h2					{ font-size: 13px; }
+
+/* Book Details */
+
+table.book-details {
+	margin-top: 20px;
+}
+
+table.book-details td {
+	padding-right: 20px;
+}

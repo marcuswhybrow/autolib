@@ -36,11 +36,40 @@
 	<div class="inner">
 		{% if book %}
 			<h2>{{ book.title }}</h2>
-			<p>ISBN: {{ book.isbn }}</p>
-			<p>Author: {{ book.author }}</p>
-			<p>Publisher: {{ book.publisher }}</p>
-			<p>Published Date: {{ book.published }}</p>
-			<p>Description: {{ book.description }}</p>
+			<table class="book-details">
+				<tr>
+					<td>ISBN</td>
+					<td><p>{{ book.isbn }}</p></td>
+				</tr>
+				<tr>
+					<td>Pages</td>
+					<td><p>{{ book.pages }}</p></td>
+				</tr>
+				<tr>
+					<td>Dimensions</td>
+					<td><p>{{ book.width }}cm x {{ book.height }}cm x {{ book.depth }}cm</p></td>
+				</tr>
+				<tr>
+					<td>Language</td>
+					<td><p>{{ book.language }}</p></td>
+				</tr>
+				<tr>
+					<td>Author</td>
+					<td><p>{{ book.author }}</p></td>
+				</tr>
+				<tr>
+					<td>Publisher</td>
+					<td><p>{{ book.publisher }}</p></td>
+				</tr>
+				<tr>
+					<td>Published</td>
+					<td><p>{{ book.published }}</p></td>
+				</tr>
+				<tr>
+					<td>Description</td>
+					<td><p>{{ book.description }}</p></td>
+				</tr>
+			</table>
 		{% else %}
 			<h2>Whoops!</h2>
 			<p>You dont have that book in this library.</p>
