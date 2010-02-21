@@ -183,9 +183,9 @@ table.book-details td 			{ padding-right: 20px; }
 div.icon-link					{  }
 div.icon-link img				{ float: left; padding-right: 10px; }
 
-div.icon-link h1,
-div.icon-link h2,
-div.icon-link h3				{ padding-top: 10px; padding-bottom: 0; }
+div.icon-link h1.compact,
+div.icon-link h2.compact,
+div.icon-link h3.compact		{ padding: 5px 0; }
 
 div.icon-link p.last			{ padding-bottom: 0; }
 
