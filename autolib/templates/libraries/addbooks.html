@@ -9,13 +9,40 @@
 <link rel="stylesheet" href="/media/js/jqtransform/jqtransform.css" />
 <script type="text/javascript" src="/media/js/jqtransform/jquery.jqtransform.js"></script>
 <script type="text/javascript" src="/media/js/jquery-ui-1.8rc1.custom.min.js"></script>
+<script type="text/javascript" src="/media/js/jquery.blockUI.js"></script>
 <script type="text/javascript">
 	$(function() {
 		$("form#add-books").jqTransform();
 		
 		$("form#add-books").submit(function() {
 			
-			alert("submitted");
+			var form = $(this);
+			
+			formData = form.serialize();
+			
+			$.post('{% url api_save_profile %}', formData, function(data){
+				if (data.meta.success) {
+					$.blockUI({ css: { 
+			            border: 'none', 
+			            padding: '15px', 
+			            backgroundColor: '#000', 
+			            '-webkit-border-radius': '10px', 
+			            '-moz-border-radius': '10px', 
+			            opacity: .5, 
+			            color: '#fff' 
+			        }, message: '<h1>' + data.book.title + '</h1><p>' + 
+			        			data.book.author + '</p><p>' + 
+			        			data.book.description + '</p><p>' + 
+			        			data.book.publisher + '</p><p>' + 
+			        			data.book.published + '</p><input type="button" id="go-to-profile" value="Go to Profile" />' });
+			        
+			        $("#go-to-profile").click(function() {
+			        	window.location.replace(data.profile.url);
+			        });
+				} else {
+					alert(data.meta.error);
+				}
+			}, 'json');
 			return false;
 		});
 	});
@@ -27,6 +54,7 @@
 		<div class="inner">
 			<h1>Add Some Books</h1>
 			<form id="add-books" action="" method="post" class="jqTransform">
+				{% if collection %}<input type="hidden" name="collection_pk" value="{{ collection.pk }}" />{% endif %}
 				<div class="rowElem">
 					<input type="text" id="isbn" name="isbn" value="" />
 				</div>

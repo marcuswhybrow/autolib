@@ -117,6 +117,8 @@
 				{% else %}
 					<p class="error">So there are no books in this bookshelf yet, you should be ashamed of yourself!</p>
 				{% endif %}
+				<h3>Add a <span class="book">Book</span> to this Bookshelf</h3>
+				<p>Click <a href="{% url add_books %}?c={{ bookshelf.pk }}">here</a></p>
 			{% else %}
 				<h2>{{ unsorted_bin.value }}</h2>
 				<p>{{ unsorted_bin_description.value }}</p>
@@ -129,6 +131,8 @@
 				{% else %}
 					<p class="error">So there are no books in this bookshelf yet, you should be ashamed of yourself!</p>
 				{% endif %}
+				<h3>Add a <span class="book">Book</span> to this Bookshelf</h3>
+				<p>Click <a href="{% url add_books %}?c={{ library.pk }}">here</a></p>
 			{% endif %}
 		</div>
 	</div>

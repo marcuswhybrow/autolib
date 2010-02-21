@@ -90,6 +90,7 @@ class SaveProfile(APIAuthView):
 					'collection': profile.collection.pk,
 					'added': str(profile.added),
 					'last_modified': str(profile.last_modified),
+					'url': profile.get_absolute_url(),
 				}
 				self.data['meta']['success'] = True
 				return
@@ -137,6 +138,7 @@ class SaveProfile(APIAuthView):
 								'collection': profile.collection.pk,
 								'added': str(profile.added),
 								'last_modified': str(profile.last_modified),
+								'url': profile.get_absolute_url(),
 							}
 							self.data['book'] = {
 								'isbn10': book.isbn10,

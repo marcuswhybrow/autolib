@@ -100,7 +100,16 @@ class GoogleAdapter(Adapter):
 			author =  entry.find('dc:creator')
 			self.author = author.string if author is not None else None
 			date = entry.find('dc:date')
-			self.published = utils.parseDateTime(date.string + ' 00:00:00') if date is not None else None
+			
+			if date is not None:
+				dateString = ''
+				if re.match('^[0-9][0-9][0-9][0-9]$', date.string): dateString = date.string + '-01-01 00:00:00'
+				elif re.match('^[0-9][0-9][0-9][0-9]-[0-9][0-9]$', date.string): dateString = date.string + '-01 00:00:00'
+				elif re.match('^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$', date.string): dateString = date.string + ' 00:00:00'
+				self.published = utils.parseDateTime(dateString)
+			else:
+				self.published = None
+				
 			description = entry.find('dc:description')
 			self.description = description.string if description is not None else None
 			
