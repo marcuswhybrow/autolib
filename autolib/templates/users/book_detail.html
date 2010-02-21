@@ -66,6 +66,10 @@
 					<td><p>{{ book.published }}</p></td>
 				</tr>
 				<tr>
+					<td>Tags</td>
+					<td><p>{% for tag in book.book_instance.tags %}{% if not forloop.first %}, {% endif %}{{ tag }}{% endfor %}</p></td>
+				</tr>
+				<tr>
 					<td>Description</td>
 					<td><p>{{ book.description }}</p></td>
 				</tr>

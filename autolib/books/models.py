@@ -35,11 +35,9 @@ class Book(UUIDSyncable):
 	format = models.CharField(max_length=200, null=True)
 	language = models.CharField(max_length=5, null=True)
 	
-# 	tags = TagField()
-# 	
-# 	def get_tags(self):
-# 		return Tag.objects.get_for_object(self) 
-
+	def get_tags(self):
+		return Tag.objects.get_for_object(self)
+	
 	def __unicode__(self):
 		return '[Book] %s' % self.isbn
 		
@@ -70,12 +68,10 @@ class BookProfile(UUIDSyncable):
 	book_instance = models.ForeignKey(Book, related_name='instances')
 	collection = models.ForeignKey(Collection, related_name='books')
 	slug = models.CharField(max_length=200, editable=False)
-	
-# 	tags = TagField()
-# 	
-# 	def get_tags(self):
-# 		return Tag.objects.get_for_object(self) 
-	
+		
+	def get_tags(self):
+		return Tag.objects.get_for_object(self) 
+		
 	class Meta:
 		unique_together = ('book_instance', 'collection')
 	
