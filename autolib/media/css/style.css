@@ -87,7 +87,7 @@ ul.collection-list li span.really:hover { text-decoration: none; }
 a                            { font-style: normal; color: #337; text-decoration: none; }
 a:hover                      { text-decoration: underline; }
 
-#content a                   { color: #fff; background-color: #888; -moz-border-radius: 6px; -webkit-border-radius: 6px; padding: 0 4px; border: 1px solid #888; }
+#content a                   { color: #fff; background-color: #888; -moz-border-radius: 6px; -webkit-border-radius: 6px; padding: 0 4px; border: 1px solid #888; white-space: nowrap; }
 #content a:hover             { text-decoration: none; background-color: #999; border: 1px solid #777; }
 
 
@@ -140,7 +140,7 @@ div#overview #meta #tags ul li.more     { color: #fff; padding-top: 18px; text-t
 /* Footer */
 
 #footer-wrap        { width: 100%; }
-#footer             { width: 936px; text-align: center; margin: 0 auto; color: #bbb; font-size: 11px; height: 50px; }
+#footer             { width: 936px; text-align: center; margin: 0 auto; color: #bbb; font-size: 11px; height: 50px; padding-top: 10px; }
 
 /* Clearfix */
 
@@ -175,10 +175,25 @@ div.growlUI h2					{ font-size: 13px; }
 
 /* Book Details */
 
-table.book-details {
-	margin-top: 20px;
-}
+table.book-details 				{ margin-top: 20px; }
+table.book-details td 			{ padding-right: 20px; }
 
-table.book-details td {
-	padding-right: 20px;
-}
+/* Icon Links */
+
+div.icon-link					{  }
+div.icon-link img				{ float: left; padding-right: 10px; }
+
+div.icon-link h1,
+div.icon-link h2,
+div.icon-link h3				{ padding-top: 10px; padding-bottom: 0; }
+
+div.icon-link p.last			{ padding-bottom: 0; }
+
+
+/* Last */
+
+div#content div.section div.inner .last 	{ padding-bottom: 0; }
+
+div#content div.third			{ width: 300px; float: left; margin-left: 20px; width: 280px; }
+div#content div.third.alpha		{ margin-left: 0; }
+div#content div.third.omega		{  }

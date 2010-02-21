@@ -3,9 +3,52 @@
 {% block content %}
 <div class="section">
 	<div class="inner">
-		<h2>Welcome, we don't know you.</h2>
-		<p>Hey, if you want to keep track of your books then sign up over at <a href="{% url registration.views.register %}">{% url registration.views.register %}</a></p>
-		<p>If you allready have an account login here <a href="{% url django.contrib.auth.views.login %}">{% url django.contrib.auth.views.login %}</a></p>
+		<h1 class="last">Welcome to AutoLib</h1>
+	</div>
+</div>
+<div class="section">
+	<div class="inner">
+		<div class="clearfix">
+			<div class="third alpha">
+				<h3>What We Do</h3>
+				<p>AutoLib is designed to keep track of books, gathering information from around the web, and displaying it to you simply.</p>
+			</div>
+			<div class="third">
+				<h3>What You Do</h3>
+				<p>All you need do, is provide an ISBN and we do the rest. Gathering information from Google the Guardian and even Twitter.</p>
+			</div>
+			<div class="third omega">
+				<h3>How We Do It</h3>
+				<p>We do all the tricky behind the scenes stuff for each information source, and provide the tools to access that info from anywhere.</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="section">
+	<div class="inner">
+		<div class="clearfix">
+			<div class="third icon-link clearfix alpha">
+				<img src="/media/images/icons/Man-DBrown-icon-128.png" width="128" height="128" />
+				<h2>Signup</h2>
+				<p>Create an account, its simple, easy and <strong>free</strong>.</p>
+				<p class="last"><a href="{% url registration.views.register %}">Click here to Sign Up</a></p>
+			</div>
+			<div class="third icon-link clearfix">
+				<img src="/media/images/icons/Man-Grey-icon-128.png" width="128" height="128" />
+				<h2>Add</h2>
+				<p>Check out the apps:</p>
+				<ul>
+					<li><a href="#">Android App</a></li>
+					<li><a href="#">Desktop Application</a></li>
+				</ul>
+			</div>
+			<div class="third icon-link clearfix omega">
+				<img src="/media/images/icons/Man-Brown-icon-128.png" width="128" height="128" />
+				<h2>Organise</h2>
+				<p>Create libraries and bookshelves, group your books, or don't.</p>
+			</div>
+		</div>
 	</div>
 </div>
 {% endblock %}
