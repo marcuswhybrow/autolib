@@ -1,6 +1,6 @@
 # api.views.sync
 
-from api import utils
+from base import utils
 from django.core import serializers
 from django.db.models import Q
 from base.models import Update

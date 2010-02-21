@@ -87,10 +87,10 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'googlehooks',
     'registration',
+    'tagging'
     #'django_openidconsumer',
     #'django_openid_auth',
 )
-
 
 TEMPLATE_CONTEXT_PROCESSORS = (
 	"context_processors.user",
@@ -119,6 +119,9 @@ LOGIN_REDIRECT_URL = '/'
 # made aavailable again.
 ACCOUNT_ACTIVATION_DAYS = 7
 
+# Django-tagging
+
+FORCE_LOWERCASE_TAGS = True
 
 # Loads any local settings (possibly overriding values here).
 try:

@@ -1,4 +1,4 @@
-from api import utils
+from base import utils
 from django.http import HttpResponse
 import simplejson
 
@@ -30,10 +30,10 @@ class APIAuthView(APIView):
 		self.user = utils.get_user_from_token(self.token_id) if self.token_id is not None else request.user
 		
 		if self.user and self.user.is_authenticated():
-			try:
+# 			try:
 				self.process(request, *args, **kwargs)
-			except Exception, e:
-				self.data = {'meta': {'success': False, 'error': str(e)}}
+# 			except Exception, e:
+# 				self.data = {'meta': {'success': False, 'error': str(e)}}
 		else:
 			self.data['meta']['error'] = 'Invalid token_id'
 		

@@ -6,6 +6,7 @@ from libraries.models import Collection
 from base.models import Config
 
 from django.utils.http import urlquote_plus
+from django.template.defaultfilters import slugify
 
 import re
 
@@ -14,18 +15,43 @@ import re
 ##################
 
 from base.models import UUIDSyncable
+from tagging.fields import TagField
+from tagging.models import Tag
+import tagging
 
 class Book(UUIDSyncable):
 	
-	isbn = models.IntegerField(db_index=True, unique=True, editable=False)
+	isbn10 = models.CharField(db_index=True, unique=True, editable=False, max_length=10)
+	isbn13 = models.CharField(db_index=True, unique=True, editable=False, max_length=13)
 	title = models.CharField(max_length=200)
-	description = models.TextField()
-	author = models.CharField(max_length=200)
-	publisher = models.CharField(max_length=200)
-	published = models.DateField()
+	description = models.TextField(null=True)
+	author = models.CharField(max_length=200, null=True)
+	publisher = models.CharField(max_length=200, null=True)
+	published = models.DateTimeField(null=True)
+	pages = models.IntegerField(null=True)
+	width = models.FloatField(null=True)
+	height = models.FloatField(null=True)
+	depth = models.FloatField(null=True)
+	format = models.CharField(max_length=200, null=True)
+	language = models.CharField(max_length=5, null=True)
+	
+# 	tags = TagField()
+# 	
+# 	def get_tags(self):
+# 		return Tag.objects.get_for_object(self) 
 
 	def __unicode__(self):
 		return '[Book] %s' % self.isbn
+		
+	def get_isbn(self):
+		if self.isbn10:
+			return self.isbn10
+		elif self.isbn13:
+			return self.isbn13
+		
+		return None
+	
+	isbn = property(get_isbn)
 	
 # 	def save(self, *args, **kwargs):
 # 		assert re.match('^[a-zA-Z0-9\ \-\_]*$', self.title), 'A title can only contain the characters: a-z, A-Z, 0-9, spaces, underscores and dashes.'
@@ -38,10 +64,17 @@ class Book(UUIDSyncable):
 	def get_owner(self):
 		return None
 
+tagging.register(Book)
+
 class BookProfile(UUIDSyncable):
 	book_instance = models.ForeignKey(Book, related_name='instances')
 	collection = models.ForeignKey(Collection, related_name='books')
 	slug = models.CharField(max_length=200, editable=False)
+	
+# 	tags = TagField()
+# 	
+# 	def get_tags(self):
+# 		return Tag.objects.get_for_object(self) 
 	
 	class Meta:
 		unique_together = ('book_instance', 'collection')
@@ -81,6 +114,24 @@ class BookProfile(UUIDSyncable):
 	def get_published(self):
 		return self.book_instance.published
 	
+	def get_pages(self):
+		return self.book_instance.pages
+	
+	def get_width(self):
+		return self.book_instance.width
+	
+	def get_height(self):
+		return self.book_instance.height
+	
+	def get_depth(self):
+		return self.book_instance.depth
+	
+	def get_format(self):
+		return self.book_instance.format
+	
+	def get_language(self):
+		return self.book_instance.language
+	
 	def get_owner(self):
 		if self.collection.collection_type == 'library':
 			return self.collection.owner
@@ -98,10 +149,18 @@ class BookProfile(UUIDSyncable):
 	publisher = property(get_publisher)
 	published = property(get_published)
 	user = property(get_owner)
+	pages = property(get_pages)
+	width = property(get_width)
+	height = property(get_height)
+	depth = property(get_depth)
+	format = property(get_format)
+	language = property(get_language)
 	
-	def save(self, *args, **kwagrs):
+	def save(self, *args, **kwargs):
 		self.slug = slugify(self.title)
 		super(BookProfile, self).save(*args, **kwargs)
+
+tagging.register(BookProfile)
 		
 #############
 ### Forms ###
