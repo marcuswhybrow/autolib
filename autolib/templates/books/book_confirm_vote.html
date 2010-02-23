@@ -1,0 +1,10 @@
+{% extends "books/base.html" %}
+
+{% block content %}
+<div class="section">
+	<div class="inner">
+		<h1>Vote: {{ book.title }}</h1>
+		{{ direction }}
+	</div>
+</div>
+{% endblock %}

@@ -2,7 +2,7 @@
 
 from libraries.models import Collection
 from books.models import BookProfile
-from api.views import APIAuthView
+from api.views import APIView, APIAuthView
 
 from django.db.models import Q
 
@@ -116,7 +116,47 @@ class GetBookProfileDetail(APIAuthView):
 		else:
 			self.data['meta']['error'] = "profile_pk not found"
 
+class GetBookDetail(APIView):
+	
+	def process(self, request):
+		isbn = request.POST.get('isbn', None)
+		if isbn is not None:
+			try:
+				if len(isbn) == 10:
+					book = Book.objects.get(isbn10=isbn)
+				elif len(isbn) == 13:
+					book = Book.objects.get(isbn13=isbn)
+				else:
+					self.data['meta']['error'] = 'ISBN must be 10 or 13 characters in length'
+					return
+				
+				self.data['book'] = {
+					'isbn10': book.isbn10,
+					'isbn13': book.isbn13,
+					'title': book.title,
+					'description': book.description,
+					'author': book.author,
+					'publisher': book.publisher,
+					'published': str(book.published),
+					'pages': book.pages,
+					'width': book.width,
+					'height': book.height,
+					'depth': book.depth,
+					'format': book.format,
+					'language': book.language,
+					'added': str(profile.added),
+					'last_modified': str(profile.last_modified),
+				}
+				self.data['meta']['success'] = True
+				return
+			except Book.DoesNotExist:
+				self.data['meta']['error'] = 'Details for the book with ISBN ' + isbn + ' not found'
+				return
+		else:
+			self.data['meta']['error'] = "isbn was not found"
+
 get_collection_list = GetCollectionList()
 get_collection_detail = GetCollectionDetail()
 get_profile_list = GetBookProfileList()
 get_profile_detail = GetBookProfileDetail()
+get_book_detail = GetBookDetail()

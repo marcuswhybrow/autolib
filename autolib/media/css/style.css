@@ -19,6 +19,9 @@ h3, dt              { font-size: 16px; }
 
 dd                  { margin-left: 9px; }
 
+h3					{ padding-bottom: 0; }
+h3.inline			{ padding-top: 9px; }
+
 /* Editable Stuff */
 
 div.editable input.focus.H2 { color: #2e2e2e; font-family: "Helvetica"; text-transform: capitalize; font-size: 30px; font-weight: bold; padding: 0; margin: 0; border: 0; }
@@ -197,3 +200,26 @@ div#content div.section div.inner .last 	{ padding-bottom: 0; }
 div#content div.third			{ width: 300px; float: left; margin-left: 20px; width: 280px; }
 div#content div.third.alpha		{ margin-left: 0; }
 div#content div.third.omega		{  }
+
+/* Add Books */
+
+form#add-books div.rowElem					{ float: left; }
+form#add-books div.rowElem.button			{ clear: none; position: relative; top: -2px; }
+
+div#content table#lookup-status				{ width: 100%; }
+div#content table#lookup-status td.source	{ background-color: #eee; padding: 10px; border: 2px solid white; border-right: 1px solid #ddd; width: 60px; text-transform: uppercase; font-weight: bold; text-align: center; }
+div#content table#lookup-status td.status	{ background-color: #fafafa; padding: 10px; border: 2px solid white; border-left: none; color: #ddd; -moz-user-select: none; }
+
+/* Voting */
+
+div.vote-cell				{ width: 40px; position: relative; float: left; }
+div.vote-cell .vote-up,
+div.vote-cell .vote-down	{ display: block; margin: 0 auto; cursor: pointer; }
+
+div.vote-cell .vote-score	{ display: block; color: #808185; font-weight: bold; font-family: Arial,Liberation Sans,DejaVu Sans,sans-serif; font-size: 30px; text-align: center; }
+
+div.votable-content			{ position: relative; float: right; width: 845px; padding-left: 15px; }
+
+/* Layout */
+
+.center						{ text-align: center; }

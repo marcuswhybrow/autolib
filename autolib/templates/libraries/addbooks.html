@@ -34,13 +34,25 @@
 			        			data.book.author + '</p><p>' + 
 			        			data.book.description + '</p><p>' + 
 			        			data.book.publisher + '</p><p>' + 
-			        			data.book.published + '</p><input type="button" id="go-to-profile" value="Go to Profile" />' });
+			        			data.book.published + '</p><input type="button" id="go-to-profile" value="Go to Profile" />'
+			        });
 			        
 			        $("#go-to-profile").click(function() {
 			        	window.location.replace(data.profile.url);
 			        });
 				} else {
-					alert(data.meta.error);
+					$.blockUI({ 
+						css: { 
+				            border: 'none', 
+				            padding: '15px', 
+				            backgroundColor: '#000', 
+				            '-webkit-border-radius': '10px', 
+				            '-moz-border-radius': '10px', 
+				            opacity: .5, 
+				            color: '#fff' 
+				        }, message: data.meta.error,
+				        timeout: 2000
+			        });
 				}
 			}, 'json');
 			return false;
@@ -53,15 +65,40 @@
 	<div class="section">
 		<div class="inner">
 			<h1>Add Some Books</h1>
-			<form id="add-books" action="" method="post" class="jqTransform">
-				{% if collection %}<input type="hidden" name="collection_pk" value="{{ collection.pk }}" />{% endif %}
-				<div class="rowElem">
-					<input type="text" id="isbn" name="isbn" value="" />
+			<div class="clearfix">
+				<div class="third alpha">
+					<form id="add-books" action="" method="post" class="jqTransform">
+					{% if collection %}<input type="hidden" name="collection_pk" value="{{ collection.pk }}" />{% endif %}
+					<div class="rowElem clearfix">
+						<input type="text" id="isbn" name="isbn" value="" />
+					</div>
+					<div class="button rowElem clearifx">
+						<input type="submit" value="Find" />
+					</div>
+				</form>
 				</div>
-				<div class="rowElem">
-					<input type="submit" value="Add" />
+				<div class="third">
+					<table id="lookup-status">
+						<tr>
+							<td class="source">Local</td>
+							<td class="status">Checking</td>
+						</tr>
+						<tr>
+							<td class="source">Google</td>
+							<td class="status">Checking</td>
+						</tr>
+						<tr>
+							<td class="source">Guardian</td>
+							<td class="status">Checking</td>
+						</tr>
+					</table>
 				</div>
-			</form>
+				<div class="third omega">
+					<h3>Book Title</h3>
+					<p>Author</p>
+					<p>Published</p>
+				</div>
+			</div>
 		</div>
 	</div>
 {% endblock %}

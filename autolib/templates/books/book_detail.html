@@ -5,6 +5,77 @@
 <li> > <a href="{% url book_detail book.isbn %}">{{ book.title }}</a></li>
 {% endblock %}
 
+{% block head %}
+<script type="text/javascript">
+	$(function() {
+		
+		$("div.vote-cell.voted-up .vote-up").attr('src', '/media/images/icons/vote-arrow-up-on.png');
+		$("div.vote-cell.voted-down .vote-down").attr('src', '/media/images/icons/vote-arrow-down-on.png');
+		
+		$(".vote-up").click(function() {
+			
+			var voteCell = $(this).parent();
+			var bookPK = voteCell.find('input[name="book"]').val()
+			
+			if (voteCell.is('.voted-up')) {
+				$.post('/books/' + bookPK + '/clearvote/', {}, function(data) {
+					if (data.success) {
+						voteCell.removeClass('voted-up');
+						voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up.png');
+						voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down.png');
+						voteCell.find('.vote-score').text(data.score.score);
+					} else {
+						alert(data.error_message);
+					}
+				}, 'json');
+			} else {
+				$.post('/books/' + bookPK + '/upvote/', {}, function(data) {
+					if(data.success) {
+						voteCell.removeClass('voted-down');
+						voteCell.addClass('voted-up');
+						voteCell.find('span.vote-score').text(data.score.score);
+						voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up-on.png');
+						voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down.png');
+					} else {
+						alert(data.error_message);
+					}
+				}, 'json');
+			}
+		});
+		
+		$(".vote-down").click(function() {
+			
+			var voteCell = $(this).parent();
+			var bookPK = voteCell.find('input[name="book"]').val()
+			
+			if (voteCell.is('.voted-down')) {
+				$.post('/books/' + bookPK + '/clearvote/', {}, function(data) {
+					if (data.success) {
+						voteCell.removeClass('voted-down');
+						voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up.png');
+						voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down.png');
+						voteCell.find('.vote-score').text(data.score.score);
+					}
+				}, 'json');
+			} else {
+			
+				$.post('/books/' + bookPK + '/downvote/', {}, function(data) {
+					if(data.success) {
+						voteCell.removeClass('voted-up');
+						voteCell.addClass('voted-down');
+						voteCell.find('span.vote-score').text(data.score.score);
+						voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up.png');
+						voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down-on.png');
+					} else {
+						alert(data.error_message);
+					}
+				}, 'json');
+			}
+		});
+	});
+</script>
+{% endblock %}
+
 {% block sidebar %}
 <div id="overview" class="clearfix">
 	<div id="thumb">
@@ -29,18 +100,39 @@
 
 {% block content %}
 <div class="section">
-	<div class="inner">
+	<div class="inner clearfix">
 		{% if book %}
 			<h2>{{ book.title }}</h2>
-			<p>ISBN: {{ book.isbn }}</p>
-			<p>Author: {{ book.author }}</p>
-			<p>Publisher: {{ book.publisher }}</p>
-			<p>Published Date: {{ book.published }}</p>
-			<p>Description: {{ book.description }}</p>
+			<div class="vote-cell {% if vote and vote.is_upvote %}voted-up{% else %}{% if vote and vote.is_downvote %}voted-down{% endif %}{% endif %}">
+				<input type="hidden" name="book" value="{{ book.pk }}" />
+				<img class="vote-up" src="/media/images/icons/vote-arrow-up.png" />
+				<span class="vote-score">{{ score.score }}</span>
+				<img class="vote-down" src="/media/images/icons/vote-arrow-down.png" />
+			</div>
+			<div class="votable-content">
+				<p>{{ book.description }}</p>
+				<p><strong>{{ book.author }}</strong> ({{ book.publisher }}, {{ book.published|date:"Y" }})</p>
+			</div>
 		{% else %}
 			<h2>Whoops!</h2>
 			<p>You dont have that book in this library.</p>
 		{% endif %}
+	</div>
+</div>
+<div class="section">
+	<div class="inner clearfix">
+		<div class="votable-content">
+			<h3>Popularity</h3>
+			<p>Information regarding addition of this book to users libraries or collections. Maybe a graph, and some sort of total number.</p>
+			<h3 class="inline">Other statistics</h3>
+			<p>Who knows what might be here in the future.</p>
+		</div>
+	</div>
+</div>
+<div class="section">
+	<div class="inner">
+		<p class="center">{{ book.isbn }}</p>
+		<p class="last center">{{ book.pk }}</p>
 	</div>
 </div>
 {% endblock %}

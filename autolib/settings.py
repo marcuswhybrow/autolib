@@ -30,7 +30,7 @@ TIME_ZONE = 'Europe/London'
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-gb'
 
-SITE_ID = 1
+SITE_ID = 2
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -87,7 +87,8 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'googlehooks',
     'registration',
-    'tagging'
+    'tagging',
+    'voting',
     #'django_openidconsumer',
     #'django_openid_auth',
 )
@@ -122,6 +123,9 @@ ACCOUNT_ACTIVATION_DAYS = 7
 # Django-tagging
 
 FORCE_LOWERCASE_TAGS = True
+
+
+DEFAULT_FROM_EMAIL = 'autolib-noreply@marcuswhybrow.net'
 
 # Loads any local settings (possibly overriding values here).
 try:

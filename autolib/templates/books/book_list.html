@@ -1,18 +1,49 @@
 {% extends "books/base.html" %}
 
+{% load voting_tags %}
+{% votes_by_user user on books as vote_dict %}
+{% scores_for_objects books as score_dict %}
+
 {% block breadcrumbs %}
 {{ block.super }}
 <li> > <a href="{% url books.views.book_list %}">Books</a></li>
 {% endblock %}
 
+{% block head %}
+<script type="text/javascript">
+	$(function(){
+		$("form.book-vote").submit(function() {			
+			var vote = 'clearvote';
+			if ($(this).is('.vote-up')) {
+				vote = 'upvote';
+			} else if($(this).is('.vote-down')) {
+				vote = 'downvote';
+			}
+			
+			$.post('/books/' + $(this).parent().attr('id') +'/' + vote + '/', {}, function(data) {
+				alert('Score: ' + data.score.score + ' Num: ' + data.score.num_votes);
+			}, 'json');
+			return false;
+		});
+	});
+</script>
+{% endblock %}
+
 {% block content %}
 	<div class="section">
 		<div class="inner">
+			{% for score in score_dict %}
+				{{ score.score }}
+			{% endfor %}
 			<h2>Books</h2>
 			<p>All books in the system.</p>
 			<ul id="books">
 				{% for book in books %}
-					<li><a href="{{ book.isbn }}">{{ book.isbn }}</a></li>
+					{% dict_entry_for_item book from vote_dict as vote %}
+					{% dict_entry_for_item book from score_dict as score %}
+					<li id="{{ book.pk }}">
+						<p><a href="{{ book.get_absolute_url }}">{{ book.title }}</a> first seen {{ book.added|timesince }} ago.</p>
+					</li>
 				{% endfor %}
 			</ul>
 		</div>
