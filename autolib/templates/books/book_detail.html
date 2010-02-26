@@ -17,26 +17,65 @@
 			var voteCell = $(this).parent();
 			var bookPK = voteCell.find('input[name="book"]').val()
 			
+			// Remember the initial state
+			var initialState = '';
 			if (voteCell.is('.voted-up')) {
+				initialState = 'voted-up';
+			} else if (voteCell.is('.voted-down')) {
+				initialState = 'voted-down';
+			} else {
+				initialState = 'clear'
+			}
+			
+			var score = parseInt(voteCell.find('.vote-score').text());
+			
+			if (initialState == 'voted-up') {
+			
+				// Removing Vote Up (go to clear)
+				voteCell.removeClass('voted-up');
+				voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up.png');
+				voteCell.find('.vote-score').text(score - 1);
+				
 				$.post('/books/' + bookPK + '/clearvote/', {}, function(data) {
-					if (data.success) {
-						voteCell.removeClass('voted-up');
-						voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up.png');
-						voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down.png');
-						voteCell.find('.vote-score').text(data.score.score);
-					} else {
+					if (!data.success) {
+						voteCell.addClass('voted-up');
+						voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up-on.png');
+						voteCell.find('.vote-score').text(score);
 						alert(data.error_message);
 					}
 				}, 'json');
 			} else {
+				
+				// Adding Vote Up from clear or down
+				voteCell.addClass('voted-up');
+				
+				if (initialState == 'clear') {
+					
+					// Adding Vote Up from clear
+					voteCell.find('.vote-score').text(score + 1);
+					voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up-on.png');
+					
+				} else if (initialState == 'voted-down') {
+					
+					// Adding Vote Up from down
+					voteCell.removeClass('voted-down');
+					voteCell.find('.vote-score').text(score + 2);
+					
+					voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up-on.png');
+					voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down.png');
+				}
+				
 				$.post('/books/' + bookPK + '/upvote/', {}, function(data) {
-					if(data.success) {
-						voteCell.removeClass('voted-down');
-						voteCell.addClass('voted-up');
-						voteCell.find('span.vote-score').text(data.score.score);
-						voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up-on.png');
-						voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down.png');
-					} else {
+					if(!data.success) {
+						voteCell.find('span.vote-score').text(score);
+						if (initialState == 'clear') {
+							// Fall back from Up to Clear
+							voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up.png');
+						} else if (initialState == 'voted-down') {
+							// Fall back from Up to Down
+							voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up.png');
+							voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down-on.png');
+						}
 						alert(data.error_message);
 					}
 				}, 'json');
@@ -48,25 +87,65 @@
 			var voteCell = $(this).parent();
 			var bookPK = voteCell.find('input[name="book"]').val()
 			
-			if (voteCell.is('.voted-down')) {
+			// Remember the initial state
+			var initialState = '';
+			if (voteCell.is('.voted-up')) {
+				initialState = 'voted-up';
+			} else if (voteCell.is('.voted-down')) {
+				initialState = 'voted-down';
+			} else {
+				initialState = 'clear'
+			}
+			
+			var score = parseInt(voteCell.find('.vote-score').text());
+			
+			if (initialState == 'voted-down') {
+			
+				// Removing Vote Down (go to clear)
+				voteCell.removeClass('voted-down');
+				voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down.png');
+				voteCell.find('.vote-score').text(score + 1);
+				
 				$.post('/books/' + bookPK + '/clearvote/', {}, function(data) {
-					if (data.success) {
-						voteCell.removeClass('voted-down');
-						voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up.png');
-						voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down.png');
-						voteCell.find('.vote-score').text(data.score.score);
+					if (!data.success) {
+						voteCell.addClass('voted-down');
+						voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down-on.png');
+						voteCell.find('.vote-score').text(score);
+						alert(data.error_message);
 					}
 				}, 'json');
 			} else {
-			
+				
+				// Adding Vote Down from clear or up
+				voteCell.addClass('voted-down');
+				
+				if (initialState == 'clear') {
+					
+					// Adding Vote Up from clear
+					voteCell.find('.vote-score').text(score - 1);
+					voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down-on.png');
+					
+				} else if (initialState == 'voted-up') {
+					
+					// Adding Vote Up from down
+					voteCell.removeClass('voted-up');
+					voteCell.find('.vote-score').text(score - 2);
+					
+					voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down-on.png');
+					voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up.png');
+				}
+				
 				$.post('/books/' + bookPK + '/downvote/', {}, function(data) {
-					if(data.success) {
-						voteCell.removeClass('voted-up');
-						voteCell.addClass('voted-down');
-						voteCell.find('span.vote-score').text(data.score.score);
-						voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up.png');
-						voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down-on.png');
-					} else {
+					if(!data.success) {
+						voteCell.find('span.vote-score').text(score);
+						if (initialState == 'clear') {
+							// Fall back from Up to Clear
+							voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down.png');
+						} else if (initialState == 'voted-up') {
+							// Fall back from Up to Down
+							voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down.png');
+							voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up-on.png');
+						}
 						alert(data.error_message);
 					}
 				}, 'json');
