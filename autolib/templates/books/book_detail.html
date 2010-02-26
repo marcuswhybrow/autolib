@@ -6,11 +6,20 @@
 {% endblock %}
 
 {% block head %}
+<script type="text/javascript" src="/media/js/jquery.page-realtime-twitter-reactions.js"></script>
 <script type="text/javascript">
 	$(function() {
 		
 		$("div.vote-cell.voted-up .vote-up").attr('src', '/media/images/icons/vote-arrow-up-on.png');
 		$("div.vote-cell.voted-down .vote-down").attr('src', '/media/images/icons/vote-arrow-down-on.png');
+		
+		$("#realtime-twitter-updates").getPageRealtimeReactions({
+			query: "{{ book.title }}",
+			numTweets: 5,
+			loaderText: "Loading ...",
+			slideIn: false,
+			showHeading: false
+		});
 		
 		$(".vote-up").click(function() {
 			
@@ -196,6 +205,14 @@
 			<h2>Whoops!</h2>
 			<p>You dont have that book in this library.</p>
 		{% endif %}
+	</div>
+</div>
+<div class="section">
+	<div class="inner clearfix">
+		<div id="realtime-twitter" class="votable-content">
+			<h3>Latest Twitter Updates</h3>
+			<div id="realtime-twitter-updates"></div>
+		</div>
 	</div>
 </div>
 <div class="section">

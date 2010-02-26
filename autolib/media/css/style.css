@@ -223,3 +223,17 @@ div.votable-content			{ position: relative; float: right; width: 845px; padding-
 /* Layout */
 
 .center						{ text-align: center; }
+
+/* Realtime Twitter Update Style */
+
+#realtime-twitter-updates 					{ float:left; margin-bottom:15px; margin-left:10px; padding-top:5px;}
+
+#realtime-twitter-updates ul				{ margin-left: 0px; list-style: none; padding-left: 10px; text-indent: -10px; }
+#realtime-twitter-updates li 				{ margin: 7px 0; font-size: 10px; padding: 0; }
+#realtime-twitter-updates a 				{ color: #2786C2; text-decoration: none; background: none; border: none; }
+#realtime-twitter-updates a:hover			{ text-decoration: underline; background: none; border: none; }
+
+#realtime-twitter-updates span				{  }
+
+#realtime-twitter-updates a.username		{ padding: 2px 8px; background-color: #ccc; -moz-border-radius: 3px; color: #fff; text-shadow: #aaa 1px 1px 1px; margin-right: 10px; font-size: 13px; }
+#realtime-twitter-updates a.username:hover	{ background-color: #ddd; text-decoration: none; }
