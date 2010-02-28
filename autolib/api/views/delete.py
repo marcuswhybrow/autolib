@@ -6,7 +6,7 @@ from django.db.models import Q
 
 class DeleteCollection(APIAuthView):
 	def process(self, request):
-		collection_pk = request.POST.get('collection_pk', None) or request.POST.get('pk', None)
+		collection_pk = request.POST.get('pk', None)
 		if collection_pk is not None:
 			try:
 				collection = Collection.objects.get(Q(pk=collection_pk) & (Q(owner=self.user) | Q(parent__owner=self.user) | Q(parent__parent__owner=self.user)))
@@ -28,7 +28,7 @@ class DeleteCollection(APIAuthView):
 			
 class DeleteBookProfile(APIAuthView):
 	def process(self, request):
-		profile_pk = request.POST.get('profile_pk', None) or request.POST.get('pk', None)
+		profile_pk = request.POST.get('pk', None)
 		if profile_pk is not None:
 			try:
 				profile = BookProfile.objects.get(Q(pk=profile_pk) & (Q(collection__owner=self.user) | Q(collection__parent__owner=self.user) | Q(collection__parent__parent__owner=self.user)))

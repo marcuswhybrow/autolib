@@ -93,6 +93,9 @@ a:hover                      { text-decoration: underline; }
 #content a                   { color: #fff; background-color: #888; -moz-border-radius: 6px; -webkit-border-radius: 6px; padding: 0 4px; border: 1px solid #888; white-space: nowrap; }
 #content a:hover             { text-decoration: none; background-color: #999; border: 1px solid #777; }
 
+#content li.this a			{ background-color: #ffaa55; border-color: #dd8833; }
+#content li.this a:hover	{ background-color: #ffcc77; }
+
 
 div#header-wrap     { width: 100%; height: 200px; }
 

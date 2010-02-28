@@ -1,101 +1,44 @@
-class Adapter(object):
-	"""
-	An interface for other adapters
-	"""
-	
-	def __init__(self, isbn):
-		raise NotImplementedError
-	
-	def get_title(self):
-		raise NotImplementedError
-	
-	def get_isbn10(self):
-		raise NotImplementedError
-	
-	def get_isbn13(self):
-		raise NotImplementedError
-	
-	def get_description(self):
-		raise NotImplementedError
-	
-	def get_publisher(self):
-		raise NotImplementedError
-	
-	def get_published(self):
-		raise NotImplementedError
-	
-	def get_author(self):
-		raise NotImplementedError
-	
-	def get_pages(self):
-		raise NotImplementedError
-	
-	def get_dimensions(self):
-		raise NotImplementedError
-	
-	def get_width(self):
-		raise NotImplementedError
-		
-	def get_height(self):
-		raise NotImplementedError
-	
-	def get_depth(self):
-		raise NotImplementedError
-	
-	def get_format(self):
-		raise NotImplementedError
-	
-	def get_custom_id(self):
-		raise NotImplementedError
-	
-	def get_language(self):
-		raise NotImplementedError
-	
-	def get_subjects(self):
-		raise NotImplementedError
-	
-	def does_exist(self):
-		raise NotImplementedError
-	
-	def get_details(self):
-		if self.does_exist():
-			return dict({
-				'title': self.get_title(),
-				'isbn10': self.get_isbn10(),
-				'isbn13': self.get_isbn13(),
-				'description': self.get_description(),
-				'publisher': self.get_publisher(),
-				'published': self.get_published(),
-				'author': self.get_author(),
-				'pages': self.get_pages(),
-				'format': self.get_format(),
-				'language': self.get_language(),
-			}.items() + self.get_dimensions().items())
-		else:
-			return None
-			
-
 from BeautifulSoup import BeautifulStoneSoup
-from urllib import urlopen
+from urllib2 import urlopen, HTTPError, URLError
+import httplib
 import re
 from base import utils
+from django.db.models import Q
 
-class GoogleAdapter(Adapter):
+from books.models import Book, BookEditionGroup
+from tagging.models import Tag
+from django.template.defaultfilters import slugify
+
+def get_editions(isbn):
+	
+	# Get on of the ISBN numbers and query google for all related editions
+	if len(isbn) == 10 or len(isbn) == 13:
+		url = 'http://books.google.com/books/feeds/volumes?q=editions:isbn' + isbn
+	else:
+		raise ValueError('Books must have either an ISBN10 or ISBN13 identifier')
+	
+	try:
+		return BeautifulStoneSoup(urlopen(url).read())
+	except (HTTPError, URLError, httplib.BadStatusLine, httplib.InvalidURL, ValueError, IOError):
+		return None		
+
+class BookDetail():
 	"""
 	Gets information regarding books using Google's books API
 	"""
+	
+	status = False
 		
-	def __init__(self, isbn):
-		url = 'http://books.google.com/books/feeds/volumes?q=isbn:' + isbn
-		searchFeed = BeautifulStoneSoup(urlopen(url).read())
+	def __init__(self, url):
+		try:
+			self.soup = BeautifulStoneSoup(urlopen(url).read())
+		except (HTTPError, URLError, httplib.BadStatusLine, httplib.InvalidURL, ValueError, IOError):
+			return None
 		
-		if searchFeed.entry is not None:
+		if self.soup is not None:
+			
 			self.status = True
-			
-			volumeURL = searchFeed.entry.id.string
-			self.soup = BeautifulStoneSoup(urlopen(volumeURL).read())
-			
-			entry = self.soup.entry
+			entry = self.soup
 			
 			author =  entry.find('dc:creator')
 			self.author = author.string if author is not None else None
@@ -113,23 +56,28 @@ class GoogleAdapter(Adapter):
 			description = entry.find('dc:description')
 			self.description = description.string if description is not None else None
 			
-			for format in entry.findAll('dc:format'):
-				if format.string.startswith('Dimensions'):
-					dimensions = format.string.split(' ')[1]
-					dimensions = dimensions.split('x')
-					self.width = float(dimensions[0])
-					self.height = float(dimensions[1])
-					self.depth = float(dimensions[2])
-				elif re.match('[0-9]', format.string):
-					self.pages = int(format.string.split(' ')[0])
-				else:
-					self.format = format.string
+			self.width = self.height = self.depth = self.pages = self.format = None
+			
+			try:
+				for format in entry.findAll('dc:format'):
+					if format.string.startswith('Dimensions'):
+						dimensions = format.string.split(' ')[1]
+						dimensions = dimensions.split('x')
+						self.width = float(dimensions[0])
+						self.height = float(dimensions[1])
+						self.depth = float(dimensions[2])
+					elif re.match('[0-9]', format.string):
+						self.pages = int(format.string.split(' ')[0])
+					else:
+						self.format = format.string
+			except IndexError:
+				# Some dimensions are not present
+				pass
 			
 			identifiers = entry.findAll('dc:identifier')
 			
 			self.googleid = identifiers[0].string
-			self.isbn10 = ''
-			self.isbn13 = ''
+			self.isbn10 = self.isbn13 = None
 			for identifier in identifiers[1:]:
 				if identifier.string.startswith('ISBN:'):
 					isbn = identifier.string.lstrip('ISBN:')
@@ -155,53 +103,163 @@ class GoogleAdapter(Adapter):
 		else:
 			self.status = False
 	
-	def get_title(self):
-		return self.title
+	def get_details(self):
+		if self.status:
+			return {
+				'title': self.title,
+				'isbn10': self.isbn10,
+				'isbn13': self.isbn13,
+				'description': self.description,
+				'publisher': self.publisher,
+				'published': self.published,
+				'author': self.author,
+				'pages': self.pages,
+				'format': self.format,
+				'language': self.language,
+				'width': self.width,
+				'height': self.height,
+				'depth': self.depth,
+			}
+		else:
+			return None
+	
+	def get_book(self):
+		if self.status:
+			try:
+				return Book.objects.get(Q(isbn10=self.isbn10) | Q(isbn13=self.isbn13))
+			except Book.DoesNotExist:
+				return None
+		else:
+			return None
+	
+	def convert_to_book(self, edition_group=None):
+		"""
+		Converts a BookDetail object into a Book object (from the database).
+		 - If the book already exists it is retrieved from the database (unchanged)
+		 - If the book does not exist it is created
+		   - If an edition_group is specified it is set as the edition_group for the new book
+		   - If an edition_group is not specified:
+		     - Editions are retrieved from Google Books
+		     - If any of those editions exist in the database, that Book's edition_group is used.
+		"""
 		
-	def get_isbn10(self):
-		return self.isbn10
+		# If this BookDetail has details
+		if self.status:
+			
+			# Attempt to get the book from the database
+			book = self.get_book()
+			
+			# If the book is in the database
+			if book is not None:
+				# possibly update information
+				pass
+				
+			else:
+				# Create a new book
+				book = Book(**self.get_details())
+				
+				# If an edition_group was provided
+				if edition_group is not None:
+					# assign this new book that edition_group
+					book.edition_group = edition_group
+				else:
+					# Get the editions (XML data) soup
+					editionSoup = get_editions(self.isbn10) if self.isbn10 is not None else get_editions(self.isbn13)
+					# Check each editions ISBN numbers
+					for entry in editionSoup.findAll('entry'):
+						# For each identifier
+						for ident in entry.findAll('dc:identifier'):
+							
+							# If it is an ISBN identifier
+							if ident.string.startswith('ISBN:'):
+								# Get the actual ISBN
+								isbn = ident.string.lstrip('ISBN:')
+								
+								try:
+									# See if its the same book as the initial book, or if it is in the database.
+									if len(isbn) == 10:
+										if isbn == book.isbn10: continue
+										existing_book = Book.objects.get(isbn10=isbn)
+									elif len(isbn) == 13:
+										if isbn == book.isbn13: continue
+										existing_book = Book.objects.get(isbn13=isbn)
+									
+									# Assign the book we are trying to create the edition_group of this book
+									book.edition_group = existing_book.edition_group
+									book.save()
+									return book
+									
+								except Book.DoesNotExist:
+									# If not found try the next ISBN or the next Edition.
+									continue
+					
+					# If no other editions were found in the database, its safe to create a new edition_group for this book
+					edition_group = BookEditionGroup()
+					edition_group.save()
+					book.edition_group = edition_group
+				
+			# Save the book to the database
+			book.save()
+			return book
+		else:
+			return None
+
+def update_all_editions(book):
+	"""
+	Ensures all other editions of the same book are in the database and that all editions are associated with the same edition_group.
+	"""
 	
-	def get_isbn13(self):
-		return self.isbn13
+	# Get the editions soup for this book
+	soup = get_editions(book.isbn10) if book.isbn10 else get_editions(book.isbn13)
 	
-	def get_description(self):
-		return self.description
+	# Create a list for the resultant book details URLs
+	books = []
 	
-	def get_publisher(self):
-		return self.publisher
+	# For each edition
+	for entry in soup.findAll('entry'):
+		# Check all identifiers
+		for ident in entry.findAll('dc:identifier'):
+			# If its an ISBN identifier
+			if ident.string.startswith('ISBN:'):
+				# Get the actual ISBN
+				isbn = ident.string.lstrip('ISBN:')
+				
+				try:
+					# See if its the same book as the initial book, or if it is in the database.
+					if len(isbn) == 10:
+						if isbn == book.isbn10: continue
+						book.edition_group.editions.get(isbn10=isbn)
+					elif len(isbn) == 13:
+						if isbn == book.isbn13: continue
+						book.edition_group.editions.get(isbn13=isbn)
+				except Book.DoesNotExist:
+					# If not found, add it to the database and to the inital books edition_group
+					BookDetail(entry.id.string).convert_to_book(book.edition_group)
+
+def get_book_detail(isbn):
+	"""
+	Gets al details from google books about regarding a specific ISBN, making them assessable through a BooKDetail object.
+	"""
 	
-	def get_published(self):
-		return self.published
-	
-	def get_author(self):
-		return self.author
-	
-	def get_pages(self):
-		return self.pages
-	
-	def get_dimensions(self):
-		return {'width': self.width, 'height': self.height, 'depth': self.depth}
-	
-	def get_width(self):
-		return self.width
-	
-	def get_height(self):
-		return self.height
-	
-	def get_depth(self):
-		return self.depth
-	
-	def get_format(self):
-		return self.format
-	
-	def get_custom_id(self):
-		return self.googleid
-	
-	def get_language(self):
-		return self.language
-	
-	def get_subjects(self):
-		return self.subjects
-	
-	def does_exist(self):
-		return self.status
+	# If the ISBN number is the correct length
+	if len(isbn) == 10 or len(isbn) == 13:
+		
+		# Query Google
+		queryUrl = 'http://books.google.com/books/feeds/volumes?q=isbn:' + isbn
+		try:
+			querySoup = BeautifulStoneSoup(urlopen(queryUrl).read())
+		except (HTTPError, URLError, httplib.BadStatusLine, httplib.InvalidURL, ValueError, IOError):
+			return None
+		
+		# If an entry was found
+		if querySoup.entry is not None:
+			
+			# Find the url for the full details of the book
+			volumeUrl = querySoup.entry.id.string
+			# Return a BookDetail object containign those detials
+			return BookDetail(volumeUrl)
+			
+		else:
+			raise Exception('ISBN not found using Google Books')
+	else:
+		raise Exception('An ISBN must be 10 or 13 digits long')

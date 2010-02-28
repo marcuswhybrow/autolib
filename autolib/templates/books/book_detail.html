@@ -1,8 +1,10 @@
 {% extends "books/book_list.html" %}
 
+{% load truncate_filters %}
+
 {% block breadcrumbs %}
 {{ block.super }}
-<li> > <a href="{% url book_detail book.isbn %}">{{ book.title }}</a></li>
+<li> > <a href="{% url book_detail book.isbn %}">{{ book.title|truncatechars:50 }}</a></li>
 {% endblock %}
 
 {% block head %}
@@ -14,7 +16,7 @@
 		$("div.vote-cell.voted-down .vote-down").attr('src', '/media/images/icons/vote-arrow-down-on.png');
 		
 		$("#realtime-twitter-updates").getPageRealtimeReactions({
-			query: "{{ book.title }}",
+			query: "{{ book.author }}",
 			numTweets: 5,
 			loaderText: "Loading ...",
 			slideIn: false,
@@ -209,8 +211,20 @@
 </div>
 <div class="section">
 	<div class="inner clearfix">
+		<div id="editions" class="votable-content">
+			<h3>Editions Of This Book</h3>
+			<ul>
+			{% for edition in book.edition_group.editions.all %}
+				<li id="{{ edition.pk }}" {% ifequal edition.pk book.pk %}class="this"{% endifequal %}>{{ edition.published|date:"Y"|default:'0000' }} <a href="{{ edition.get_absolute_url }}">{{ edition.isbn }}</a>	</li>
+			{% endfor %}
+			</ul>
+		</div>
+	</div>
+</div>
+<div class="section">
+	<div class="inner clearfix">
 		<div id="realtime-twitter" class="votable-content">
-			<h3>Latest Twitter Updates</h3>
+			<h3>Tweets About The Author</h3>
 			<div id="realtime-twitter-updates"></div>
 		</div>
 	</div>

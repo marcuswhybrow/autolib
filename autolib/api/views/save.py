@@ -68,23 +68,32 @@ class SaveCollection(APIAuthView):
 		
 		self.data['meta']['success'] = True
 
-from books.utils import GoogleAdapter
 from tagging.models import Tag
 from django.template.defaultfilters import slugify
 
 class SaveProfile(APIAuthView):
+	
 	def process(self, request):
+		"""
+		Creates or Updates a BookProfile object.
+		"""
+		
+		# Get the POST variables
 		pk = request.POST.get('pk', None)
 		collection_pk = request.POST.get('collection_pk', None)
 		
+		# If the pk a profile was supplied we are updating an exisiting profile
 		if pk is not None:
 			try:
+				# get the profile and collection specified
 				profile = BookProfile.objects.get(Q(pk=pk) & (Q(collection__owner=self.user) | Q(collection__parent__owner=self.user) | Q(collection__parent__parent__owner=self.user)))
 				collection = Collection.objects.get(Q(pk=collection_pk) & (Q(owner=self.user) | Q(parent__owner=self.user) | Q(parent__parent__owner=self.user)))
 				
+				# Update the collection the profile is linked to
 				profile.collection = collection
 				profile.save()
 								
+				# Return data about the profile
 				self.data['profile'] = {
 					'book_instance': profile.book_instance.pk,
 					'collection': profile.collection.pk,
@@ -92,79 +101,53 @@ class SaveProfile(APIAuthView):
 					'last_modified': str(profile.last_modified),
 					'url': profile.get_absolute_url(),
 				}
+				
+				# The request has been completed successfully
 				self.data['meta']['success'] = True
 				return
 				
 			except BookProfile.DoesNotExist:
+				# If the profile was not found:
 				self.data['meta']['error'] = "A BookProfile with pk " + pk + " was not found for this User"
 				return
 			except Collection.DoesNotExist:
+				# If the collection was not found:
 				self.data['meta']['error'] = "A Collection with pk " + pk + " was not found for this User"
 				return
 			
 		else:
-			isbn = request.POST.get('isbn', None)
-			if isbn is not None:
+			# We are creating a new profile
+			
+			# Get the book_pk from the POST data
+			book_pk = request.POST.get('book_pk', None)
+			
+			if book_pk is not None:
 				if collection_pk is not None:
 					try:
+						# Get the collection and book specified
 						collection = Collection.objects.get(Q(pk=collection_pk) & (Q(owner=self.user) | Q(parent__owner=self.user) | Q(parent__parent__owner=self.user)))
-						try:
-							if len(isbn) == 10:
-								book = Book.objects.get(isbn10=isbn)
-							elif len(isbn) == 13:
-								book = Book.objects.get(isbn13=isbn)
-							else:
-								self.data['meta']['error'] = 'ISBN must be 10 or 13 characters in length'
-								return
-						except Book.DoesNotExist:
-							details = GoogleAdapter(isbn)
-							
-							if details.get_details() is not None:
-								book = Book(**details.get_details())
-								print details.get_details()
-								book.save()
-							else:
-								self.data['meta']['error'] = 'ISBN not found using Google Books'
-								return
-							
-							for subject in details.get_subjects():
-								Tag.objects.add_tag(book, slugify(subject))
-							
-						try:
-							profile = BookProfile(book_instance=book, collection=collection)
-							profile.save()
-							self.data['profile'] = {
-								'book_instance': profile.book_instance.pk,
-								'collection': profile.collection.pk,
-								'added': str(profile.added),
-								'last_modified': str(profile.last_modified),
-								'url': profile.get_absolute_url(),
-							}
-							self.data['book'] = {
-								'isbn10': book.isbn10,
-								'isbn13': book.isbn13,
-								'title': book.title,
-								'description': book.description,
-								'author': book.author,
-								'publisher': book.publisher,
-								'published': str(book.published),
-								'pages': book.pages,
-								'width': book.width,
-								'height': book.height,
-								'depth': book.depth,
-								'format': book.format,
-								'language': book.language,
-								'added': str(profile.added),
-								'last_modified': str(profile.last_modified),
-							}
-							self.data['meta']['success'] = True
-							return
-							
-						except Book.DoesNotExist:
-							self.data['meta']['error'] = "A Book with that pk was not found"
+						book = Book.objects.get(pk=book_pk)
+						
+						# Create the profile with those details
+						profile = BookProfile(book_instance=book, collection=collection)
+						profile.save()
+						
+						# Return data regarding the profile
+						self.data['profile'] = {
+							'book_instance': profile.book_instance.pk,
+							'collection': profile.collection.pk,
+							'added': str(profile.added),
+							'last_modified': str(profile.last_modified),
+							'url': profile.get_absolute_url(),
+						}
+						
+						# The request has been successful
+						self.data['meta']['success'] = True
 					
 					except Collection.DoesNotExist:
 						self.data['meta']['error'] = "A Collection with that pk does not exist for this user"
+					except Book.DoesNotExist:
+						self.data['meta']['error'] = 'Book with pk ' + book_pk + ' does not exist'
 				else:
 					self.data['meta']['error'] = "collection_pk was not found"
 			else:

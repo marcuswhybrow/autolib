@@ -19,6 +19,17 @@ from tagging.fields import TagField
 from tagging.models import Tag
 import tagging
 
+class BookEditionGroup(UUIDSyncable):
+	
+	def get_owner(self):
+		return None
+	
+	def __unicode__(self):
+		try:
+			return self.editions.all()[0].title
+		except IndexError:
+			return 'EMPTY'
+
 class Book(UUIDSyncable):
 	
 	isbn10 = models.CharField(db_index=True, unique=True, editable=False, max_length=10)
@@ -34,6 +45,13 @@ class Book(UUIDSyncable):
 	depth = models.FloatField(null=True)
 	format = models.CharField(max_length=200, null=True)
 	language = models.CharField(max_length=5, null=True)
+	
+	edition_group = models.ForeignKey(BookEditionGroup, related_name='editions', editable=False)
+	
+	class Meta:
+		ordering = ('-published', )
+		get_latest_by = 'published'
+
 	
 	def get_tags(self):
 		return Tag.objects.get_for_object(self)

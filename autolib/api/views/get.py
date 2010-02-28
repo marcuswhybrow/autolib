@@ -1,7 +1,8 @@
 # api.views.get
 
 from libraries.models import Collection
-from books.models import BookProfile
+from books import utils
+from books.models import BookProfile, Book
 from api.views import APIView, APIAuthView
 
 from django.db.models import Q
@@ -71,7 +72,7 @@ class GetBookProfileList(APIAuthView):
 		collection_id = request.POST.get('collection_pk', None) or request.POST.get('pk', None)
 		if collection_id is not None:
 			try:
-				c = Collection.objects.get(Q(pk=collection_id)& (Q(collection__owner=self.user) | Q(collection__parent__owner=self.user) | Q(collection__parent__parent__owner=self.user)))
+				c = Collection.objects.get(Q(pk=collection_id)& (Q(owner=self.user) | Q(parent__owner=self.user) | Q(parent__parent__owner=self.user)))
 				self.data['profiles'] = []
 				for p in c.books.all():
 					self.data['profiles'].append({
@@ -119,9 +120,20 @@ class GetBookProfileDetail(APIAuthView):
 class GetBookDetail(APIView):
 	
 	def process(self, request):
-		isbn = request.POST.get('isbn', None)
+		"""
+		Gets information about a book by its ISBN number from Google Books
+		"""
+		
+		# The ISBN number of the book
+		isbn = request.GET.get('isbn', None)
+		
+		# If the ISBN number was provided
 		if isbn is not None:
+			
+			book = None
+			
 			try:
+				# Try to find the book locally
 				if len(isbn) == 10:
 					book = Book.objects.get(isbn10=isbn)
 				elif len(isbn) == 13:
@@ -129,31 +141,55 @@ class GetBookDetail(APIView):
 				else:
 					self.data['meta']['error'] = 'ISBN must be 10 or 13 characters in length'
 					return
-				
-				self.data['book'] = {
-					'isbn10': book.isbn10,
-					'isbn13': book.isbn13,
-					'title': book.title,
-					'description': book.description,
-					'author': book.author,
-					'publisher': book.publisher,
-					'published': str(book.published),
-					'pages': book.pages,
-					'width': book.width,
-					'height': book.height,
-					'depth': book.depth,
-					'format': book.format,
-					'language': book.language,
-					'added': str(profile.added),
-					'last_modified': str(profile.last_modified),
-				}
-				self.data['meta']['success'] = True
-				return
 			except Book.DoesNotExist:
-				self.data['meta']['error'] = 'Details for the book with ISBN ' + isbn + ' not found'
-				return
+				# If not found locally try and get the book details from Google
+				bookDetails = utils.get_book_detail(isbn)
+				
+				# If book details were found
+				if bookDetails is not None:
+					book = bookDetails.convert_to_book()
+					
+					# TODO Get Django to queue up the updating of this books Editions
+					
+				else:
+					self.data['meta']['error'] = 'Details for the book with the ISBN ' + isbn + ' not found'
+					return
+			
 		else:
-			self.data['meta']['error'] = "isbn was not found"
+			book_pk = request.GET.get('pk', None)
+			
+			if book_pk is not None:
+				try:
+					book = Book.objects.get(pk=book_pk)
+				except Book.DoesNotExist:
+					self.data['meta']['error'] = 'Details for the book with the pk' + book_pk + ' not found'
+					return
+			else:
+				self.data['meta']['error'] = "Neither isbn or pk was found in the POST data"
+				return
+		
+		if book is not None:
+			self.data['book'] = {
+				'pk': book.pk,
+				'isbn10': book.isbn10,
+				'isbn13': book.isbn13,
+				'title': book.title,
+				'description': book.description,
+				'author': book.author,
+				'publisher': book.publisher,
+				'published': str(book.published),
+				'pages': book.pages,
+				'width': book.width,
+				'height': book.height,
+				'depth': book.depth,
+				'format': book.format,
+				'language': book.language,
+				'added': str(book.added),
+				'last_modified': str(book.last_modified),
+				'edition_group': book.edition_group.pk,
+				'url': book.get_absolute_url(),
+			}
+			self.data['meta']['success'] = True
 
 get_collection_list = GetCollectionList()
 get_collection_detail = GetCollectionDetail()
