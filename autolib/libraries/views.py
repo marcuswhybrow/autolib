@@ -28,7 +28,7 @@ def add_books(request):
 		collection = None
 	
 	return render_to_response('libraries/addbooks.html', {
-		'collection': collection
+		'collection': collection,
 	}, context_instance=RequestContext(request))
 
 @login_required

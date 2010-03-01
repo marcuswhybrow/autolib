@@ -14,32 +14,41 @@
 	$(function() {
 		$("form#add-books").jqTransform();
 		
+		$("button#add-books-button").attr('disabled', 'disabled');
+		
 		$("form#add-books").submit(function() {
 			
 			var form = $(this);
 			
 			formData = form.serialize();
 			
-			$.post('{% url api_save_profile %}', formData, function(data){
+			$("#add-books").block({
+				css: {
+		            border: 'none',
+		            padding: '15px',
+		            backgroundColor: '#000',
+		            '-webkit-border-radius': '10px',
+		            '-moz-border-radius': '10px',
+		            opacity: .5,
+		            color: '#fff'
+				},
+				message: 'Searching'
+			});
+			
+			$.get('{% url api_get_book_detail %}', formData, function(data) {
+				
+				$("#add-books").unblock();
+				
 				if (data.meta.success) {
-					$.blockUI({ css: { 
-			            border: 'none', 
-			            padding: '15px', 
-			            backgroundColor: '#000', 
-			            '-webkit-border-radius': '10px', 
-			            '-moz-border-radius': '10px', 
-			            opacity: .5, 
-			            color: '#fff' 
-			        }, message: '<h1>' + data.book.title + '</h1><p>' + 
-			        			data.book.author + '</p><p>' + 
-			        			data.book.description + '</p><p>' + 
-			        			data.book.publisher + '</p><p>' + 
-			        			data.book.published + '</p><input type="button" id="go-to-profile" value="Go to Profile" />'
-			        });
-			        
-			        $("#go-to-profile").click(function() {
-			        	window.location.replace(data.profile.url);
-			        });
+					var booksBox = $("#books-box");
+					
+					if ($("#" + data.book.pk).length > 0) {
+						alert('You already have this book in your box!');
+					} else {
+						booksBox.append('<li style="display: none;" id="' + data.book.pk + '"><span>' + data.book.title + '</span> by ' + data.book.author + '</li>');
+						$("#" + data.book.pk).slideDown('200');
+						$("button#add-books-button").attr('disabled', '');
+					}
 				} else {
 					$.blockUI({ 
 						css: { 
@@ -54,8 +63,33 @@
 				        timeout: 2000
 			        });
 				}
+				
 			}, 'json');
+			
 			return false;
+		});
+		
+		$("button#add-books-button").click(function() {
+			
+			var button = $(this);
+			
+			$("ul#books-box li").each(function() {
+				var item = $(this);
+				var id = item.attr('id');
+				
+				$.post('{% url api_save_profile %}', {collection_pk: '{{ collection.pk }}', book_pk:id}, function(data) {
+					
+					button.attr('disabled', 'disabled');
+					
+					if (data.meta.success) {
+						item.append(' <span>ADDED!</span>');
+					} else {
+						item.append(' <span>WAS NOT ADDED!</span>');
+						alert(data.meta.error);
+					}
+				}, 'json');
+			});
+			
 		});
 	});
 </script>
@@ -66,9 +100,9 @@
 		<div class="inner">
 			<h1>Add Some Books</h1>
 			<div class="clearfix">
-				<div class="third alpha">
-					<form id="add-books" action="" method="post" class="jqTransform">
-					{% if collection %}<input type="hidden" name="collection_pk" value="{{ collection.pk }}" />{% endif %}
+				<div>
+					<form id="add-books" action="" method="post" class="jqTransform clearfix">
+					{# {% if collection %}<input type="hidden" name="collection_pk" value="{{ collection.pk }}" />{% endif %} #}
 					<div class="rowElem clearfix">
 						<input type="text" id="isbn" name="isbn" value="" />
 					</div>
@@ -77,28 +111,17 @@
 					</div>
 				</form>
 				</div>
-				<div class="third">
-					<table id="lookup-status">
-						<tr>
-							<td class="source">Local</td>
-							<td class="status">Checking</td>
-						</tr>
-						<tr>
-							<td class="source">Google</td>
-							<td class="status">Checking</td>
-						</tr>
-						<tr>
-							<td class="source">Guardian</td>
-							<td class="status">Checking</td>
-						</tr>
-					</table>
-				</div>
-				<div class="third omega">
-					<h3>Book Title</h3>
-					<p>Author</p>
-					<p>Published</p>
-				</div>
 			</div>
+			<div>
+				<h3>Books in Box</h3>
+				<ul id="books-box"></ul>
+				<button id="add-books-button">Add All Books</button>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="inner">
+			<p class="center"><a href="{{ collection.get_absolute_url }}">{{ collection.pk }}</a></p>
 		</div>
 	</div>
 {% endblock %}
