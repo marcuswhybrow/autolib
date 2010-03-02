@@ -1,6 +1,4 @@
 from django.db import models
-from django.contrib.contenttypes import generic
-from django.contrib.contenttypes.models import ContentType
 
 # Create your models here.
 
@@ -34,13 +32,17 @@ class Update(models.Model):
 	time = models.DateTimeField(auto_now_add=True, db_index=True)
 	action = models.CharField(max_length=20, choices=UPDATE_TYPES)
 	user = models.ForeignKey(User, related_name="updates", editable=False, db_index=True, null=True, blank=True)
-	
-	content_type = models.ForeignKey(ContentType, null=True)
-	object_pk = models.CharField(max_length=64)
-	content_object = generic.GenericForeignKey('content_type', 'object_pk')
+	object_type = models.CharField(max_length=200)
 	
 	def __unicode__(self):
-		return '%s - %s - %s - %s' % (self.action, self.content_type, self.content_object, self.user)
+		return '%s - %s - %s' % (self.action, self.object_type, self.user)
+	
+	def get_object(self):
+		try:
+			return models.get_model(*self.object_type.split('.')).objects.get(pk=self.uuid)
+		except ObjectDoesNotExist:
+			print self
+			return None
 
 from uuid import uuid4
 
@@ -52,8 +54,6 @@ class UUIDSyncable(models.Model):
 	last_modified = models.DateTimeField(auto_now=True)
 	# UUIDSyncable objects must have a UUID as their primary key
 	uuid = models.CharField(primary_key=True, max_length=64, editable=False, blank=True)
-	
-	updates = generic.GenericRelation(Update, object_id_field='object_pk')
 	
 	class Meta:
 		
@@ -74,12 +74,9 @@ class UUIDSyncable(models.Model):
 		
 		# Call the rest of save normally
 		super(UUIDSyncable, self).save(*args, **kwargs)
-		Update(uuid=self.pk, content_object=self, action=action, user=self.get_owner()).save()
+		Update(uuid=self.pk, object_type=self.__module__.split('.')[0] + '.' + self.__class__.__name__, action=action, user=self.get_owner()).save()
 	
 	def delete(self, *args, **kwargs):
-		Update(uuid=self.pk, content_object=self, action='delete', user=self.get_owner()).save()
-		
-		for update in self.updates.all():
-			update.content_type = None
-		
+				
+		Update(uuid=self.pk, object_type=self.__module__.split('.')[0] + '.' + self.__class__.__name__, action='delete', user=self.get_owner()).save()
 		super(UUIDSyncable, self).delete(*args, **kwargs)
