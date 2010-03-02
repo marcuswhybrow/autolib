@@ -29,8 +29,12 @@
 		
 		 $('#connection-problem #connection-problem-ok').click(function() { 
             $.unblockUI();
+            overlay = false;
             return false;
         });
+        
+        var bookshelvesLocked = false;
+        var overlay = false;
 		
 		function select() {
 			var selected = $(this);
@@ -56,6 +60,7 @@
 				    }, 
 			        message: '<div class="ajax-loader">&nbsp;</div>' 
 			    });
+			    bookshelvesLocked = true;
 				
 				// Repopulation the bookshelf field with the appropriate data
 				$.ajax({
@@ -80,11 +85,11 @@
 						}
 						
 						$('ul#bookshelf-picker').unblock();
-						
+						bookshelvesLocked = false;
 					},
 					error: function() {
 						$('ul#bookshelf-picker').unblock();
-						
+						bookshelvesLocked = false;
 						$.blockUI({
 							fadeIn:  100,
 							fadeOut: 100,
@@ -97,6 +102,8 @@
 					        },
 					        message: $('#connection-problem')
 					    });
+					    overlay = true;
+					    clearInterval(repeatInterval);
 					},
 					dataType: 'json'
 				});
@@ -171,52 +178,54 @@
 		
 		$(window).keydown(function(event) {
 			
-			if (event.keyCode == 37) {
-				//Left
-				selection = $("ul li.selected.prime");
-				if (selection.parent().attr('id') == 'bookshelf-picker') {
-					
-					selection.removeClass('selected').removeClass('prime');
-					$('ul#library-picker li.selected').addClass('prime');
-				}
-			} else if (event.keyCode == 39) {
-				// Right
-				selection = $("ul li.selected.prime");
-				if (selection.parent().attr('id') == 'library-picker' && selection.is('.has-more')) {
-					var newSelection = $('ul#bookshelf-picker li:first');
-					
-					// Only move into the bookshelves pain if there are bookshelves
-					if (!newSelection.is('.no-bookshelves')) {
-						selection.removeClass('prime');
-						newSelection.addClass('selected').addClass('prime').siblings('.selected').removeClass('selected');
+			if (!overlay) {
+				if (event.keyCode == 37) {
+					//Left
+					selection = $("ul li.selected.prime");
+					if (selection.parent().attr('id') == 'bookshelf-picker') {
+						
+						selection.removeClass('selected').removeClass('prime');
+						$('ul#library-picker li.selected').addClass('prime');
 					}
-				}
-			} else if (event.keyCode == 38) {
-				// Up
-				upKey = true;
-				upFunc();
-				if (downKey) {
-					clearInterval(repeatInterval);
-				} else {
-					setTimeout(function() {
-						if (upKey) {
-							repeatInterval = setInterval(upFunc, 50);
+				} else if (event.keyCode == 39) {
+					// Right
+					selection = $("ul li.selected.prime");
+					if (selection.parent().attr('id') == 'library-picker' && selection.is('.has-more')) {
+						var newSelection = $('ul#bookshelf-picker li:first');
+						
+						// Only move into the bookshelves pain if there are bookshelves
+						if (!newSelection.is('.no-bookshelves') && !bookshelvesLocked) {
+							selection.removeClass('prime');
+							newSelection.addClass('selected').addClass('prime').siblings('.selected').removeClass('selected');
 						}
-					}, 100);
-				}
-				
-			} else if (event.keyCode == 40) {
-				// Down
-				downKey = true;
-				downFunc();
-				if (upKey) {
-					clearInterval(repeatInterval);
-				} else {
-					setTimeout(function() {
-						if (downKey) {
-							repeatInterval = setInterval(downFunc, 50);
-						}
-					}, 100);
+					}
+				} else if (event.keyCode == 38) {
+					// Up
+					upKey = true;
+					upFunc();
+					if (downKey) {
+						clearInterval(repeatInterval);
+					} else {
+						setTimeout(function() {
+							if (upKey) {
+								repeatInterval = setInterval(upFunc, 50);
+							}
+						}, 100);
+					}
+					
+				} else if (event.keyCode == 40) {
+					// Down
+					downKey = true;
+					downFunc();
+					if (upKey) {
+						clearInterval(repeatInterval);
+					} else {
+						setTimeout(function() {
+							if (downKey) {
+								repeatInterval = setInterval(downFunc, 50);
+							}
+						}, 100);
+					}
 				}
 			}
 		});

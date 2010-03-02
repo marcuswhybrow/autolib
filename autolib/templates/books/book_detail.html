@@ -9,8 +9,17 @@
 
 {% block head %}
 <script type="text/javascript" src="/media/js/jquery.page-realtime-twitter-reactions.js"></script>
+<script type="text/javascript" src="/media/js/jquery.preLoadImages.js"></script>
 <script type="text/javascript">
 	$(function() {
+		
+		$.preLoadImages(
+			'/media/images/icons/vote-arrow-up.png',
+			'/media/images/icons/vote-arrow-up-on.png',
+			'/media/images/icons/vote-arrow-down.png',
+			'/media/images/icons/vote-arrow-down-on.png',
+			'/media/images/black-50-bg.png'
+		);
 		
 		$("div.vote-cell.voted-up .vote-up").attr('src', '/media/images/icons/vote-arrow-up-on.png');
 		$("div.vote-cell.voted-down .vote-down").attr('src', '/media/images/icons/vote-arrow-down-on.png');
@@ -47,14 +56,25 @@
 				voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up.png');
 				voteCell.find('.vote-score').text(score - 1);
 				
-				$.post('/books/' + bookPK + '/clearvote/', {}, function(data) {
-					if (!data.success) {
+				$.ajax({
+					url: '/books/' + bookPK + '/clearvote/',
+					type: 'POST',
+					success: function(data) {
+						if (!data.success) {
+							voteCell.addClass('voted-up');
+							voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up-on.png');
+							voteCell.find('.vote-score').text(score);
+							alert(data.error_message);
+						}
+					},
+					error: function() {
 						voteCell.addClass('voted-up');
 						voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up-on.png');
 						voteCell.find('.vote-score').text(score);
-						alert(data.error_message);
-					}
-				}, 'json');
+						alert('no response');
+					},
+					dataType: 'json'
+				});
 			} else {
 				
 				// Adding Vote Up from clear or down
@@ -76,20 +96,42 @@
 					voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down.png');
 				}
 				
-				$.post('/books/' + bookPK + '/upvote/', {}, function(data) {
-					if(!data.success) {
+				$.ajax({
+					url: '/books/' + bookPK + '/upvote/', 
+					type: 'POST',
+					success: function(data) {
+						if(!data.success) {
+							voteCell.find('span.vote-score').text(score);
+							voteCell.removeClass('voted-up');
+							if (initialState == 'clear') {
+								// Fall back from Up to Clear
+								
+								voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up.png');
+							} else if (initialState == 'voted-down') {
+								// Fall back from Up to Down
+								voteCell.addClass('voted-down');
+								voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up.png');
+								voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down-on.png');
+							}
+							alert(data.error_message);
+						}
+					},
+					error: function() {
 						voteCell.find('span.vote-score').text(score);
+						voteCell.removeClass('voted-up');
 						if (initialState == 'clear') {
 							// Fall back from Up to Clear
 							voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up.png');
 						} else if (initialState == 'voted-down') {
 							// Fall back from Up to Down
+							voteCell.addClass('voted-down');
 							voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up.png');
 							voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down-on.png');
 						}
-						alert(data.error_message);
-					}
-				}, 'json');
+						alert('no response');
+					},
+					dataType: 'json'
+				});
 			}
 		});
 		
@@ -117,14 +159,25 @@
 				voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down.png');
 				voteCell.find('.vote-score').text(score + 1);
 				
-				$.post('/books/' + bookPK + '/clearvote/', {}, function(data) {
-					if (!data.success) {
+				$.ajax({
+					url: '/books/' + bookPK + '/clearvote/',
+					type: 'POST',
+					success: function(data) {
+						if (!data.success) {
+							voteCell.addClass('voted-down');
+							voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down-on.png');
+							voteCell.find('.vote-score').text(score);
+							alert(data.error_message);
+						}
+					},
+					error: function() {
 						voteCell.addClass('voted-down');
 						voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down-on.png');
 						voteCell.find('.vote-score').text(score);
-						alert(data.error_message);
-					}
-				}, 'json');
+						alert('no response');
+					},
+					dataType: 'json'
+				});
 			} else {
 				
 				// Adding Vote Down from clear or up
@@ -146,20 +199,41 @@
 					voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up.png');
 				}
 				
-				$.post('/books/' + bookPK + '/downvote/', {}, function(data) {
-					if(!data.success) {
+				$.ajax({
+					url: '/books/' + bookPK + '/downvote/', 
+					type: 'POST',
+					success: function(data) {
+						if(!data.success) {
+							voteCell.find('span.vote-score').text(score);
+							voteCell.removeClass('voted-down');
+							if (initialState == 'clear') {
+								// Fall back from Down to Clear
+								voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down.png');
+							} else if (initialState == 'voted-up') {
+								// Fall back from Down to Down
+								
+								voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down.png');
+								voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up-on.png');
+							}
+							alert(data.error_message);
+						}
+					},
+					error: function() {
 						voteCell.find('span.vote-score').text(score);
+						voteCell.removeClass('voted-down');
 						if (initialState == 'clear') {
-							// Fall back from Up to Clear
+							// Fall back from Down to Clear
 							voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down.png');
 						} else if (initialState == 'voted-up') {
-							// Fall back from Up to Down
+							// Fall back from Down to Down
+							voteCell.addClass('voted-up');
 							voteCell.find('.vote-down').attr('src', '/media/images/icons/vote-arrow-down.png');
 							voteCell.find('.vote-up').attr('src', '/media/images/icons/vote-arrow-up-on.png');
 						}
-						alert(data.error_message);
-					}
-				}, 'json');
+						alert('no response');
+					},
+					dataType: 'json'
+				});
 			}
 		});
 	});
