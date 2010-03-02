@@ -110,6 +110,16 @@ div#header-bg h1    { display: none; }
 div#header-wrap div#auth-box        { float: right; position: relative; top: 43px; right: 18px; color: #fff; }
 div#header-wrap div#auth-box a      { color: #fff; }
 
+
+
+/*
+div#header div#global-nav			{ float: left; position: relative; top: 120px; width: 100%; }
+
+div#header div#global-nav ul		{ padding: 0; }
+div#header div#global-nav li		{ float: left; padding: 5px 10px; }
+div#header div#global-nav li a		{ display: block; opacity: 1.0; font-family: Arial,Liberation Sans,DejaVu Sans,sans-serif; font-size: 16px; color: #fff; }
+*/
+
 /* Full layout*/
 
 div#content-wrap                    { width: 100%; }
@@ -213,6 +223,22 @@ div#content table#lookup-status				{ width: 100%; }
 div#content table#lookup-status td.source	{ background-color: #eee; padding: 10px; border: 2px solid white; border-right: 1px solid #ddd; width: 60px; text-transform: uppercase; font-weight: bold; text-align: center; }
 div#content table#lookup-status td.status	{ background-color: #fafafa; padding: 10px; border: 2px solid white; border-left: none; color: #ddd; -moz-user-select: none; }
 
+div#content ul.picker								{ padding: 0; width: 210px; margin: 17px 0 0 0; height: 200px; overflow-y: scroll; border-top: 1px solid #ddd; position: relative; }
+
+div#content ul.picker li							{ display: block; -moz-user-select: none; cursor: default; padding: 0; color: #444; padding-left: 9px; font-size: 12px; line-height: 17px; height: 17px; }
+div#content ul.picker li.selected					{ background-color: #d4d4d4; }
+div#content ul.picker li.selected.prime				{ color: #fff; background-color: #3875d7; }
+
+div#content ul.picker li.has-more					{ background: url(/media/images/ui/more.png) top right no-repeat; background-position: 184px 5px; }
+div#content ul.picker li.has-more.selected			{ background: #d4d4d4 url(/media/images/ui/more-selected.png) top right no-repeat; background-position: 184px 5px; }
+div#content ul.picker li.has-more.selected.prime	{ color: #fff; background: #3875d7 url(/media/images/ui/more-selected-prime.png) top right no-repeat; background-position: 184px 5px; }
+
+
+div#content ul#library-picker						{ border-left: 1px solid #eee; }
+
+div#content ul li.no-items,
+div#content ul.picker li.no-bookshelves				{ text-align: center; padding: 0; color: #bbb; }
+
 /* Voting */
 
 div.vote-cell				{ width: 40px; position: relative; float: left; }
@@ -226,6 +252,13 @@ div.votable-content			{ position: relative; float: right; width: 845px; padding-
 /* Layout */
 
 .center						{ text-align: center; }
+.left						{ float: left; }
+.container					{ position: relative; }
+
+/* Misc */
+
+.ajax-loader				{ background: url(/media/images/ajax-loader.gif) no-repeat top left; width: 16px; height: 11px; }
+.overlay					{ display:none; cursor: default; background: url(/media/images/black-50-bg.png) repeat; -webkit-border-radius: 10px; -moz-border-radius: 10px; padding: 15px; color: #fff; }
 
 /* Realtime Twitter Update Style */
 

@@ -6,7 +6,7 @@
 	<!--[if IE]>
 	<link rel="stylesheet" href="/media/css/ie.css" />
 	<![endif]-->
-	<link rel="stylesheet" href="/media/css/jquery-ui-theme/jquery-ui-1.8rc1.custom.css" />
+	<!--<link rel="stylesheet" href="/media/css/jquery-ui-theme/jquery-ui-1.8rc1.custom.css" />-->
 	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js?ver=1.3.2"></script>
 	<script type="text/javascript" src="/media/js/jquery.fancyzoom.min.js"></script>
 	
@@ -29,6 +29,15 @@
 						<a href="{% url django.contrib.auth.views.login %}">login</a> | <a href="{% url registration.views.register %}">register</a>
 					{% endif %}
 				</div>
+<!--
+				<div id="global-nav">
+					<ul class="clearfix">
+						<li class="gn-home"><a href="{% url home %}">Home</a></li>
+						<li class="gn-profile"><a href="{% url library_list %}">Profile</a></li>
+						<li class="gn-add-books"><a href="{% url add_books %}">Add Books</a></li>
+					</ul>
+				</div>
+-->
 				<div id="breadcrumbs" class="clearfix">
 					<ul>
 						{% block breadcrumbs %}

@@ -24,7 +24,7 @@ class DeleteCollection(APIAuthView):
 			except Collection.DoesNotExist:
 				self.data['meta']['error'] = "A Collection with that pk does not exist for this User"
 		else:
-			self.data['meta']['error'] = "collection_pk not found in POST data"
+			self.data['meta']['error'] = "pk not found in POST data"
 			
 class DeleteBookProfile(APIAuthView):
 	def process(self, request):

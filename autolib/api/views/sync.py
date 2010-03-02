@@ -46,8 +46,9 @@ class SyncUpdate(APIAuthView):
 						'time': str(d.time),
 					})
 				
+				object_list = []
 				for uuid,u in update.items():
-					object_list.append(u.get_object())
+					object_list.append(u.content_object)
 				
 				self.data['update'] = simplejson.loads(serializers.serialize("json", object_list))
 				
@@ -60,7 +61,7 @@ class SyncUpdate(APIAuthView):
 				
 				object_list = []
 				for uuid,i in insert.items():
-					object_list.append(i.get_object())
+					object_list.append(i.content_object)
 				
 				self.data['insert'] = simplejson.loads(serializers.serialize("json", object_list))
 				

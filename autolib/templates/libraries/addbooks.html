@@ -1,5 +1,7 @@
 {% extends 'libraries/base.html' %}
 
+{% load truncate_filters %}
+
 {% block breadcrumbs %}
 {{ block.super }}
 <li> > <a href="{% url add_books %}">Add Books</a></li>
@@ -8,13 +10,228 @@
 {% block head %}
 <link rel="stylesheet" href="/media/js/jqtransform/jqtransform.css" />
 <script type="text/javascript" src="/media/js/jqtransform/jquery.jqtransform.js"></script>
-<script type="text/javascript" src="/media/js/jquery-ui-1.8rc1.custom.min.js"></script>
 <script type="text/javascript" src="/media/js/jquery.blockUI.js"></script>
+<script type="text/javascript" src="/media/js/jquery.scrollTo-min.js"></script>
+<script type="text/javascript" src="/media/js/jquery.preLoadImages.js"></script>
 <script type="text/javascript">
 	$(function() {
+	
+		$.preLoadImages(
+			'/media/images/ui/more-selected.png',
+			'/media/images/ui/more-selected-prime.png',
+			'/media/images/ajax-loader.gif',
+			'/media/images/black-50-bg.png'
+		);
+		
 		$("form#add-books").jqTransform();
 		
 		$("button#add-books-button").attr('disabled', 'disabled');
+		
+		 $('#connection-problem #connection-problem-ok').click(function() { 
+            $.unblockUI();
+            return false;
+        });
+		
+		function select() {
+			var selected = $(this);
+			
+			// Make this library the selected element
+			selected.addClass('selected').addClass('prime');
+			selected.siblings(".selected").removeClass('selected').removeClass('prime');
+			
+			if (selected.is('.has-more')) {
+			
+				$('ul#bookshelf-picker').block({
+					fadeIn:  50,
+					fadeOut: 50,
+					css: { 
+						border: 'none',
+						padding: '15px',
+						opacity: 1,
+						color: '#000',
+			        },
+			        overlayCSS:  { 
+						backgroundColor: '#fff', 
+						opacity:         0.8 
+				    }, 
+			        message: '<div class="ajax-loader">&nbsp;</div>' 
+			    });
+				
+				// Repopulation the bookshelf field with the appropriate data
+				$.ajax({
+					url: '{% url api_get_collection_list %}', 
+					data: {parent_pk:selected.attr('id')},
+					type: 'POST',
+					success: function(data) {
+						if (data.meta.success) {
+							var picker = $("ul#bookshelf-picker");
+							picker.html('');
+							for (var i = data.collections.length - 1; i >= 0; --i) {
+								var collection = data.collections[i];
+								picker.append('<li id="' + collection.pk + '">' + collection.name + '</li>');
+								$("#" + collection.pk).click(function() {
+									selected.removeClass('prime');
+									$(this).addClass('selected').addClass('prime');
+									$(this).siblings(".selected").removeClass('selected').removeClass('prime');
+								});
+							}
+						} else {
+							alert(data.meta.error);
+						}
+						
+						$('ul#bookshelf-picker').unblock();
+						
+					},
+					error: function() {
+						$('ul#bookshelf-picker').unblock();
+						
+						$.blockUI({
+							fadeIn:  100,
+							fadeOut: 100,
+							css: { 
+								border: 'none',
+								opacity: 1,
+								'-webkit-border-radius': '10px',
+								'-moz-border-radius': '10px',
+								backgroundColor: 'none'
+					        },
+					        message: $('#connection-problem')
+					    });
+					},
+					dataType: 'json'
+				});
+			} else {
+				$('ul#bookshelf-picker').html('<li class="no-bookshelves">no bookshelves</li>');
+			}
+		}
+		
+		
+		$('ul li.selected').each(function() {
+			$(this).parent().scrollTo($(this));
+		});
+		
+		
+		$("ul#library-picker li").click(select);
+		
+		function downFunc() {
+			selection = $("ul li.selected.prime");
+			if (selection.parent().attr('id') == 'library-picker') {
+				var newSelection = $("ul li.selected.prime").next('li');
+				newSelection.each(select);
+				if(newSelection.position().top < 0) {
+					newSelection.parent().scrollTop(newSelection.position().top + newSelection.parent().scrollTop());
+				} else if (newSelection.position().top + newSelection.height() > newSelection.parent().height()) {
+					newSelection.parent().scrollTop(newSelection.position().top + newSelection.parent().scrollTop() + newSelection.height() - newSelection.parent().height());
+				}
+			} else {
+				var newSelection = $("ul li.selected.prime").next('li');
+				newSelection.each(function() {
+					selection.removeClass('prime');
+					$(this).addClass('selected').addClass('prime');
+					$(this).siblings(".selected").removeClass('selected');
+				});
+				if(newSelection.position().top < 0) {
+					newSelection.parent().scrollTop(newSelection.position().top + newSelection.parent().scrollTop());
+				} else if (newSelection.position().top + newSelection.height() > newSelection.parent().height()) {
+					newSelection.parent().scrollTop(newSelection.position().top + newSelection.parent().scrollTop() + newSelection.height() - newSelection.parent().height());
+				}
+			}
+		}
+		
+		function upFunc() {
+			selection = $("ul li.selected.prime");
+			if (selection.parent().attr('id') == 'library-picker') {
+				var newSelection = $("ul li.selected.prime").prev('li');
+				newSelection.each(select);
+				if(newSelection.position().top < 0) {
+					newSelection.parent().scrollTop(newSelection.position().top + newSelection.parent().scrollTop());
+				} else if (newSelection.position().top + newSelection.height() > newSelection.parent().height()) {
+					newSelection.parent().scrollTop(newSelection.position().top + newSelection.parent().scrollTop() + newSelection.height() - newSelection.parent().height());
+				}
+			} else {
+				var newSelection = $("ul li.selected.prime").prev('li');
+				
+				newSelection.each(function() {
+					selection.removeClass('prime');
+					$(this).addClass('selected').addClass('prime');
+					$(this).siblings(".selected").removeClass('selected');
+				});
+				if(newSelection.position().top < 0) {
+					newSelection.parent().scrollTop(newSelection.position().top + newSelection.parent().scrollTop());
+				} else if (newSelection.position().top + newSelection.height() > newSelection.parent().height()) {
+					newSelection.parent().scrollTop(newSelection.position().top + newSelection.parent().scrollTop() + newSelection.height() - newSelection.parent().height());
+				}
+			}
+		}
+		
+		
+		var downKey = false;
+		var upKey = false;
+		var repeatInterval;
+		
+		$(window).keydown(function(event) {
+			
+			if (event.keyCode == 37) {
+				//Left
+				selection = $("ul li.selected.prime");
+				if (selection.parent().attr('id') == 'bookshelf-picker') {
+					
+					selection.removeClass('selected').removeClass('prime');
+					$('ul#library-picker li.selected').addClass('prime');
+				}
+			} else if (event.keyCode == 39) {
+				// Right
+				selection = $("ul li.selected.prime");
+				if (selection.parent().attr('id') == 'library-picker' && selection.is('.has-more')) {
+					var newSelection = $('ul#bookshelf-picker li:first');
+					
+					// Only move into the bookshelves pain if there are bookshelves
+					if (!newSelection.is('.no-bookshelves')) {
+						selection.removeClass('prime');
+						newSelection.addClass('selected').addClass('prime').siblings('.selected').removeClass('selected');
+					}
+				}
+			} else if (event.keyCode == 38) {
+				// Up
+				upKey = true;
+				upFunc();
+				if (downKey) {
+					clearInterval(repeatInterval);
+				} else {
+					setTimeout(function() {
+						if (upKey) {
+							repeatInterval = setInterval(upFunc, 50);
+						}
+					}, 100);
+				}
+				
+			} else if (event.keyCode == 40) {
+				// Down
+				downKey = true;
+				downFunc();
+				if (upKey) {
+					clearInterval(repeatInterval);
+				} else {
+					setTimeout(function() {
+						if (downKey) {
+							repeatInterval = setInterval(downFunc, 50);
+						}
+					}, 100);
+				}
+			}
+		});
+		
+		$(window).keyup(function(event) {
+			if (event.keyCode == 38) {
+				// Up Key released
+				upKey = false;
+				clearInterval(repeatInterval);
+			} else if (event.keyCode == 40) {
+				// Down Key released
+				downKey = false;
+				clearInterval(repeatInterval);
+			}
+		});
 		
 		$("form#add-books").submit(function() {
 			
@@ -77,17 +294,27 @@
 				var item = $(this);
 				var id = item.attr('id');
 				
-				$.post('{% url api_save_profile %}', {collection_pk: '{{ collection.pk }}', book_pk:id}, function(data) {
-					
-					button.attr('disabled', 'disabled');
-					
-					if (data.meta.success) {
-						item.append(' <span>ADDED!</span>');
-					} else {
-						item.append(' <span>WAS NOT ADDED!</span>');
-						alert(data.meta.error);
-					}
-				}, 'json');
+				var selection = $('ul li.selected.prime');
+								
+				$.ajax({
+					url: '{% url api_save_profile %}',
+					data: {collection_pk: selection.attr('id'), book_pk:id},
+					type: 'POST',
+					success: function(data) {
+						button.attr('disabled', 'disabled');
+						
+						if (data.meta.success) {
+							item.append(' <span>ADDED!</span>');
+						} else {
+							item.append(' <span>WAS NOT ADDED!</span>');
+							alert(data.meta.error);
+						}
+					},
+					error: function() {
+						alert('no response');
+					},
+					dataType: 'json'
+				});
 			});
 			
 		});
@@ -100,6 +327,7 @@
 		<div class="inner">
 			<h1>Add Some Books</h1>
 			<div class="clearfix">
+				<h3>Enter your ISBNs</h3>
 				<div>
 					<form id="add-books" action="" method="post" class="jqTransform clearfix">
 					{# {% if collection %}<input type="hidden" name="collection_pk" value="{{ collection.pk }}" />{% endif %} #}
@@ -113,15 +341,90 @@
 				</div>
 			</div>
 			<div>
-				<h3>Books in Box</h3>
+				<h3>Books Box</h3>
 				<ul id="books-box"></ul>
-				<button id="add-books-button">Add All Books</button>
 			</div>
 		</div>
 	</div>
 	<div class="section">
 		<div class="inner">
-			<p class="center"><a href="{{ collection.get_absolute_url }}">{{ collection.pk }}</a></p>
+			<h3>Choose a Home for these Books</h3>
+			<div class="container">
+				<div class="left">
+					<h4>Pick a Library</h4>
+					<ul id="library-picker" class="picker">
+						{# <!--If a collection is present--> #}
+						{% if collection %}
+							{% ifequal collection.collection_type 'library' %}
+								{# <!--The collection is a library--> #}
+								{% for library in user.libraries.all %}
+									<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}{% ifequal collection.pk library.pk %} selected prime{% endifequal %}">{{ library.name|truncatechars:25 }}</li>
+								{% endfor %}
+							{% else %}
+								{% ifequal collection.collection_type 'bookshelf' %}
+									{# <!--The collection is a bookshelf bookshelf--> #}
+									{% for library in user.libraries.all %}
+										<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}{% ifequal collection.parent.pk library.pk %} selected{% endifequal %}">{{ library.name|truncatechars:25 }}</li>
+									{% endfor %}
+								{% else %}
+									{# <!--A collection is present but its not a library or a bookshelf--> #}
+									{% for library in user.libraries.all %}
+										<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}">{{ library.name|truncatechars:25 }}</li>
+									{% endfor %}
+								{% endifequal %}
+							{% endifequal %}
+						{% else %}
+							{# <!--A collection is not present--> #}
+							{% for library in user.libraries.all %}
+								<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}">{{ library.name|truncatechars:25 }}</li>
+							{% endfor %}
+						{% endif %}
+					</ul>
+				</div>
+				<div class="left">
+					<h4>Pick a Bookshelf</h4>
+					<ul id="bookshelf-picker" class="picker">
+						{% if collection %}
+							{# <!--A collection is present--> #}
+							{% ifequal collection.collection_type 'bookshelf' %}
+								{# <!--The collection is a bookshelf, so for all children of the parent library, add a list item--> #}
+								{% for bookshelf in collection.parent.children.all %}
+									<li id="{{ bookshelf.pk }}" class="{% ifequal collection.pk bookshelf.pk %}selected prime{% endifequal %}">{{ bookshelf.name|truncatechars:25 }}</li>
+								{% endfor %}
+							{% else %}
+								{% ifequal collection.collection_type 'library' %}
+									{# <!--The collection is a library, load up the bookshelves for that library into the list--> #}
+									{% if collection.children.all %}
+										{% for bookshelf in collection.children.all %}
+											<li id="{{ bookshelf.pk }}" class="{% ifequal collection.pk bookshelf.pk %}selected prime{% endifequal %}">{{ bookshelf.name|truncatechars:25 }}</li>
+										{% endfor %}
+									{% else %}
+										<li class="no-bookshelves">no bookshelves</li>
+									{% endif %}
+								{% endifequal %}
+							{% endifequal %}
+						{% endif %}
+					</ul>
+				</div>
+				<div class="left">
+					<h4>Preview</h4>
+					<ul id="preview" class="picker">
+						<li class="no-items">will work soon</li>
+					</ul>
+				</div>
+			</div>
 		</div>
 	</div>
+	<div class="section">
+		<div class="inner">
+			<h3>Add These Books</h3>
+			<button id="add-books-button">Add All Books</button>
+		</div>
+	</div>
+
+<div id="connection-problem" class="overlay"> 
+	<p>Oops. There was a connection problem.</p>
+	<input type="button" id="connection-problem-ok" value="OK" /> 
+</div> 
+
 {% endblock %}

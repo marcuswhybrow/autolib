@@ -23,7 +23,8 @@ from django.db.models import Q
 def add_books(request):
 	collection_pk = request.GET.get('c', None)
 	try:
-		collection = Collection.objects.get(Q(pk=collection_pk)& (Q(owner=request.user) | Q(parent__owner=request.user) | Q(parent__parent__owner=request.user)))
+		# Find either a library or bookshelf collection of that pk.
+		collection = Collection.objects.get(Q(pk=collection_pk)& (Q(owner=request.user) | Q(parent__owner=request.user)))
 	except Collection.DoesNotExist:
 		collection = None
 	

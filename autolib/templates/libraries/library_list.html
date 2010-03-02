@@ -39,7 +39,7 @@
 				really.css('display', 'inline');
 				
 				really.click(function() {
-					$.post('{% url api_delete_collection %}', {collection_pk: library_pk}, function(data) {
+					$.post('{% url api_delete_collection %}', {pk: library_pk}, function(data) {
 						if (data.meta.success == true) {
 							library_row.slideUp('200', function() {
 								$(this).remove();
