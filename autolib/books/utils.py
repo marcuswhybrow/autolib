@@ -30,10 +30,11 @@ class BookDetail():
 	status = False
 		
 	def __init__(self, url):
-		try:
-			self.soup = BeautifulStoneSoup(urlopen(url).read())
-		except (HTTPError, URLError, httplib.BadStatusLine, httplib.InvalidURL, ValueError, IOError):
-			return None
+# 		try:
+		xml = unicode(urlopen(url).read(), errors='ignore')
+		self.soup = BeautifulStoneSoup(xml)
+# 		except (HTTPError, URLError, httplib.BadStatusLine, httplib.InvalidURL, ValueError, IOError):
+# 			return None
 		
 		if self.soup is not None:
 			
