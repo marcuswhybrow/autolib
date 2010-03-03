@@ -315,10 +315,12 @@ Add New Books | {{ block.super }}
 								// Start repeating the move UP function every 0.05 seconds
 								if ($.browser.safari) {
 									// Safari has a bug with intervals such that they behave unpredictably if the function is not enclosed within quotations
-									repeatInterval = setInterval("upFunc()", 50);
+									clearInterval(repeatInterval);
+									repeatInterval = setInterval(function() {upFunc();}, 50);
 								} else {
 									// For everything else use the normal way
-									repeatInterval = setInterval(upFunc, 50);
+									clearInterval(repeatInterval);
+									repeatInterval = setInterval(function() {upFunc();}, 50);
 								}
 							}
 						}, 100);
@@ -347,10 +349,12 @@ Add New Books | {{ block.super }}
 								// Start repeating the DOWN function every 0.05 seconds
 								if ($.browser.safari) {
 									// Safari has a bug with intervals such that they behave unpredictably if the function is not enclosed within quotations
-									repeatInterval = setInterval("downFunc()", 50);
+									clearInterval(repeatInterval);
+									repeatInterval = setInterval(function() {downFunc();}, 50);
 								} else {
 									// For everthing else use the normal way
-									repeatInterval = setInterval(downFunc, 50);
+									clearInterval(repeatInterval);
+									repeatInterval = setInterval(function() {downFunc();}, 50);
 								}
 							}
 						}, 100);
