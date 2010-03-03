@@ -312,16 +312,10 @@ Add New Books | {{ block.super }}
 							if (upKey) {
 								// If the UP key is still held down
 								
-								// Start repeating the move UP function every 0.05 seconds
-								if ($.browser.safari) {
-									// Safari has a bug with intervals such that they behave unpredictably if the function is not enclosed within quotations
-									clearInterval(repeatInterval);
-									repeatInterval = setInterval(function() {upFunc();}, 50);
-								} else {
-									// For everything else use the normal way
-									clearInterval(repeatInterval);
-									repeatInterval = setInterval(function() {upFunc();}, 50);
-								}
+								// Remove any existing repeating actions
+								clearInterval(repeatInterval);
+								// Move the selection up every 0.05 seconds
+								repeatInterval = setInterval(upFunc, 50);
 							}
 						}, 100);
 					}
@@ -346,16 +340,10 @@ Add New Books | {{ block.super }}
 							if (downKey) {
 								// If the DOWN key is still held down
 								
-								// Start repeating the DOWN function every 0.05 seconds
-								if ($.browser.safari) {
-									// Safari has a bug with intervals such that they behave unpredictably if the function is not enclosed within quotations
-									clearInterval(repeatInterval);
-									repeatInterval = setInterval(function() {downFunc();}, 50);
-								} else {
-									// For everthing else use the normal way
-									clearInterval(repeatInterval);
-									repeatInterval = setInterval(function() {downFunc();}, 50);
-								}
+								// Remove the existing repeating actions
+								clearInterval(repeatInterval);
+								// Move the selection down every 0.05 seconds
+								repeatInterval = setInterval(downFunc, 50);
 							}
 						}, 100);
 					}
