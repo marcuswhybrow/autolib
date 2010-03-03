@@ -1,13 +1,15 @@
 from django.db import models
 
-class LibraryManager(models.Manager):
-	def get_query_set(self):
-		return super(self.__class__, self).get_query_set().filter(type='library')
+from base.models import UUIDSyncableManager
 
-class BookshelfManager(models.Manager):
+class LibraryManager(UUIDSyncableManager):
 	def get_query_set(self):
-		return super(self.__class__, self).get_query_set().filter(type='bookshelf')
+		return super(LibraryManager, self).get_query_set().filter(collection_type='library')
 
-class SeriesManager(models.Manager):
+class BookshelfManager(UUIDSyncableManager):
 	def get_query_set(self):
-		return super(self.__class__, self).get_query_set().filter(type='series')
+		return super(BookshelfManager, self).get_query_set().filter(collection_type='bookshelf')
+
+class SeriesManager(UUIDSyncableManager):
+	def get_query_set(self):
+		return super(SeriesManager, self).get_query_set().filter(collection_type='series')

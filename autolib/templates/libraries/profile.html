@@ -1,15 +1,58 @@
 {% extends "libraries/base.html" %}
 
+{% block title %}
+Profile | {{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+{{ block.super }}
+<li> > <a href="{% url profile %}">Profile</a></li>
+{% endblock %}
+
 {% block content %}
-	{% if user.is_authenticated %}
-		<h2>{{ user.get_full_name }}</h2>
-		<h3>Your Libraries</h3>
-		<ul>
-			{% for library in libraries %}
-				<li>{{ library.name }}</li>
-			{% endfor %}
-		</ul>
-	{% else %}
-		<h2>Log in First</h2>
-	{% endif %}
+	<div class="section">
+		<div class="inner">
+			<h1>{{ user.get_full_name|default:user.username }}</h1>
+			
+			<div>
+				<div class="third alpha">
+					<h3>Things you can do</h3>
+					<ul>
+						<li><a href="{% url library_list %}">Browse Your Libraries</a></li>
+						<li><a href="{% url add_books %}">Add New Books</a></li>
+					</ul>
+				</div>
+				<div class="third">
+					<h3>Recommended Books for You</h3>
+					<ul>
+						<li>This</li>
+						<li>Will</li>
+						<li>Work</li>
+					</ul>
+				</div>
+				<div class="third omega">
+					<h3>Recent Actions</h3>
+					<ul>
+						{% spaceless %}
+							{% for update in updates %}
+								<li id="update-{{ update.pk }}" class="{{ update.action }}">{{ update.time|timesince }} ago:
+								{% ifequal update.action 'insert' %}
+									Added
+								{% else %}
+									{% ifequal update.action 'update' %}
+										Updated
+									{% else %}
+										{% ifequal update.action 'delete' %}
+											Deleted
+										{% endifequal %}
+									{% endifequal %}
+								{% endifequal %}
+								{{ update.content_object }}</li>
+							{% endfor %}
+						{% endspaceless %}
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock %}

@@ -33,7 +33,6 @@ class Collection(UUIDSyncable):
 	owner = models.ForeignKey(User, related_name="libraries", null=True, blank=True)
 	slug = models.CharField(max_length=200, editable=False)
 	
-	objects = models.Manager()
 	libraries = managers.LibraryManager()
 	bookshelves = managers.BookshelfManager()
 	series = managers.SeriesManager()
@@ -60,13 +59,9 @@ class Collection(UUIDSyncable):
 	
 	def __unicode__(self):
 		'''
-		Return a pretty formatted name depending on Collection type.
+		Return a pretty formatted name
 		'''
-		
-		if self.collection_type == 'library':
-			return '[%s - %s] %s' % (self.get_collection_type_display(), self.owner, self.name)
-		else:
-			return '[%s] %s' % (self.get_collection_type_display(), self.name)
+		return self.name
 	
 	def save(self, *args, **kwargs):
 		'''

@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from books.models import Book
 from libraries.models import Collection
-from base.models import Config
+from base.models import Config, Update
 from libraries.forms import CreateCollectionForm
 from libraries.utils import CurrentUser
 
@@ -18,6 +18,13 @@ from django.template import RequestContext
 from django.views.generic.list_detail import object_list
 
 from django.db.models import Q
+
+@login_required
+def profile(request):
+	updates = Update.objects.filter(user=request.user).order_by('-time')
+	return render_to_response('libraries/profile.html', {
+		'updates': updates,
+	}, context_instance=RequestContext(request))
 
 @login_required
 def add_books(request):

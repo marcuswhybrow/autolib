@@ -4,6 +4,7 @@ from libraries import views
 
 urlpatterns = patterns('libraries.views',
 	
+	url(r'^$', 'profile', name='profile'),
 	url(r'^addbooks/$', 'add_books', name='add_books'),
 	url(r'^libraries/$', 'library_list', {'template_name': 'libraries/library_list.html'}, name='library_list'),
 	url(r'^libraries/(?P<library_name>[^/]+)/$', 'library_detail', name='library_detail'),

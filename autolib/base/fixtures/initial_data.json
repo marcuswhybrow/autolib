@@ -1,0 +1,10 @@
+[
+  {
+    "pk": "unsorted_bin", 
+    "model": "base.config", 
+    "fields": {
+      "slug": "unsorted", 
+      "value": "Unsorted Bin"
+    }
+  }
+]
