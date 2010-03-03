@@ -1,5 +1,9 @@
 {% extends "libraries/library_list.html" %}
 
+{% block title %}
+{{ library.name }} | {{ block.super }}
+{% endblock %}
+
 {% block breadcrumbs %}
 {{ block.super }}
 <li class="library"> > <a href="{% url library_detail library.slug %}">{{ library.name }}</a></li>

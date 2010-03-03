@@ -50,6 +50,10 @@
 		
 		<div id="content-wrap" class="clearfix">
 			{% block main %}
+			<div id="content">
+				{% block content %}
+				{% endblock %}
+			</div><!-- / #content -->
 			{% endblock %}
 		</div><!-- / #content-wrap -->
 		

@@ -1,5 +1,13 @@
 {% extends "libraries/library_detail.html" %}
 
+{% block title %}
+{% if bookshelf %}
+	{{ bookshelf.name }} | {{ block.super }}
+{% else %}
+	{{ unsorted_bin.value }} | {{ block.super }}
+{% endif %}
+{% endblock %}
+
 {% block breadcrumbs %}
 	{{ block.super }}
 	{% if bookshelf %}

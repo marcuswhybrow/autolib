@@ -1,4 +1,8 @@
-{% extends "books/base_full.html" %}
+{% extends "base.html" %}
+
+{% block title %}
+404 Not Found | {{ block.super }}
+{% endblock %}
 
 {% block content %}
 <div class="section">

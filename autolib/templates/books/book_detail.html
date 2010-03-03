@@ -1,5 +1,9 @@
 {% extends "books/book_list.html" %}
 
+{% block title %}
+{{ book.title }} | {{ block.super }}
+{% endblock %}
+
 {% load truncate_filters %}
 
 {% block breadcrumbs %}
