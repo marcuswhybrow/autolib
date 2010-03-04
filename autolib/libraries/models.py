@@ -33,9 +33,10 @@ class Collection(UUIDSyncable):
 	owner = models.ForeignKey(User, related_name="libraries", null=True, blank=True)
 	slug = models.CharField(max_length=200, editable=False)
 	
-	libraries = managers.LibraryManager()
-	bookshelves = managers.BookshelfManager()
-	series = managers.SeriesManager()
+# 	objects = models.Manager()
+# 	libraries = managers.LibraryManager()
+# 	bookshelves = managers.BookshelfManager()
+# 	series = managers.SeriesManager()
 	
 	def get_user(self):
 		if self.collection_type == 'library':
