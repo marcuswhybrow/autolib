@@ -1,8 +1,13 @@
 from django.db import models
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
 
-# Create your models here.
+
+class SoftDeletableContentType(ContentType):
+	
+	def get_object_for_this_type(self, **kwargs):
+		return self.model_class().all_objects.using(self._state.db).get(**kwargs)
+
 
 class Config(models.Model):
 	'''
@@ -35,10 +40,24 @@ class Update(models.Model):
 	time = models.DateTimeField(auto_now_add=True, db_index=True)
 	action = models.CharField(max_length=20, choices=UPDATE_TYPES)
 	user = models.ForeignKey(User, related_name="updates", editable=False, db_index=True, null=True, blank=True)
-	
-	content_type = models.ForeignKey(ContentType)
+
+	content_type = models.CharField(max_length=200)
 	object_pk = models.CharField(max_length=64)
-	content_object = generic.GenericForeignKey('content_type', 'object_pk')
+	
+	def _get_content_object(self):
+		if self.content_type and len(self.content_type.split('.')) == 2:
+			try:
+				return models.get_model(*self.content_type.split('.')).all_objects.get(pk=self.object_pk)
+			except ObjectDoesNotExist:
+				return None
+		else:
+			return None
+	
+	def _set_content_object(self, content_object):
+		self.content_type = content_object.__module__.split('.')[0] + '.' + content_object.__class__.__name__
+		self.object_pk = content_object.pk
+	
+	content_object = property(_get_content_object, _set_content_object)
 	
 	def __unicode__(self):
 		return '%s - %s - %s - %s' % (self.action, self.content_type, self.content_object, self.user)
@@ -61,8 +80,9 @@ class UUIDSyncable(models.Model):
 	# UUIDSyncable objects must have a UUID as their primary key
 	uuid = models.CharField(primary_key=True, max_length=64, editable=False, blank=True)
 	
-	# The updates this syncable item is related to
-	updates = generic.GenericRelation(Update, content_type_field='content_type', object_id_field='object_pk')
+	@property
+	def updates(self):
+		return Update.all_objects.filter(object_pk=self.pk)
 	
 	# Flag to specify that the object is deleted (instead of actual deletion)
 	is_deleted = models.BooleanField(default=False, editable=False)
@@ -71,8 +91,8 @@ class UUIDSyncable(models.Model):
 	# all bespoke code uses Model.objects.all() to get all objects for a model (which is no longer the default manager)
 	# But behind the scenes django modules use Model._default_manager.all(), which uses Model.all_objects.all()
 	# as it is the new default manager
-	all_objects = models.Manager()
 	objects = UUIDSyncableManager()
+	all_objects = models.Manager()
 	deleted = UUIDSyncableDeletedManager()
 	
 	class Meta:

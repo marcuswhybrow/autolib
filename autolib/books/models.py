@@ -172,7 +172,15 @@ class BookProfile(UUIDSyncable):
 	
 	def save(self, *args, **kwargs):
 		self.slug = slugify(self.title)
-		super(BookProfile, self).save(*args, **kwargs)
+		
+		uniqueConstraint = {'book_instance': self.book_instance, 'collection': self.collection}
+		
+		profiles = BookProfile.objects.filter(**uniqueConstraint)
+		
+		if len(profiles) == 0:
+			super(BookProfile, self).save(*args, **kwargs)
+		else:
+			raise ValidationError('A Book Profile for that book instance in that collection already exists')
 
 tagging.register(BookProfile)
 		

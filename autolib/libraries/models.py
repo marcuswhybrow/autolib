@@ -9,6 +9,8 @@ from django.utils.http import urlquote_plus
 import managers
 import re
 
+from django.core.exceptions import ValidationError
+
 #########################
 ### Collections Model ###
 #########################
@@ -23,8 +25,6 @@ from base.models import UUIDSyncable
 from django.template.defaultfilters import slugify
 
 class Collection(UUIDSyncable):
-	class Meta:
-		unique_together = (('collection_type', 'owner', 'slug'),('collection_type', 'parent', 'slug'))
 	
 	name = models.CharField(max_length=200)
 	collection_type = models.CharField(max_length=20, choices=COLLECTION_TYPE_CHOICES)
@@ -32,11 +32,6 @@ class Collection(UUIDSyncable):
 	parent = models.ForeignKey('self', related_name="children", null=True, blank=True)
 	owner = models.ForeignKey(User, related_name="libraries", null=True, blank=True)
 	slug = models.CharField(max_length=200, editable=False)
-	
-# 	objects = models.Manager()
-# 	libraries = managers.LibraryManager()
-# 	bookshelves = managers.BookshelfManager()
-# 	series = managers.SeriesManager()
 	
 	def get_user(self):
 		if self.collection_type == 'library':
@@ -49,6 +44,7 @@ class Collection(UUIDSyncable):
 	user = property(get_user)
 
 	def get_absolute_url(self):
+		
 		if self.collection_type == 'library':
 			return ('library_detail', [self.slug])
 		elif self.collection_type == 'bookshelf':
@@ -59,9 +55,9 @@ class Collection(UUIDSyncable):
 	get_absolute_url = permalink(get_absolute_url)
 	
 	def __unicode__(self):
-		'''
+		"""
 		Return a pretty formatted name
-		'''
+		"""
 		return self.name
 	
 	def save(self, *args, **kwargs):
@@ -88,14 +84,32 @@ class Collection(UUIDSyncable):
 		else:
 			raise AssertionError, 'A Collection must be of type "library", "bookshelf" or "series"'
 		
-		super(Collection, self).save(*args, **kwargs)
+		# The uniqueness constraints a collection must abide by
+		ownerConstraint = {'collection_type': self.collection_type, 'owner': self.owner, 'slug': self.slug}
+		parentConstraint = {'collection_type': self.collection_type, 'parent': self.parent, 'slug': self.slug}
+		
+		# Gather any collections which match those values
+		collections = list(Collection.objects.filter(**ownerConstraint)) + list(Collection.objects.filter(**parentConstraint))
+		
+		if len(collections) == 0:
+			# If there are no matches
+			
+			# Save the current collection
+			super(Collection, self).save(*args, **kwargs)
+		else:
+			# Otherwise you cannot add the collection in its current state
+			raise ValidationError('There already exists a collection of that collection type "parent or owner" and slug')
 	
 	def get_owner(self):
+		"""
+		Get the owner (User) of this collection
+		"""
+		
 		if self.collection_type == 'library':
 			return self.owner
 		elif self.collection_type == 'bookshelf':
 			return self.parent.owner
 		elif self.collection_type == 'series':
 			return self.parent.parent.owner
-			
-		return None
+		else:
+			return None
