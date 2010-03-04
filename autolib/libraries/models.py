@@ -10,6 +10,7 @@ import managers
 import re
 
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 
 #########################
 ### Collections Model ###
@@ -89,7 +90,7 @@ class Collection(UUIDSyncable):
 		parentConstraint = {'collection_type': self.collection_type, 'parent': self.parent, 'slug': self.slug}
 		
 		# Gather any collections which match those values
-		collections = list(Collection.objects.filter(**ownerConstraint)) + list(Collection.objects.filter(**parentConstraint))
+		collections = list(Collection.objects.filter(Q(**ownerConstraint) & ~Q(pk=self.pk))) + list(Collection.objects.filter(Q(**parentConstraint) & ~Q(pk=self.pk)))
 		
 		if len(collections) == 0:
 			# If there are no matches

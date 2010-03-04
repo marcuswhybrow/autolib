@@ -8,6 +8,8 @@ from base.models import Config
 from django.utils.http import urlquote_plus
 from django.template.defaultfilters import slugify
 
+from django.db.models import Q
+
 import re
 
 ##################
@@ -175,7 +177,7 @@ class BookProfile(UUIDSyncable):
 		
 		uniqueConstraint = {'book_instance': self.book_instance, 'collection': self.collection}
 		
-		profiles = BookProfile.objects.filter(**uniqueConstraint)
+		profiles = BookProfile.objects.filter(Q(**uniqueConstraint) & ~Q(pk=self.pk))
 		
 		if len(profiles) == 0:
 			super(BookProfile, self).save(*args, **kwargs)
