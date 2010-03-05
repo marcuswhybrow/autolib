@@ -4,9 +4,11 @@
 Your Libraries | {{ block.super }}
 {% endblock %}
 
+{% block page_title %}libraries-library-list{% endblock %}
+
 {% block breadcrumbs %}
 {{ block.super }}
-<li> > <a href="{% url library_list %}">Libraries</a></li>
+<li id="bc-libraries-library-list"><a href="{% url library_list %}">Libraries</a></li>
 {% endblock %}
 
 {% block head %}

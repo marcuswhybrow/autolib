@@ -8,12 +8,14 @@
 {% endif %}
 {% endblock %}
 
+{% block page_title %}libraries-bookshelf-detail{% endblock %}
+
 {% block breadcrumbs %}
 	{{ block.super }}
 	{% if bookshelf %}
-		<li class="bookshelf"> > <a href="{% url bookshelf_detail library.slug, bookshelf.slug %}">{{ bookshelf.name }}</a></li>
+		<li id="bc-libraries-bookshelf-detail" class="bookshelf"><a href="{% url bookshelf_detail library.slug, bookshelf.slug %}">{{ bookshelf.name }}</a></li>
 	{% else %}
-		<li class="bookshelf"> > <a href="{% url library_detail library.slug %}{{ unsorted_bin.slug }}/">{{ unsorted_bin.value }}</a></li>
+		<li id="bc-libraries-bookshelf-detail" class="bookshelf"><a href="{% url library_detail library.slug %}{{ unsorted_bin.slug }}/">{{ unsorted_bin.value }}</a></li>
 	{% endif %}
 {% endblock %}
 

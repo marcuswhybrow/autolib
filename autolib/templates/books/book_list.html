@@ -8,9 +8,11 @@ Books Statistics | {{ block.super }}
 {% votes_by_user user on books as vote_dict %}
 {% scores_for_objects books as score_dict %}
 
+{% block page_title %}books-book-list{% endblock %}
+
 {% block breadcrumbs %}
 {{ block.super }}
-<li> > <a href="{% url books.views.book_list %}">Books</a></li>
+<li id="bc-books-book-list"><a href="{% url books.views.book_list %}">Books</a></li>
 {% endblock %}
 
 {% block head %}

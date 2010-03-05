@@ -1,8 +1,10 @@
 {% extends "users/base.html" %}
 
+{% block page_title %}users-user-detail{% endblock %}
+
 {% block breadcrumbs %}
 {{ block.super }}
-<li> > <a href="{% url users.views.user_detail user.username %}">{{ user.username }}</a></li>
+<li id="bc-users-user-detail"><a href="{% url users.views.user_detail user.username %}">{{ user.username }}</a></li>
 {% endblock %}
 
 {% block content %}

@@ -6,9 +6,11 @@ Add New Books | {{ block.super }}
 
 {% load truncate_filters %}
 
+{% block page_title %}libraries-add-books{% endblock %}
+
 {% block breadcrumbs %}
 {{ block.super }}
-<li> > <a href="{% url add_books %}">Add Books</a></li>
+<li id="bc-libraries-add-books"><a href="{% url add_books %}">Add Books</a></li>
 {% endblock %}
 
 {% block head %}

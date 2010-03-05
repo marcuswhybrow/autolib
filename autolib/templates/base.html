@@ -16,7 +16,7 @@
 	<title>{% block title %}AutoLibrarian{% endblock %}</title>
 </head>
 
-<body>
+<body id="{% block page_title %}{% endblock %}">
 
 	<div id="page-wrap">
 	
@@ -38,19 +38,19 @@
 					</ul>
 				</div>
 -->
-				<div id="breadcrumbs" class="clearfix">
-					<ul>
-						{% block breadcrumbs %}
-						<li><a href="{% url home %}">Home</a></li>
-						{% endblock %}
-					</ul>
-				</div>
 			</div>
 		</div><!-- / #header-wrap -->
 		
 		<div id="content-wrap" class="clearfix">
 			{% block main %}
 			<div id="content">
+				<div id="breadcrumbs" class="clearfix">
+					<ul class="clearfix">
+						{% block breadcrumbs %}
+						<li id="bc-home-page" class="alpha"><a href="{% url home %}">Home</a></li>
+						{% endblock %}
+					</ul>
+				</div>
 				{% block content %}
 				{% endblock %}
 			</div><!-- / #content -->

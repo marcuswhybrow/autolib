@@ -6,9 +6,11 @@
 
 {% load truncate_filters %}
 
+{% block page_title %}books-book-detail{% endblock %}
+
 {% block breadcrumbs %}
 {{ block.super }}
-<li> > <a href="{% url book_detail book.isbn %}">{{ book.title|truncatechars:50 }}</a></li>
+<li id="bc-books-book-detail"><a href="{% url book_detail book.isbn %}">{{ book.title|truncatechars:50 }}</a></li>
 {% endblock %}
 
 {% block head %}

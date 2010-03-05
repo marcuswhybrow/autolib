@@ -71,10 +71,6 @@ class Book(UUIDSyncable):
 	
 	isbn = property(get_isbn)
 	
-# 	def save(self, *args, **kwargs):
-# 		assert re.match('^[a-zA-Z0-9\ \-\_]*$', self.title), 'A title can only contain the characters: a-z, A-Z, 0-9, spaces, underscores and dashes.'
-# 		super(self.__class__, self).save(*args, **kwargs)
-	
 	@permalink
 	def get_absolute_url(self):
 		return ('books.views.book_detail', [self.isbn])
@@ -96,7 +92,7 @@ class BookProfile(UUIDSyncable):
 		unique_together = ('book_instance', 'collection')
 	
 	def __unicode__(self):
-		return '[BookProfile] %s' % self.book_instance.isbn
+		return self.book_instance.title
 	
 	@permalink
 	def get_absolute_url(self):
@@ -185,6 +181,17 @@ class BookProfile(UUIDSyncable):
 			raise ValidationError('A Book Profile for that book instance in that collection already exists')
 
 tagging.register(BookProfile)
+
+class Note(UUIDSyncable):
+	
+	profile = models.ForeignKey(BookProfile, related_name='notes')
+	note = models.TextField()
+	
+	def __unicode__(self):
+		return 'Note for %s' % (self.profile.title)
+	
+	def get_owner(self):
+		return self.profile.get_owner()
 		
 #############
 ### Forms ###

@@ -97,9 +97,9 @@ a:hover                      { text-decoration: underline; }
 #content li.this a:hover	{ background-color: #ffcc77; }
 
 
-div#header-wrap     { width: 100%; height: 200px; }
+div#header-wrap     { width: 100%; height: 180px; }
 
-div#header          { width: 936px; margin: 0 auto; position: absolute; left: 50%; margin-left: -468px; height: 200px; }
+div#header          { width: 936px; margin: 0 auto; position: absolute; left: 50%; margin-left: -468px; height: 180px; }
 
 div#header-bg       {  width: 1300px; height: 406px; 
                       position: relative; margin: 0 auto; z-index: -10; }
@@ -165,10 +165,31 @@ div#overview #meta #tags ul li.more     { color: #fff; padding-top: 18px; text-t
 
 /* Breadcrumbs */
 
-#breadcrumbs        { position: absolute; bottom: 0; color: white; }
-#breadcrumbs a      { color: white }
-#breadcrumbs ul     {  }
-#breadcrumbs ul li  { display: inline; }
+#breadcrumbs       			{ color: white; }
+#breadcrumbs a     			{ color: #474747; -moz-border-radius: 0; -webkit-border-radius: 0; border: none; display: block; padding: 0; padding: 1px 5px 0 20px;
+							  background: url(/media/images/breadcrumbs-divider.png) top left no-repeat; height: 22px; text-shadow: #f9faf9 1px 1px 1px; }
+#breadcrumbs a:hover		{ background: url(/media/images/breadcrumbs-divider.png) top left no-repeat; border: none; }
+#breadcrumbs ul    			{ padding: 0; background: url(/media/images/breadcrumbs-bg.png) repeat-x; -moz-border-radius: 6px 6px 0 0; border-bottom: 1px solid #d4d4d4; }
+#breadcrumbs ul li 			{ display: inline; float: left; font-size: 11px; padding: 0; }
+#breadcrumbs ul li.alpha	{ -moz-border-radius: 6px 0 0 0; }
+
+body#home-page 							#breadcrumbs ul li#bc-home-page a,
+body#books-book-detail					#breadcrumbs ul li#bc-books-book-detail a,
+body#books-book-list					#breadcrumbs ul li#bc-books-book-list a,
+body#libraries-add-books				#breadcrumbs ul li#bc-libraries-add-books a,
+body#libraries-bookshelf-detail			#breadcrumbs ul li#bc-libraries-bookshelf-detail a,
+body#libraries-library-detail			#breadcrumbs ul li#bc-libraries-library-detail a,
+body#libraries-library-list				#breadcrumbs ul li#bc-libraries-library-list a,
+body#libraries-profile					#breadcrumbs ul li#bc-libraries-profile a,
+body#registration-activation-complete	#breadcrumbs ul li#bc-registration-activation-complete a,
+body#registration-login					#breadcrumbs ul li#bc-registration-login a,
+body#registration-complete				#breadcrumbs ul li#bc-registration-complete a,
+body#registration-form					#breadcrumbs ul li#bc-registration-form a,
+body#users-book-detail					#breadcrumbs ul li#bc-users-book-detail a,
+body#users-user-detail					#breadcrumbs ul li#bc-users-user-detail a		{ /* background: url(/media/images/breadcrumbs-divider-penultimate.png) top left no-repeat; */ }
+
+body 									#breadcrumbs ul li#bc-home-page a		{ background-image: none !important; padding-left: 10px !important; }
+
 
 /* jQuery */
 

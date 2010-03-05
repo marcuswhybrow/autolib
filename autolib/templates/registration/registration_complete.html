@@ -1,8 +1,10 @@
 {% extends "registration/base.html" %}
 
+{% block page_title %}registration-complete{% endblock %}
+
 {% block breadcrumbs %}
 {{ block.super }}
-<li> > <a href="{% url registration.urls.register %}">Registration</a></li>
+<li id="bc-registration-complete"><a href="{% url registration.urls.register %}">Registration</a></li>
 {% endblock %}
 
 {% block content %}

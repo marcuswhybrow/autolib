@@ -15,9 +15,11 @@ Login | {{ block.super }}
 </script>
 {% endblock %}
 
+{% block page_title %}registration-login{% endblock %}
+
 {% block breadcrumbs %}
 {{ block.super }}
-<li> > <a href="{% url django.contrib.auth.views.login %}">Login</a></li>
+<li id="bc-registration-login"><a href="{% url django.contrib.auth.views.login %}">Login</a></li>
 {% endblock %}
 
 {% block content %}

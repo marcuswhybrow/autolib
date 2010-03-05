@@ -11,9 +11,11 @@
 </script>
 {% endblock %}
 
+{% block page_title %}registration-form{% endblock %}
+
 {% block breadcrumbs %}
 {{ block.super }}
-<li> > <a href="{% url registration.urls.register %}">Registration</a></li>
+<li id="bd-registration-form"><a href="{% url registration.urls.register %}">Registration</a></li>
 {% endblock %}
 
 {% block content %}
