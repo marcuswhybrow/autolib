@@ -110,6 +110,9 @@ ul.item-list li img.failure									{ position: absolute; top: 5px; right: 7px; 
 #content ul.item-list li a.item-title						{ background: none; color: #2e2e2e; border: none; padding: 0; font-family: Arial; font-size: 18px; font-weight: bold; }
 #content ul.item-list li a.item-title:hover					{ text-decoration: underline; }
 
+#content ul.item-list li a.item-title.deleted				{ color: #ccc; cursor: default; }
+#content ul.item-list li a.item-title.deleted:hover			{ text-decoration: none; }
+
 #content ul.item-list li p.item-description					{ padding: 0; }
 #content ul.item-list li span.item-children-count			{ font-family: Arial,Liberation Sans,DejaVu Sans,sans-serif; font-size: 30px; font-weight: bold; text-align: center; display: block; color: #808185;
 															  position: absolute; top: 0; right: 0; padding: 10px 10px 0 0; -moz-user-select: none; -webkit-user-select: none; cursor: default; }

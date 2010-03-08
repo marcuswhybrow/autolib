@@ -19,39 +19,39 @@ Profile | {{ block.super }}
 			<div>
 				<div class="third alpha">
 					<h3>Things you can do</h3>
-					<ul>
-						<li><a href="{% url library_list %}">Browse Your Libraries</a></li>
-						<li><a href="{% url add_books %}">Add New Books</a></li>
+					<ul class="item-list">
+						<li><a class="item-title" href="{% url library_list %}">Browse Your Libraries</a></li>
+						<li><a class="item-title" href="{% url add_books %}">Add New Books</a></li>
 					</ul>
 				</div>
 				<div class="third">
 					<h3>Recommended Books for You</h3>
-					<ul>
+					<ul class="item-list">
 						<li>This</li>
 						<li>Will</li>
 						<li>Work</li>
+						<li>One</li>
+						<li>Day</li>
 					</ul>
 				</div>
 				<div class="third omega">
 					<h3>Recent Actions</h3>
-					<ul>
-						{% spaceless %}
-							{% for update in updates %}
-								<li id="update-{{ update.pk }}" class="{{ update.action }}">{{ update.time|timesince }} ago:
-								{% ifequal update.action 'insert' %}
-									Added
+					<ul class="item-list">
+						{% for update in updates|slice:":5" %}
+							<li id="update-{{ update.pk }}" class="{{ update.action }}"><a class="item-title{% if not update.content_object.is_deleted %}" href="{{ update.content_object.get_absolute_url }}" {% else %} deleted"{% endif %}>
+							{% ifequal update.action 'insert' %}
+								Added
+							{% else %}
+								{% ifequal update.action 'update' %}
+									Updated
 								{% else %}
-									{% ifequal update.action 'update' %}
-										Updated
-									{% else %}
-										{% ifequal update.action 'delete' %}
-											Deleted
-										{% endifequal %}
+									{% ifequal update.action 'delete' %}
+										Deleted
 									{% endifequal %}
 								{% endifequal %}
-								{{ update.content_object }}</li>
-							{% endfor %}
-						{% endspaceless %}
+							{% endifequal %}
+							{{ update.content_object }}</a> <br /> {{ update.time|timesince }} ago</li>
+						{% endfor %}
 					</ul>
 				</div>
 			</div>

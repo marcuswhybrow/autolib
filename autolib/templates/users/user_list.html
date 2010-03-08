@@ -16,9 +16,12 @@
 <div class="section">
 	<div class="inner">
 		{% if users %}
-		<ul id="users-list">
+		<ul id="users-list" class="item-list">
 			{% for user in users %}
-				<li><a href="{{ user.get_absolute_url }}">{{ user.username }}</a></li>
+				<li>
+					<a class="item-title" href="{{ user.get_absolute_url }}">{{ user.username }} ({{ user.get_full_name|default:user.username }})</a>
+					<span class="item-children-count">{{ user.date_joined|timesince }}</span>
+				</li>
 			{% endfor %}
 		</ul>
 		{% endif %}

@@ -43,12 +43,13 @@ Books Statistics | {{ block.super }}
 			{% endfor %}
 			<h2>Books</h2>
 			<p>All books in the system.</p>
-			<ul id="books">
+			<ul class="item-list">
 				{% for book in books %}
 					{% dict_entry_for_item book from vote_dict as vote %}
 					{% dict_entry_for_item book from score_dict as score %}
 					<li id="{{ book.pk }}">
-						<p><a href="{{ book.get_absolute_url }}">{{ book.title }}</a> first seen {{ book.added|timesince }} ago.</p>
+						<a class="item-title" href="{{ book.get_absolute_url }}">{{ book.title }}</a>
+						<span class="item-children-count">{{ book.added|date }}</span>
 					</li>
 				{% endfor %}
 			</ul>
