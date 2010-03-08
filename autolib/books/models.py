@@ -51,6 +51,14 @@ class Book(UUIDSyncable):
 	
 	edition_group = models.ForeignKey(BookEditionGroup, related_name='editions', editable=False)
 	
+	def get_tags(self):
+		return Tag.objects.get_for_object(self)
+	
+	def set_tags(self, tag_list):
+		Tag.objects.update_tags(self, tag_list)
+	
+	tags = property(get_tags, set_tags)
+	
 	class Meta:
 		ordering = ('-published', )
 		get_latest_by = 'published'
@@ -60,7 +68,7 @@ class Book(UUIDSyncable):
 		return Tag.objects.get_for_object(self)
 	
 	def __unicode__(self):
-		return '[Book] %s' % self.isbn
+		return self.title
 		
 	def get_isbn(self):
 		if self.isbn10:
@@ -79,7 +87,7 @@ class Book(UUIDSyncable):
 	def get_owner(self):
 		return None
 
-tagging.register(Book)
+#tagging.register(Book)
 
 class BookProfile(UUIDSyncable):
 	book_instance = models.ForeignKey(Book, related_name='instances')
@@ -181,7 +189,7 @@ class BookProfile(UUIDSyncable):
 		else:
 			raise ValidationError('A Book Profile for that book instance in that collection already exists')
 
-tagging.register(BookProfile)
+#tagging.register(BookProfile)
 
 class Note(UUIDSyncable):
 	

@@ -27,11 +27,9 @@ Profile | {{ block.super }}
 				<div class="third">
 					<h3>Recommended Books for You</h3>
 					<ul class="item-list">
-						<li>This</li>
-						<li>Will</li>
-						<li>Work</li>
-						<li>One</li>
-						<li>Day</li>
+						{% for book in recommended_books %}
+							<li>{{ book }}</li>
+						{% endfor %}
 					</ul>
 				</div>
 				<div class="third omega">

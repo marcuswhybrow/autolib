@@ -147,6 +147,7 @@ def xmlhttprequest_vote_on_object(request, model, direction,
 
     # Vote and respond
     Vote.objects.record_vote(obj, request.user, vote)
+    
     return HttpResponse(simplejson.dumps({
         'success': True,
         'score': Vote.objects.get_score(obj),

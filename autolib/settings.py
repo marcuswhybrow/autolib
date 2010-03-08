@@ -89,6 +89,7 @@ INSTALLED_APPS = (
     'registration',
     'tagging',
     'voting',
+    'recommender',
     #'django_openidconsumer',
     #'django_openid_auth',
 )

@@ -188,6 +188,11 @@ class BookDetail():
 									# Assign the book we are trying to create the edition_group of this book
 									book.edition_group = existing_book.edition_group
 									book.save()
+									
+									# Add the subjects as tags to this book
+									for subject in self.subjects:
+										Tag.objects.add_tag(book, slugify(subject))
+									
 									return book
 									
 								except Book.DoesNotExist:
@@ -201,6 +206,11 @@ class BookDetail():
 				
 			# Save the book to the database
 			book.save()
+			
+			# Add the subjects as tags to this book
+			for subject in self.subjects:
+				Tag.objects.add_tag(book, slugify(subject))
+			
 			return book
 		else:
 			return None
