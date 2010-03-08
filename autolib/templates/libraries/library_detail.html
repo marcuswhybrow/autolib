@@ -99,7 +99,7 @@
 					var description = data.collection.description;
 					var url = data.collection.url;
 					var pk = data.collection.pk;
-					$("ul#bookshelf-list").append('<li id="' + pk + '" style="display: none"><a href="' + url + '">' + name + '</a><span class="delete">delete</span></li>');
+					$("ul#bookshelf-list").append('<li id="' + pk + '" style="display: none"><a class="item-title" href="' + url + '">' + name + '</a><span class="item-children-count">0</span></li>');
 					$("li#" + pk).slideDown('200');
 					
 					$("#" + pk).hover(bookshelf_hover_over, bookshelf_hover_out);
