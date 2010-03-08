@@ -14,6 +14,9 @@ urlpatterns = patterns('',
 	
 	# !App base paths
 	url(r'^$', 'base.views.index', name='home'),
+	url(r'^apps/$', direct_to_template, {'template': 'base/apps.html'}, name='apps'),
+	url(r'^apps/android$', direct_to_template, {'template': 'base/apps_android.html'}, name='apps_android'),
+	url(r'^apps/java$', direct_to_template, {'template': 'base/apps_java.html'}, name='apps_java'),
 	
 	# !Registration App
 	(r'^accounts/', include('registration.backends.default.urls')),

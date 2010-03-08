@@ -15,8 +15,8 @@ class Config(models.Model):
 	values such as naming schemes to be altered later on.
 	'''
 	
-	key = models.CharField(max_length=200, primary_key=True)
-	value = models.CharField(max_length=200)
+	key = models.CharField(max_length=100, primary_key=True)
+	value = models.CharField(max_length=100)
 	slug = models.SlugField()
 	
 	def __unicode__(self):
@@ -41,7 +41,7 @@ class Update(models.Model):
 	action = models.CharField(max_length=20, choices=UPDATE_TYPES)
 	user = models.ForeignKey(User, related_name="updates", editable=False, db_index=True, null=True, blank=True)
 
-	content_type = models.CharField(max_length=200)
+	content_type = models.CharField(max_length=100)
 	object_pk = models.CharField(max_length=64)
 	
 	def _get_content_object(self):

@@ -121,15 +121,16 @@ class GetBookDetail(APIView):
 	
 	def process(self, request):
 		"""
-		Gets information about a book by its ISBN number from Google Books
+		Gets information about a book by its ISBN number or UUID pk from the local database,
+		Uses google books to update the database if ISBN is used.
 		"""
 		
 		# The ISBN number of the book
 		isbn = request.GET.get('isbn', None)
 		
-		# If the ISBN number was provided
 		if isbn is not None:
-			
+			# If the ISBN number was provided
+				
 			book = None
 			
 			try:
@@ -141,12 +142,14 @@ class GetBookDetail(APIView):
 				else:
 					self.data['meta']['error'] = 'ISBN must be 10 or 13 characters in length'
 					return
+				
 			except Book.DoesNotExist:
 				# If not found locally try and get the book details from Google
 				bookDetails = utils.get_book_detail(isbn)
 				
-				# If book details were found
 				if bookDetails is not None:
+					# If book details were found
+					# Convert the details into a database object
 					book = bookDetails.convert_to_book()
 					
 					# TODO Get Django to queue up the updating of this books Editions
@@ -156,16 +159,22 @@ class GetBookDetail(APIView):
 					return
 			
 		else:
+			# Otherwise get look for the a UUID pk of the Book
 			book_pk = request.GET.get('pk', None)
 			
 			if book_pk is not None:
 				try:
+					# Try and get the Book based on that pk
 					book = Book.objects.get(pk=book_pk)
+					
 				except Book.DoesNotExist:
+					# If it doesn't exist
+					
 					self.data['meta']['error'] = 'Details for the book with the pk' + book_pk + ' not found'
 					return
 			else:
-				self.data['meta']['error'] = "Neither isbn or pk was found in the POST data"
+				# If the book_pk was not supplied
+				self.data['meta']['error'] = "Neither isbn or pk was found in the GET data"
 				return
 		
 		if book is not None:

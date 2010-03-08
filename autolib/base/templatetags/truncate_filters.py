@@ -3,7 +3,7 @@ register = template.Library()
  
 @register.filter("truncatechars")  
 def truncate_chars(value, max_length):  
-    if len(value) <= max_length:  
+    if value is None or len(value) <= max_length:  
         return value  
   
     truncd_val = value[:max_length]  

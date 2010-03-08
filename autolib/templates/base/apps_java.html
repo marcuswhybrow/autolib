@@ -1,0 +1,22 @@
+{% extends 'base/apps.html' %}
+
+{% block breadcrumbs %}
+{{ block.super }} <li id="bc-apps"><a href="{% url apps_java %}">Java</a></li>
+{% endblock %}
+
+{% block content %}
+	<div class="section">
+		<div class="inner">
+			<div class="container clearfix">
+				<div class="two-thirds alpha">
+					<h1>Download Our Java Application</h1>
+					<p>No matter what your operating system, this will work for you.</p>
+					<p><a href="">Download</a></p>
+				</div>
+				<div class="third">
+					<img src="/media/images/java-icon-256.png" width="256" height="256" alt="The Java cup logo" />
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

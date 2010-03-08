@@ -1,0 +1,22 @@
+{% extends 'base/apps.html' %}
+
+{% block breadcrumbs %}
+{{ block.super }} <li id="bc-apps"><a href="{% url apps_android %}">Android</a></li>
+{% endblock %}
+
+{% block content %}
+	<div class="section">
+		<div class="inner">
+			<div class="container clearfix">
+				<div class="two-thirds alpha">
+					<h1>Download The Android App</h1>
+					<p>Just scan this crazy image below in order to install the application.</p>
+					<div style="width:256px; height:256px; background-color:#eee;"></div>
+				</div>
+				<div class="third omega">
+					<img src="/media/images/android-icon-256.png" width="256" height="256" alt="The Android logo" />
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

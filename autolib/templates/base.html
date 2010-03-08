@@ -24,26 +24,30 @@
 			<div id="header" class="clearfix">
 				<div id="auth-box">
 					{% if user.is_authenticated %}
-						<a href="{% url library_list %}">{{ user.username }}</a> | <a href="{% url django.contrib.auth.views.logout %}">logout</a>
+						<div id="ab-main" class="authenticated"><a id="ab-username" href="{% url profile %}">{{ user.username }}</a><a id="ab-logout" href="{% url django.contrib.auth.views.logout %}">logout</a></div>
 					{% else %}
-						<a href="{% url django.contrib.auth.views.login %}">login</a> | <a href="{% url registration.views.register %}">register</a>
+						<div class="unauthenticated"><a id="ab-login" href="{% url django.contrib.auth.views.login %}">login</a><a id="ab-register" href="{% url registration.views.register %}">register</a></div>
 					{% endif %}
 				</div>
-<!--
-				<div id="global-nav">
-					<ul class="clearfix">
-						<li class="gn-home"><a href="{% url home %}">Home</a></li>
-						<li class="gn-profile"><a href="{% url library_list %}">Profile</a></li>
-						<li class="gn-add-books"><a href="{% url add_books %}">Add Books</a></li>
-					</ul>
+				<div id="promo-message">
+					<p>Download the Android App, to start</p>
 				</div>
--->
+				<div id="android">
+					<a href="{% url apps_android %}">
+						<img src="/media/images/android-icon-256.png" width="128" height="128" alt="Get the Android App" />
+					</a>
+				</div>
+				<div id="java">
+					<a href="{% url apps_java %}">
+						<img src="/media/images/java-icon-256.png" width="128" height="128" alt="Get the Java App" />
+					</a>
+				</div>
 			</div>
 		</div><!-- / #header-wrap -->
 		
 		<div id="content-wrap" class="clearfix">
 			{% block main %}
-			<div id="content">
+			<div id="content" class="clearfix">
 				<div id="breadcrumbs" class="clearfix">
 					<ul class="clearfix">
 						{% block breadcrumbs %}

@@ -29,8 +29,6 @@ Add New Books | {{ block.super }}
 			'/media/images/black-50-bg.png'
 		);
 		
-		$("form#add-books").jqTransform();
-		
 		$("button#add-books-button").attr('disabled', 'disabled');
 		
 		 $('#connection-problem #connection-problem-ok').click(function() { 
@@ -397,6 +395,7 @@ Add New Books | {{ block.super }}
 			var form = $(this);
 			
 			formData = form.serialize();
+			form.find('#id_isbn').val('').focus();
 			
 			$("#add-books").block({
 				css: {
@@ -421,7 +420,7 @@ Add New Books | {{ block.super }}
 					if ($("#" + data.book.pk).length > 0) {
 						alert('You already have this book in your box!');
 					} else {
-						booksBox.append('<li style="display: none;" id="' + data.book.pk + '"><span>' + data.book.title + '</span> by ' + data.book.author + '</li>');
+						booksBox.append('<li style="display: none;" id="' + data.book.pk + '"><a class="item-title">' + data.book.title + '</a> by ' + data.book.author + '</li>');
 						$("#" + data.book.pk).slideDown('200');
 						$("button#add-books-button").attr('disabled', '');
 					}
@@ -463,10 +462,9 @@ Add New Books | {{ block.super }}
 						button.attr('disabled', 'disabled');
 						
 						if (data.meta.success) {
-							item.append(' <span>ADDED!</span>');
+							item.append('<img class="success" src="/media/images/icons/accept.png" alt="This book was added successfully" title="This book was added successfully" />');
 						} else {
-							item.append(' <span>WAS NOT ADDED!</span>');
-							alert(data.meta.error);
+							item.append('<img class="failure" src="/media/images/icons/remove.png" alt="' + data.meta.error + '" title="' + data.meta.error + '" />');
 						}
 					},
 					error: function() {
@@ -485,30 +483,30 @@ Add New Books | {{ block.super }}
 	<div class="section">
 		<div class="inner">
 			<h1>Add Some Books</h1>
-			<div class="clearfix">
-				<h3>Enter your ISBNs</h3>
-				<div>
-					<form id="add-books" action="" method="post" class="jqTransform clearfix">
-					{# {% if collection %}<input type="hidden" name="collection_pk" value="{{ collection.pk }}" />{% endif %} #}
-					<div class="rowElem clearfix">
-						<input type="text" id="isbn" name="isbn" value="" />
+			<div class="container clearfix">
+				<div class="two-thirds alpha">
+					<div class="clearfix">
+						<h3>Enter your ISBNs</h3>
+						<div class="new-item-form">
+							<form id="add-books" action="" method="post">
+								<input type="text" id="id_isbn" name="isbn" value="" />
+								<input type="submit" value="Add" />
+							</form>
+						</div>
 					</div>
-					<div class="button rowElem clearifx">
-						<input type="submit" value="Find" />
-					</div>
-				</form>
+					<ul id="books-box" class="item-list"></ul>
 				</div>
-			</div>
-			<div>
-				<h3>Books Box</h3>
-				<ul id="books-box"></ul>
+				<div class="third omega">
+					<h3>Information</h3>
+					<p>Some information will go here.</p>
+				</div>
 			</div>
 		</div>
 	</div>
 	<div class="section">
 		<div class="inner">
 			<h3>Choose a Home for these Books</h3>
-			<div class="container">
+			<div class="container clearfix">
 				<div class="left">
 					<h4>Pick a Library</h4>
 					<ul id="library-picker" class="picker">

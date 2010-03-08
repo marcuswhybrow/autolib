@@ -8,6 +8,7 @@ from base.models import Config
 from django.utils.http import urlquote_plus
 from django.template.defaultfilters import slugify
 
+from django.core.exceptions import ValidationError
 from django.db.models import Q
 
 import re
@@ -36,16 +37,16 @@ class Book(UUIDSyncable):
 	
 	isbn10 = models.CharField(db_index=True, unique=True, editable=False, max_length=10)
 	isbn13 = models.CharField(db_index=True, unique=True, editable=False, max_length=13)
-	title = models.CharField(max_length=200)
+	title = models.CharField(max_length=100)
 	description = models.TextField(null=True)
-	author = models.CharField(max_length=200, null=True)
-	publisher = models.CharField(max_length=200, null=True)
+	author = models.CharField(max_length=100, null=True)
+	publisher = models.CharField(max_length=100, null=True)
 	published = models.DateTimeField(null=True)
 	pages = models.IntegerField(null=True)
 	width = models.FloatField(null=True)
 	height = models.FloatField(null=True)
 	depth = models.FloatField(null=True)
-	format = models.CharField(max_length=200, null=True)
+	format = models.CharField(max_length=100, null=True)
 	language = models.CharField(max_length=5, null=True)
 	
 	edition_group = models.ForeignKey(BookEditionGroup, related_name='editions', editable=False)
@@ -83,7 +84,7 @@ tagging.register(Book)
 class BookProfile(UUIDSyncable):
 	book_instance = models.ForeignKey(Book, related_name='instances')
 	collection = models.ForeignKey(Collection, related_name='books')
-	slug = models.CharField(max_length=200, editable=False)
+	slug = models.CharField(max_length=100, editable=False)
 		
 	def get_tags(self):
 		return Tag.objects.get_for_object(self) 

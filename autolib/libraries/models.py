@@ -27,12 +27,12 @@ from django.template.defaultfilters import slugify
 
 class Collection(UUIDSyncable):
 	
-	name = models.CharField(max_length=200)
+	name = models.CharField(max_length=100)
 	collection_type = models.CharField(max_length=20, choices=COLLECTION_TYPE_CHOICES)
-	description = models.CharField(max_length=1024, null=True, blank=True)
+	description = models.TextField(null=True, blank=True)
 	parent = models.ForeignKey('self', related_name="children", null=True, blank=True)
 	owner = models.ForeignKey(User, related_name="libraries", null=True, blank=True)
-	slug = models.CharField(max_length=200, editable=False)
+	slug = models.CharField(max_length=100, editable=False)
 	
 	def get_user(self):
 		if self.collection_type == 'library':
@@ -85,18 +85,19 @@ class Collection(UUIDSyncable):
 		else:
 			raise AssertionError, 'A Collection must be of type "library", "bookshelf" or "series"'
 		
+		
 		# The uniqueness constraints a collection must abide by
-		ownerConstraint = {'collection_type': self.collection_type, 'owner': self.owner, 'slug': self.slug}
-		parentConstraint = {'collection_type': self.collection_type, 'parent': self.parent, 'slug': self.slug}
+		constraint = {'collection_type': self.collection_type, 'owner': self.owner, 'parent': self.parent, 'slug': self.slug}
 		
 		# Gather any collections which match those values
-		collections = list(Collection.objects.filter(Q(**ownerConstraint) & ~Q(pk=self.pk))) + list(Collection.objects.filter(Q(**parentConstraint) & ~Q(pk=self.pk)))
+		collections = list(Collection.objects.filter(Q(**constraint) & ~Q(pk=self.pk)))
 		
 		if len(collections) == 0:
 			# If there are no matches
 			
 			# Save the current collection
 			super(Collection, self).save(*args, **kwargs)
+			
 		else:
 			# Otherwise you cannot add the collection in its current state
 			raise ValidationError('There already exists a collection of that collection type "parent or owner" and slug')

@@ -13,14 +13,11 @@
 
 {% block head %}
 <link rel="stylesheet" href="/media/js/jqtransform/jqtransform.css" />
-<script type="text/javascript" src="/media/js/jqtransform/jquery.jqtransform.js"></script>
 <script type="text/javascript" src="/media/js/jquery-ui-1.8rc1.custom.min.js"></script>
 <script type="text/javascript" src="/media/js/jquery.blockUI.js"></script>
 <script type="text/javascript" src="/media/js/jquery.jeditable.mini.js"></script>
 <script type="text/javascript">
 	$(function() {
-		//find all the forms with the class of jqtransform and then apply the plugin
-		$("form.jqtransform").jqTransform();
 		
 		// Editing Details
 		
@@ -160,7 +157,7 @@
 				really.css('display', 'inline');
 				
 				really.click(function() {
-					$.post('{% url api_delete_collection %}', {collection_pk: bookshelf_pk}, function(data) {
+					$.post('{% url api_delete_collection %}', {pk: bookshelf_pk}, function(data) {
 						if (data.meta.success == true) {
 							bookshelf_row.slideUp('200', function() {
 								$(this).remove();
@@ -201,39 +198,68 @@
 {% block content %}
 	<div class="section">
 		<div class="inner">
-			<div class="editable">
-				<h2 id="name" class="detail">{{ library.name }}</h2>
+			<div class="container clearfix">
+				<div class="two-thirds alpha">
+					<div class="editable">
+						<h2 id="name" class="detail">{{ library.name }}</h2>
+					</div>
+					<div class="editable">
+						<p id="description" class="detail">{{ library.description }}</p>
+					</div>
+				</div>
+				<div class="third omega">
+					<h3><a href="{{ library.get_absolute_url }}{{ unsorted_bin.slug }}/">{{ unsorted_bin.value }}</a></h3>
+					<p>This Library has {{ library.books.all|length }} book{{ library.books.all|pluralize }} which you should move into a bookshelf.</p>
+				</div>
 			</div>
-			<div class="editable">
-				<p id="description" class="detail">{{ library.description }}</p>
-			</div>
-			<ul id="bookshelf-list" class="collection-list">
-				<li><a href="{{ library.get_absolute_url }}{{ unsorted_bin.slug }}/">{{ unsorted_bin.slug }}</a></li>
-				{% for bookshelf in library.children.all %}
-					<li id="{{ bookshelf.pk }}"><a href="{{ bookshelf.get_absolute_url }}">{{ bookshelf.name }}</a></li>
-				{% endfor %}
-			</ul>
 		</div>
 	</div>
 	
 	<div class="section">
 		<div class="inner">
-			<h3>Create a new <span class="bookshelf">Bookshelf</span></h3>
-			<form id="new-bookshelf-form" action="" method="post" class="jqtransform">
-				<input type="hidden" name="parent_pk" id="parent_pk" value="{{ library.pk }}" />
-				<input type="hidden" name="collection_type" id="collection_type" value="bookshelf" />
-				<div class="rowElem">
-					{{ form.name }}
+			<div class="container clearfix">
+				<div class="two-thirds alpha">
+					<ul id="bookshelf-list" class="item-list">
+						{% for bookshelf in library.children.all %}
+							<li id="{{ bookshelf.pk }}">
+								<a class="item-title" href="{{ bookshelf.get_absolute_url }}">{{ bookshelf.name }}</a>
+								<span class="item-children-count">{{ bookshelf.children.all|length }}</span>
+							</li>
+						{% endfor %}
+						{% if library.children.all %}
+						{% else %}
+							<p class="center">This library has no bookshelves, add some here.</p>
+						{% endif %}
+					</ul>
+					<div class="new-item-form clearfix">
+						<form id="new-bookshelf-form" action="" method="post" class="clearfix">
+							<input type="hidden" name="parent_pk" id="parent_pk" value="{{ library.pk }}" />
+							<input type="hidden" name="collection_type" id="collection_type" value="bookshelf" />
+							{{ form.name }}
+							<input type="submit" value="Create" />
+						</form>	
+					</div>
 				</div>
-				<div class="rowElem">
-					<input type="submit" value="Create" />
+				<div class="third omega">
+					<h3>Overview</h3>
+					<p>Bookshelves are a way to organise collections of books, which you might in real life store next to each other on the same "bookshelf".</p>
+					
+					<h3>Deleting</h3>
+					<p>When you delete a bookshelf you must decide what to do with the books it contains. You can move them to another area, or delete them as well.</p>
+					
+					<h3>Editing</h3>
+					<p>If you want to change the name or description of a bookshelf, you must first choose it from the list to the left.</p>
+					
+					<h3>Adding</h3>
+					<p>No two bookshelves in the same library may have the same name.</p>
 				</div>
-			</form>			
-			<div class="icon-link clearfix">
-				<img src="/media/images/icons/milky/book.png" />
-				<h3 class="compact">Add a <span class="book">Book</span> to this Libraries Unsorted Bin</h3>
-				<p><a href="{% url add_books %}?c={{ library.pk }}">Add a Book</a></p>
 			</div>
+		</div>
+	</div>
+	
+	<div class="section">
+		<div class="inner">
+			<p class="center last"><a href="{% url add_books %}?c={{ library.pk }}">Add a Book To This Library</a></p>
 		</div>
 	</div>
 	

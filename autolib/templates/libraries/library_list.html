@@ -4,6 +4,8 @@
 Your Libraries | {{ block.super }}
 {% endblock %}
 
+{% load truncate_filters %}
+
 {% block page_title %}libraries-library-list{% endblock %}
 
 {% block breadcrumbs %}
@@ -13,13 +15,10 @@ Your Libraries | {{ block.super }}
 
 {% block head %}
 <link rel="stylesheet" href="/media/js/jqtransform/jqtransform.css" />
-<script type="text/javascript" src="/media/js/jqtransform/jquery.jqtransform.js"></script>
 <script type="text/javascript" src="/media/js/jquery-ui-1.8rc1.custom.min.js"></script>
 <script type="text/javascript" src="/media/js/jquery.blockUI.js"></script>
 <script type="text/javascript">
 	$(function() {
-		//find all the forms with the class of jqtransform and then apply the plugin
-		$("form.jqtransform").jqTransform();
 		
 		// Library List
 		
@@ -109,7 +108,7 @@ Your Libraries | {{ block.super }}
 					var description = data.collection.description;
 					var url = data.collection.url;
 					var pk = data.collection.pk;
-					$("ul#library-list").append('<li id="' + pk + '" style="display: none"><a href="' + url + '">' + name + '</a><span class="delete">delete</span></li>');
+					$("ul#library-list").append('<li id="' + pk + '" style="display: none"><a class="item-title" href="' + url + '">' + name + '</a><span class="item-children-count">0</span><span class="delete">delete</span></li>');
 					$("li#" + pk).slideDown('200');
 					
 					$("#" + pk).hover(library_hover_over, library_hover_out);
@@ -149,33 +148,52 @@ Your Libraries | {{ block.super }}
 {% block content %}
 	<div class="section">
 		<div class="inner">
-			<h2>Your Libraries</h2>
-			<p>Your libraries will all be here one day.</p>
-			{% if object_list %}
-			<ul id="library-list" class="collection-list">
-				{% for library in object_list %}
-					<li id="{{ library.pk }}"><a href="{{ library.get_absolute_url }}">{{ library.name }}</a></li>
-				{% endfor %}
-			</ul>
-			{% else %}
-			<p class="error">Erm. You do realise you dont have any libraries yet.</p>
-			{% endif %}
+			<h2>Your Library List</h2>
+			<p>The following are your libraries.</p>
 		</div>
 	</div>
-	
 	<div class="section">
 		<div class="inner">
-			<h3>Create a new <span class="library">Library</span></h3>
-			<p>Pick a name for your new library, make sure its not the same as another one and hit create.</p>
-			<form id="new-library-form" action="" method="post" class="jqtransform">
-				<input type="hidden" name="collection_type" value="library" />
-				<div class="rowElem">
-					{{ form.name }}
+			<div class="container clearfix">
+				<div class="two-thirds alpha">
+					<ul id="library-list" class="item-list">
+						{% for library in object_list %}
+							<li id="{{ library.pk }}">
+								<a class="item-title" href="{{ library.get_absolute_url }}">{{ library.name|title|truncatechars:30 }}</a>
+								<span class="item-children-count" title="Your '{{ library.name }}' library has {{ library.children.all|length }} bookshel{{ library.children.all|length|pluralize:"f,ves" }}">{{ library.children.all|length }}</span>
+							</li>
+						{% endfor %}
+					</ul>
+					{% if object_list %}
+					{% else %}
+					<p class="empty-list-text center">Ah Hello, Pick a name for your new library to get started.</p>
+					{% endif %}
+					<div class="new-item-form">
+						<form id="new-library-form" action="" method="post" class="jqtransform">
+							<input type="hidden" name="collection_type" value="library" />
+							<div class="rowElem">
+								{{ form.name }}
+							</div>
+							<div class="rowElem">
+								<input type="submit" value="Create" />
+							</div>
+						</form>
+					</div>
 				</div>
-				<div class="rowElem">
-					<input type="submit" value="Create" />
+				<div class="third">
+					<h3>Overview</h3>
+					<p>A library represents a large collection of different books, for example you may have a "Home" library and an "Office" library.</p>
+					
+					<h3>Deleting</h3>
+					<p>You may delete any empty libraries you create, here in the library list. If you have added anything to the library, you shall be asked what you want to do with the contents: delete it or move it.</p>
+					
+					<h3>Editing</h3>
+					<p>To add a description to your libraries, select the library you wish to edit from the list to the left.</p>
+					
+					<h3>Adding</h3>
+					<p>Creating a new library is as easy as choosing its name, and filling in the form below. All library names must be different.</p>
 				</div>
-			</form>
+			</div>
 		</div>
 	</div>
 	
