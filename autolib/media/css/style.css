@@ -24,11 +24,23 @@ h3.inline			{ padding-top: 9px; }
 
 /* Editable Stuff */
 
-div.editable input.focus.H2 { color: #2e2e2e; font-family: "Helvetica"; text-transform: capitalize; font-size: 30px; font-weight: bold; padding: 0; margin: 0; border: 0; }
+.editable .detail form.editing			{ padding: 0; margin: 0; border: 0; position: relative; }
+.editable .detail form.editing input	{ padding: 5px 5px; margin: 0; border: 1px solid #333; background-color: #555; color: #fafafa; position: relative; left: -7px; top: -6px; -moz-border-radius: 3px;
+										  text-shadow: 1px 1px 1px #333; padding-right: 150px; }
 
-div.editable input.focus.P { color: #5E5D5D; font-size: 13px; line-height: 21px; margin: 0; border: 0; }
+.editable .detail form.editing button						{ position: absolute; background-color: #666; border: 1px solid #444; -moz-border-radius: 3px; 
+															  text-transform: uppercase; font-weight: bold; color: #fafafa; cursor: pointer; }
 
-.editable .edit		{ background-color: yellow; cursor: pointer; }
+.editable .detail form.editing button:hover					{ background-color: #888; }
+
+.editable .detail form.editing button[type="submit"]		{ top: 0px; right: 0px; }
+.editable .detail form.editing button[type="cancel"]		{ top: 0px; right: 65px; }
+
+.editable .h2-detail form.editing button					{ padding: 5px 10px; }
+.editable .p-detail form.editing button						{ padding: 1px 10px; }
+
+.editable .h2-detail form.editing input	{ /* color: #2e2e2e; */ font-family: "Helvetica"; text-transform: capitalize; font-size: 30px; font-weight: bold; }
+.editable .p-detail form.editing input	{ /* color: #5E5D5D; */ font-size: 13px; line-height: 21px; }
 
 
 /* Forms */

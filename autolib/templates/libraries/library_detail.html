@@ -68,6 +68,12 @@
 			detail.unblock();
 			
 			return result;
+		},
+		{ 
+			cssclass: 'editing',
+			submit: 'save',
+			cancel: 'cancel',
+			width: '457px'
 		});
 				
 		// Adding Bookshelves
@@ -201,10 +207,10 @@
 			<div class="container clearfix">
 				<div class="two-thirds alpha">
 					<div class="editable">
-						<h2 id="name" class="detail">{{ library.name }}</h2>
+						<h2 id="name" class="h2-detail detail">{{ library.name }}</h2>
 					</div>
 					<div class="editable">
-						<p id="description" class="detail">{{ library.description }}</p>
+						<p id="description" class="p-detail detail">{{ library.description }}</p>
 					</div>
 				</div>
 				<div class="third omega">

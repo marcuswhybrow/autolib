@@ -74,6 +74,12 @@
 			detail.unblock();
 			
 			return result;
+		},
+		{ 
+			cssclass: 'editing',
+			submit: 'save',
+			cancel: 'cancel',
+			width: '457px'
 		});
 		
 		// Adding Bookshelves
@@ -145,10 +151,10 @@
 				<div class="two-thirds alpha">
 					{% if bookshelf %}
 						<div class="editable">
-							<h2 id="name" class="detail">{{ bookshelf.name }}</h2>
+							<h2 id="name" class="h2-detail detail">{{ bookshelf.name }}</h2>
 						</div>
 						<div class="editable">
-							<p id="description" class="detail">{{ bookshelf.description }}</p>
+							<p id="description" class="p-detail detail">{{ bookshelf.description }}</p>
 						</div>
 					{% else %}
 						<h2>{{ unsorted_bin.value }}</h2>
