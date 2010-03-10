@@ -95,6 +95,7 @@ class SaveProfile(APIAuthView):
 								
 				# Return data about the profile
 				self.data['profile'] = {
+					'pk': profile.pk,
 					'book_instance': profile.book_instance.pk,
 					'collection': profile.collection.pk,
 					'added': str(profile.added),

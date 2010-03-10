@@ -1,0 +1,69 @@
+{% extends "libraries/bookshelf_detail.html" %}
+
+{% block page_title %}user-book-detail{% endblock %}
+
+{% block breadcrumbs %}
+	{{ block.super }}
+	{% if bookshelf %}
+		<li id="bc-users-book-detail"><a href="{% url profile_detail library.slug bookshelf.slug book.isbn book.slug %}">{{ book.title }}</a></li>
+	{% else %}
+		<li id="bc-users-book-detail"><a href="{% url profile_detail library.slug unsorted_bin.slug book.isbn book.slug %}">{{ book.title }}</a></li>
+	{% endif %}
+{% endblock %}
+
+{% block head %}
+<script type="text/javascript" src="/media/js/jquery.page-realtime-twitter-reactions.js"></script>
+<script type="text/javascript">
+	$(function() {
+		$("#realtime-twitter-updates").getPageRealtimeReactions({
+			query: "{{ book.author }}",
+			numTweets: 5,
+			loaderText: "Loading ...",
+			slideIn: false,
+			showHeading: false
+		});
+	});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="section">
+	<div class="inner clearfix">
+		{% if book %}
+			<h2>{{ book.title }}</h2>
+			<div class="container clearfix">
+				<div class="two-thirds alpha">
+					<p>{{ book.description }}</p>
+					<p><strong>{{ book.author }}</strong> ({{ book.publisher }}, {{ book.published|date:"Y" }})</p>
+					<div id="editions">
+						<h3>Editions Of This Book</h3>
+						<ul class="item-list">
+						{% for edition in book.book_instance.edition_group.editions.all %}
+							<li id="{{ edition.pk }}" {% ifequal edition.pk book.book_instance.pk %}class="this"{% endifequal %}><a class="item-title" href="{{ edition.get_absolute_url }}">{{ edition.published|date:"Y"|default:'0000' }}</a> <span>({{ edition.publisher }})</span> <span class="item-children-count">{{ edition.isbn }}</span></li>
+						{% endfor %}
+						</ul>
+					</div>
+					<div>
+						<h3>Tags</h3>
+						<p class="tag-list center">
+						{% for tag in book.book_instance.tags %}
+							<a href="">{{ tag.name }}</a>
+						{% endfor %}
+						</ul>
+					</div>
+				</div>
+				<div class="third omega">
+					<div id="realtime-twitter">
+						<div style="width:100%; height:200px; background-color:#eee; margin-bottom:20px;"></div>
+						<h3>Tweets About The Author</h3>
+						<div id="realtime-twitter-updates"></div>
+					</div>
+				</div>
+			</div>
+		{% else %}
+			<h2>Whoops!</h2>
+			<p>You dont have that book in this library.</p>
+		{% endif %}
+	</div>
+</div>
+{% endblock %}

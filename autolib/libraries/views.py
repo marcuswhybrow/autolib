@@ -111,7 +111,7 @@ def profile_detail(request, library_name, bookshelf_name, book_isbn, book_title=
 			real_book_title
 		]))
 	else:
-		return render_to_response('users/book_detail.html', {
+		return render_to_response('libraries/profile_detail.html', {
 			'library': library,
 			'bookshelf': bookshelf,
 			'book': book,
