@@ -153,6 +153,7 @@ class GetBookDetail(APIView):
 					book = bookDetails.convert_to_book()
 					
 					# TODO Get Django to queue up the updating of this books Editions
+					utils.UpdateEditions(book).start()
 					
 				else:
 					self.data['meta']['error'] = 'Details for the book with the ISBN ' + isbn + ' not found'

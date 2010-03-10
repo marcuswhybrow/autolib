@@ -35,8 +35,8 @@ class BookEditionGroup(UUIDSyncable):
 
 class Book(UUIDSyncable):
 	
-	thumbnail_large = models.URLField()
-	thumbnail_small = models.URLField()
+	thumbnail_large = models.URLField(null=True)
+	thumbnail_small = models.URLField(null=True)
 	
 	isbn10 = models.CharField(db_index=True, unique=True, editable=False, max_length=10)
 	isbn13 = models.CharField(db_index=True, unique=True, editable=False, max_length=13)

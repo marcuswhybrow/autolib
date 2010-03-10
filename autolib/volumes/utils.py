@@ -297,3 +297,27 @@ def get_book_detail(isbn):
 			raise Exception('ISBN not found using Google Books')
 	else:
 		raise Exception('An ISBN must be 10 or 13 digits long')
+
+
+import threading
+
+class UpdateEditions(threading.Thread):
+	"""
+	A thread which calls the update_all_editions() utility function on a specific book.
+	Books are added within a view, we do not want the make the user wait for all editions to be updated
+	when they only care about their single book. We use a thread to execute this process non-sequentially.
+	"""
+	
+	def __init__(self, book):
+		"""
+		Specifies the book on which to update the editions
+		"""
+		
+		super(UpdateEditions, self).__init__()
+		self.book = book
+	
+	def run(self):
+		"""
+		Updates the editions for a specific book.
+		"""
+		update_all_editions(self.book)

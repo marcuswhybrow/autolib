@@ -251,6 +251,7 @@
 	<div class="inner clearfix">
 		{% if book %}
 			<h2>{{ book.title }}</h2>
+			{% if book.thumbnail_large %}<img src="{{ book.thumbnail_large }}" />{% endif %}
 			<div class="vote-cell {% if vote and vote.is_upvote %}voted-up{% else %}{% if vote and vote.is_downvote %}voted-down{% endif %}{% endif %}">
 				<input type="hidden" name="book" value="{{ book.pk }}" />
 				<img class="vote-up" src="/media/images/icons/vote-arrow-up.png" />
