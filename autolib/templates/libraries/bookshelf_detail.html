@@ -88,7 +88,7 @@
 			$.get('{% url api_get_book_detail %}', formData, function(data) {
 				if (data.meta.success == true) {
 					var book = data.book;
-					$("ul#book-list").append('<li id="' + book.pk + '" style="display:none"><a class="item-title" href="' + book.url + '">' + book.title + '</a> by ' + book.author + '<button class="confirm">confirm</button><button class="cancel">cancel</button></li>');
+					$("ul#book-list").append('<li id="' + book.pk + '" style="display:none"><a class="item-title deleted">' + book.title + '</a> by ' + book.author + '<button class="confirm">confirm</button><button class="cancel">cancel</button></li>');
 					
 					var item = $('li#' + book.pk);
 					var book_pk = item.attr('id');
@@ -103,6 +103,8 @@
 							success: function(data) {
 								if (data.meta.success == true) {
 									item.attr('id', data.profile.pk);
+									var title = item.find('a.item-title');
+									title.attr('href', data.profile.url).removeClass('deleted');
 									item.find('button').fadeOut('200');
 								} else if(data.meta.success == false) {
 									alert(data.meta.error);

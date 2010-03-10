@@ -197,6 +197,8 @@ class GetBookDetail(APIView):
 				'last_modified': str(book.last_modified),
 				'edition_group': book.edition_group.pk,
 				'url': book.get_absolute_url(),
+				'thumbnail_large': book.thumbnail_large,
+				'thumbnail_small': book.thumbnail_small,
 			}
 			self.data['meta']['success'] = True
 

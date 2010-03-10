@@ -35,6 +35,9 @@ class BookEditionGroup(UUIDSyncable):
 
 class Book(UUIDSyncable):
 	
+	thumbnail_large = models.URLField()
+	thumbnail_small = models.URLField()
+	
 	isbn10 = models.CharField(db_index=True, unique=True, editable=False, max_length=10)
 	isbn13 = models.CharField(db_index=True, unique=True, editable=False, max_length=13)
 	title = models.CharField(max_length=100)
@@ -82,7 +85,7 @@ class Book(UUIDSyncable):
 	
 	@permalink
 	def get_absolute_url(self):
-		return ('books.views.book_detail', [self.isbn])
+		return ('volumes.views.book_detail', [self.isbn])
 	
 	def get_owner(self):
 		return None

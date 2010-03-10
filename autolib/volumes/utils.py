@@ -8,6 +8,8 @@ from django.db.models import Q
 from volumes.models import Book, BookEditionGroup
 from tagging.models import Tag
 from django.template.defaultfilters import slugify
+from xml.sax.saxutils import unescape
+import httplib
 
 def get_editions(isbn):
 	
@@ -26,6 +28,12 @@ class BookDetail():
 	"""
 	Gets information regarding books using Google's books API
 	"""
+	
+	THUMBNAIL_REL = 'http://schemas.google.com/books/2008/thumbnail'
+	INFO_REL = 'http://schemas.google.com/books/2008/info'
+	ANNOTATION_REL = 'http://schemas.google.com/books/2008/annotation'
+	ALTERNATE_REL = 'alternate'
+	SELF_REL = 'self'
 	
 	status = False
 		
@@ -75,6 +83,8 @@ class BookDetail():
 				# Some dimensions are not present
 				pass
 			
+			
+			
 			identifiers = entry.findAll('dc:identifier')
 			
 			self.googleid = identifiers[0].string
@@ -95,12 +105,23 @@ class BookDetail():
 			publisher = entry.find('dc:publisher')
 			self.publisher = publisher.string if publisher is not None else None
 			
+			self.thumbnail_small = self.thumbnail_large = None
+			
+			# Thubnail
+			for link in entry.findAll('link'):
+				if link['rel'] == self.THUMBNAIL_REL:
+					url = httplib.urlsplit(unescape(link['href']))
+					thumbnail = url.scheme + '://' + url.netloc + url.path + '?id=' + self.googleid + '&printsec=frontcover&img=1&zoom='
+					self.thumbnail_large = thumbnail + '1'
+					self.thumbnail_small = thumbnail + '5'
+			
 			self.subjects = []
 			for subject in entry.findAll('dc:subject'):
 				self.subjects.append(subject.string)
 			
 			title = entry.find('dc:title')
 			self.title = title.string if title is not None else None
+			
 		else:
 			self.status = False
 	
@@ -120,6 +141,8 @@ class BookDetail():
 				'width': self.width,
 				'height': self.height,
 				'depth': self.depth,
+				'thumbnail_large': self.thumbnail_large,
+				'thumbnail_small': self.thumbnail_small,
 			}
 		else:
 			return None
