@@ -10,8 +10,8 @@ class DeleteCollection(APIAuthView):
 		if collection_pk is not None:
 			try:
 				c = Collection.objects.get(Q(pk=collection_pk) & (Q(owner=self.user) | Q(parent__owner=self.user) | Q(parent__parent__owner=self.user)))
-				if not collection.children.all():
-					if not collection.books.all():
+				if not c.children.all():
+					if not c.books.all():
 						self.data['collection'] = {
 							'pk': c.pk,
 							'name': c.name,
