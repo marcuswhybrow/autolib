@@ -370,9 +370,9 @@ div.votable-content									{ position: relative; float: right; width: 845px; pa
 /* Overlay */
 
 .overlay											{ display:none; cursor: default; background: url(/media/images/black-50-bg.png) repeat; -webkit-border-radius: 10px; -moz-border-radius: 10px; padding: 10px; color: #fff; }
-.overlay .overlay-header							{ -moz-border-radius: 5px 5px 0 0; -webkit-border-radius: 5px 5px 0 0; background-color: #eaeaea; border: 1px solid #000; border-bottom: 1px solid #ddd; padding: 20px; }
+.overlay .overlay-header							{ -moz-border-radius: 5px 5px 0 0; -webkit-border-top-left-radius: 5px; -webkit-border-top-right-radius: 5px; background-color: #eaeaea; border: 1px solid #000; border-bottom: 1px solid #ddd; padding: 20px; }
 .overlay .overlay-body								{ background-color: #fafafa; border-left: 1px solid #000; border-right: 1px solid #000; padding: 20px; color: #333; }
-.overlay .overlay-footer							{ -moz-border-radius: 0 0 5px 5px; -webkit-border-radius: 0 0 5px 5px; background-color: #fafafa; padding: 0 20px 20px; border: 1px solid #000; border-top: none; }
+.overlay .overlay-footer							{ -moz-border-radius: 0 0 5px 5px; -webkit-border-bottom-left-radius: 5px; -webkit-border-bottom-right-radius: 5px; background-color: #fafafa; padding: 0 20px 20px; border: 1px solid #000; border-top: none; }
 
 .overlay h1											{ font-size: 24px; color: #aaa; text-shadow: 1px 1px 1px #f1f1f1; line-height: 1.2em; padding: 0; }
 .overlay p											{ padding: 0; line-height: 1.5em; }
