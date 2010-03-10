@@ -18,24 +18,13 @@ from django.template import RequestContext
 from django.views.generic.list_detail import object_list
 
 from django.db.models import Q
-from recommender.models import Recommender
 
 @login_required
 def profile(request):
 	updates = Update.objects.filter(user=request.user).order_by('-time')
 	
-	#assert False, (request.user, User.objects.all(), Book.objects.all())
-	
-	try:
-		recommended_books = Recommender.objects.get_best_items_for_user(request.user, User.objects.all(), Book.objects.all())
-	except IndexError:
-		recommended_books = None
-	
-	#assert False, recommended_books
-	
 	return render_to_response('libraries/profile.html', {
 		'updates': updates,
-		'recommended_books': recommended_books,
 	}, context_instance=RequestContext(request))
 
 @login_required
