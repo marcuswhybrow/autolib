@@ -22,7 +22,7 @@ class DeleteCollection(APIAuthView):
 							'added': str(c.added),
 							'last_modified': str(c.last_modified),
 						}
-						collection.delete()
+						c.delete()
 						self.data['meta']['success'] = True
 					else:
 						self.data['meta']['error'] = "This Collection cannot be deleted as it contains books"
