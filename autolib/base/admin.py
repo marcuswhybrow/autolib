@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from libraries.models import Collection
 from base.models import Config, Update
-from books.models import Book, BookProfile, BookEditionGroup, Note
+from volumes.models import Book, BookProfile, BookEditionGroup, Note
 
 # Register models to be included in the admin
 admin.site.register(Collection)

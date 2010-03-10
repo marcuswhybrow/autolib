@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth.models import User
-from books.models import Book
+from volumes.models import Book
 from libraries.models import Collection
 from base.models import Config, Update
 from libraries.forms import CreateCollectionForm

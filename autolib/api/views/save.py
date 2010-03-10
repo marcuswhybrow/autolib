@@ -3,7 +3,7 @@
 from django.db import IntegrityError, DatabaseError
 from api.views import APIAuthView
 from libraries.models import Collection
-from books.models import BookProfile, Book
+from volumes.models import BookProfile, Book
 from django.db.models import Q
 
 class SaveCollection(APIAuthView):

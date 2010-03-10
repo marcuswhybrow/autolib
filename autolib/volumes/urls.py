@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import *
 from voting.views import vote_on_object
-from books.models import Book
+from volumes.models import Book
 
 import views
 

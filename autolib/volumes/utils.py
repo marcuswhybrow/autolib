@@ -5,7 +5,7 @@ import re
 from base import utils
 from django.db.models import Q
 
-from books.models import Book, BookEditionGroup
+from volumes.models import Book, BookEditionGroup
 from tagging.models import Tag
 from django.template.defaultfilters import slugify
 

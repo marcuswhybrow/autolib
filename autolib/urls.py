@@ -28,7 +28,7 @@ urlpatterns = patterns('',
 	(r'^profile/', include('libraries.urls')),
 	
 	# Books
-	(r'^books/', include('books.urls')),
+	(r'^books/', include('volumes.urls')),
 	
 	# Users
 	(r'^users/', include('users.urls')),

@@ -1,4 +1,4 @@
-from books.models import BookProfile
+from volumes.models import BookProfile
 from libraries.models import Collection
 
 from api.views import APIAuthView

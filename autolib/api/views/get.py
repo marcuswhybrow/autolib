@@ -1,8 +1,8 @@
 # api.views.get
 
 from libraries.models import Collection
-from books import utils
-from books.models import BookProfile, Book
+from volumes import utils
+from volumes.models import BookProfile, Book
 from api.views import APIView, APIAuthView
 
 from django.db.models import Q
