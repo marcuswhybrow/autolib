@@ -25,6 +25,14 @@
 <script type="text/javascript" src="/media/js/jquery.blockUI.js"></script>
 <script type="text/javascript">
 	$(function() {
+		
+		// Close events for overlays
+		
+		$('#accept-overlay input.overlay-ok').click(function() {
+			 $.unblockUI();
+			 return false;
+		});
+		
 		// Editing Details
 		
 		$("div.editable .detail").editable(function(value, settings) {
@@ -66,7 +74,20 @@
 						}
 						
 					} else if(data.meta.success == false) {
-						alert(data.meta.error);
+						$('#accept-overlay').find('h1.target').text('Something Went Wrong!');
+						$('#accept-overlay').find('p.target').text(data.meta.error);
+						$.blockUI({ 
+							fadeIn:  200,
+							fadeOut: 200,
+							css: { 
+								border: 'none',
+								opacity: 1,
+								'-webkit-border-radius': '10px',
+								'-moz-border-radius': '10px',
+								backgroundColor: 'none'
+					        },
+				        	message: $('#accept-overlay')
+				        });
 					}
 				}
 			});
@@ -91,54 +112,198 @@
 			
 			form.find(':input').attr('disabled', 'disabled');
 						
-			$.get('{% url api_get_book_detail %}', formData, function(data) {
-				if (data.meta.success == true) {
-					var book = data.book;
-					$("ul#book-list").append('<li id="' + book.pk + '" style="display:none"><a class="item-title deleted">' + book.title + '</a> by ' + book.author + '<button class="confirm">confirm</button><button class="cancel">cancel</button></li>');
-					
-					var item = $('li#' + book.pk);
-					var book_pk = item.attr('id');
-					var collection_pk = '{% if bookshelf %}{{ bookshelf.pk }}{% else %}{{ library.pk }}{% endif %}'
-					
-					item.find('button.confirm').click(function() {
-						$.ajax({
-							url: '{% url api_save_profile %}',
-							data: {collection_pk: collection_pk, book_pk: book_pk},
-							dataType: 'json',
-							type: 'POST',
-							success: function(data) {
-								if (data.meta.success == true) {
-									item.attr('id', data.profile.pk);
-									var title = item.find('a.item-title');
-									title.attr('href', data.profile.url).removeClass('deleted');
-									item.find('button').fadeOut('200');
-								} else if(data.meta.success == false) {
-									alert(data.meta.error);
+			$.ajax({
+				url: '{% url api_get_book_detail %}', 
+				data: formData,
+				type: 'GET',
+				dataType: 'json',
+				success: function(data) {
+					if (data.meta.success == true) {
+						var book = data.book;
+						$("ul#book-list").append('<li id="' + book.pk + '" style="display:none"><a class="item-title deleted">' + book.title + '</a> by ' + book.author + '<button class="confirm">confirm</button><button class="cancel">cancel</button></li>');
+						
+						var item = $('li#' + book.pk);
+						var book_pk = item.attr('id');
+						var collection_pk = '{% if bookshelf %}{{ bookshelf.pk }}{% else %}{{ library.pk }}{% endif %}'
+						
+						item.find('button.confirm').click(function() {
+							$.ajax({
+								url: '{% url api_save_profile %}',
+								data: {collection_pk: collection_pk, book_pk: book_pk},
+								dataType: 'json',
+								type: 'POST',
+								success: function(data) {
+									if (data.meta.success == true) {
+										item.attr('id', data.profile.pk);
+										var title = item.find('a.item-title');
+										title.attr('href', data.profile.url).removeClass('deleted');
+										item.find('button').fadeOut('200');
+									} else if(data.meta.success == false) {
+										$('#accept-overlay').find('h1.target').text('Error Finding Book');
+										$('#accept-overlay').find('p.target').text(data.meta.error);
+										$.blockUI({ 
+											fadeIn:  200,
+											fadeOut: 200,
+											css: { 
+												border: 'none',
+												opacity: 1,
+												'-webkit-border-radius': '10px',
+												'-moz-border-radius': '10px',
+												backgroundColor: 'none'
+									        },
+								        	message: $('#accept-overlay')
+								        });
+									}
+								},
+								error: function() {
+									$('#accept-overlay').find('h1.target').text('Something Went Wrong!');
+									$('#accept-overlay').find('p.target').text('This is completely our fault, something has gone wrong on our end. We are probably trying to fix it, so try again in a few seconds.');
+									$.blockUI({ 
+										fadeIn:  200,
+										fadeOut: 200,
+										css: { 
+											border: 'none',
+											opacity: 1,
+											'-webkit-border-radius': '10px',
+											'-moz-border-radius': '10px',
+											backgroundColor: 'none'
+								        },
+							        	message: $('#accept-overlay')
+							        });
 								}
-							},
-							error: function() {
-							
-							}
+							});
 						});
-					});
-					
-					item.find('button.cancel').click(function() {
-						item.slideUp('200', function() {
-							$(this).remove();
+						
+						item.find('button.cancel').click(function() {
+							item.slideUp('200', function() {
+								$(this).remove();
+							});
 						});
-					});
-					
-					$('#' + book.pk).slideDown('200');
-				} else if(data.meta.success == false) {
-					alert(data.meta.error);
+						
+						$('#' + book.pk).slideDown('200');
+						
+					} else if(data.meta.success == false) {
+						
+						$('#accept-overlay').find('h1.target').text('Error Finding Book');
+						$('#accept-overlay').find('p.target').text(data.meta.error);
+						$.blockUI({ 
+							fadeIn:  200,
+							fadeOut: 200,
+							css: { 
+								border: 'none',
+								opacity: 1,
+								'-webkit-border-radius': '10px',
+								'-moz-border-radius': '10px',
+								backgroundColor: 'none'
+					        },
+				        	message: $('#accept-overlay')
+				        });
+					}
+				},
+				error: function() {
+					$('#accept-overlay').find('h1.target').text('Something Went Wrong!');
+					$('#accept-overlay').find('p.target').text('This is completely our fault, something has gone wrong on our end. We are probably trying to fix it, so try again in a few seconds.');
+					$.blockUI({ 
+						fadeIn:  200,
+						fadeOut: 200,
+						css: { 
+							border: 'none',
+							opacity: 1,
+							'-webkit-border-radius': '10px',
+							'-moz-border-radius': '10px',
+							backgroundColor: 'none'
+				        },
+			        	message: $('#accept-overlay')
+			        });
 				}
-			}, "json");
+			});
 			
 			form.find(':input').attr('disabled', '');
 			form.find(':input[name="name"]').val('');
 			
 			return false;
 		});
+		
+		// Books List
+		
+		function book_hover_over() {
+			$(this).find('span.delete, span.really').css('display', 'inline');
+		}
+		
+		function book_hover_out() {
+			$(this).find('span.delete').css('display', 'none');
+			$(this).find('span.really').remove();
+		}
+		
+		function book_click_delete() {
+			var book_row = $(this).parent();
+			var book_pk = book_row.attr("id");
+			
+			if (book_row.find('span.really').length == 0) {
+				
+				book_row.append('<span class="really">really</span>');
+			
+				var really = book_row.find('span.really');
+				
+				really.css('display', 'inline');
+				
+				really.click(function() {
+					$.ajax({
+						url: '{% url api_delete_profile %}',
+						data: { pk: book_pk },
+						dataType: 'json',
+						type: 'POST',
+						success: function(data) {
+							if (data.meta.success == true) {
+								book_row.slideUp('200', function() {
+									$(this).remove();
+								});
+								$.growlUI('Book Deleted', 'Your book was deleted successfully');
+							} else if(data.meta.success == false) {
+								
+								$('#accept-overlay').find('h1.target').text('Error Deleting Book');
+								$('#accept-overlay').find('p.target').text(data.meta.error);
+								$.blockUI({ 
+									fadeIn:  200,
+									fadeOut: 200,
+									css: { 
+										border: 'none',
+										opacity: 1,
+										'-webkit-border-radius': '10px',
+										'-moz-border-radius': '10px',
+										backgroundColor: 'none'
+							        },
+						        	message: $('#accept-overlay')
+						        });
+							}
+						},
+						error: function() {
+							$('#accept-overlay').find('h1.target').text('Something Went Wrong!');
+							$('#accept-overlay').find('p.target').text('This is completely our fault, something has gone wrong on our end. We are probably trying to fix it, so try again in a few seconds.');
+							$.blockUI({ 
+								fadeIn:  200,
+								fadeOut: 200,
+								css: { 
+									border: 'none',
+									opacity: 1,
+									'-webkit-border-radius': '10px',
+									'-moz-border-radius': '10px',
+									backgroundColor: 'none'
+						        },
+					        	message: $('#accept-overlay')
+					        });
+						}
+					});
+				});
+				
+			}
+		}
+		
+		$("ul#book-list li").append('<span class="delete">delete</span>');
+			  
+		$("ul#book-list li").hover(book_hover_over, book_hover_out);
+			  
+		$("ul#book-list li span.delete").click(book_click_delete);
 		
 	});
 </script>
@@ -187,7 +352,6 @@
 						{% endif %}
 						<div class="new-item-form">
 							<form id="add-book-form" action="" method="post">
-								<input type="hidden" name="collection_pk" id="collection_pk" value="{{ bookshelf.pk }}" />
 								<input type="text" name="isbn" id="id_isbn" />
 								<input type="submit" value="Add" />
 							</form>	
@@ -225,6 +389,18 @@
 	<div class="section">
 		<div class="inner">
 			<p class="center"><a href="{% url add_books %}?c={{ library.pk }}">Click Here to Add Books to This Bookshelf</a></p>
+		</div>
+	</div>
+	
+	<div id="accept-overlay" class="overlay">
+		<div class="overlay-header">
+			<h1 class="target"></h1>
+		</div>
+		<div class="overlay-body">
+			<p class="target"></p>
+		</div>
+		<div class="overlay-footer clearfix">
+			<input type="button" class="overlay-ok overlay-button" value="Alright" /> 
 		</div>
 	</div>
 {% endblock %}

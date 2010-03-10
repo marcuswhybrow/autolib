@@ -20,6 +20,13 @@ Your Libraries | {{ block.super }}
 <script type="text/javascript">
 	$(function() {
 		
+		// Close events for overlays
+		
+		$('#accept-overlay input.overlay-ok').click(function() {
+			 $.unblockUI();
+			 return false;
+		});
+		
 		// Library List
 		
 		function library_hover_over() {
@@ -44,30 +51,51 @@ Your Libraries | {{ block.super }}
 				really.css('display', 'inline');
 				
 				really.click(function() {
-					$.post('{% url api_delete_collection %}', {pk: library_pk}, function(data) {
-						if (data.meta.success == true) {
-							library_row.slideUp('200', function() {
-								$(this).remove();
-							});
-							$.growlUI('Library Deleted', 'Your library was deleted successfully');
-						} else if(data.meta.success == false) {
-							$.blockUI({ css: {
-								'class': 'specialclass',
-					            border: 'none', 
-					            padding: '15px', 
-					            backgroundColor: '#000', 
-					            '-webkit-border-radius': '10px', 
-					            '-moz-border-radius': '10px', 
-					            opacity: .5, 
-					            color: '#fff' 
-					        }, message: '<h1>There was an error deleting the Library</h1><p>' + data.meta.error + '</p><input type="button" value="OK" id="blockUI-OK" />' });
-					        
-					        $("#blockUI-OK").click(function() {
-					        	$.unblockUI();
-					        	return false;
+					$.ajax({
+						url: '{% url api_delete_collection %}',
+						data: { pk: library_pk },
+						dataType: 'json',
+						type: 'POST',
+						success: function(data) {
+							if (data.meta.success == true) {
+								library_row.slideUp('200', function() {
+									$(this).remove();
+								});
+								$.growlUI('Library Deleted', 'Your library was deleted successfully');
+							} else if(data.meta.success == false) {
+								$('#accept-overlay').find('h1.target').text('There Was An Error Deleteing The Library');
+								$('#accept-overlay').find('p.target').text(data.meta.error);
+								$.blockUI({ 
+									fadeIn:  200,
+									fadeOut: 200,
+									css: { 
+										border: 'none',
+										opacity: 1,
+										'-webkit-border-radius': '10px',
+										'-moz-border-radius': '10px',
+										backgroundColor: 'none'
+							        },
+						        	message: $('#accept-overlay')
+						        });
+							}
+						},
+						error: function() {
+							$('#accept-overlay').find('h1.target').text('Something Went Wrong!');
+							$('#accept-overlay').find('p.target').text('This is completely our fault, something has gone wrong on our end. We are probably trying to fix it, so try again in a few seconds.');
+							$.blockUI({ 
+								fadeIn:  200,
+								fadeOut: 200,
+								css: { 
+									border: 'none',
+									opacity: 1,
+									'-webkit-border-radius': '10px',
+									'-moz-border-radius': '10px',
+									backgroundColor: 'none'
+						        },
+					        	message: $('#accept-overlay')
 					        });
 						}
-					}, "json");
+					});
 				});
 				
 			}
@@ -120,19 +148,19 @@ Your Libraries | {{ block.super }}
 					
 				} else if(data.meta.success == false) {
 					form.unblock();
-					$.blockUI({ css: { 
-			            border: 'none', 
-			            padding: '15px', 
-			            backgroundColor: '#000', 
-			            '-webkit-border-radius': '10px', 
-			            '-moz-border-radius': '10px', 
-			            opacity: .5, 
-			            color: '#fff' 
-			        }, message: '<h1>There was an error adding the Library</h1><p>' + data.meta.error + '</p><input type="button" value="OK" id="blockUI-OK" />' });
 			        
-			        $("#blockUI-OK").click(function() {
-			        	$.unblockUI();
-			        	return false;
+			        $('#overlay-ok').find('p.target').text(data.meta.error);
+					$.blockUI({ 
+						fadeIn:  100,
+						fadeOut: 100,
+						css: { 
+							border: 'none',
+							opacity: 1,
+							'-webkit-border-radius': '10px',
+							'-moz-border-radius': '10px',
+							backgroundColor: 'none'
+				        },
+			        	message: $('#overlay-delete-error')
 			        });
 				}
 			}, "json");
@@ -197,11 +225,15 @@ Your Libraries | {{ block.super }}
 		</div>
 	</div>
 	
-	<div id="library-delete" class="dialog" title="Delete this Library?">
-		<p><span class="ui-icon ui-icon-alert" style="float:left; margin:3px 7px 30px 0;"></span>This library will be permanently deleted. Are you sure?</p>
-	</div>
-	
-	<div id="library-delete-error" class="dialog" title="Problem deleting Library!">
-		<p class="error-message"><span class="ui-icon ui-icon-alert" style="float:left; margin:3px 7px 30px 0;"></span></p>
-	</div>
+	<div id="accept-overlay" class="overlay">
+		<div class="overlay-header">
+			<h1 class="target"></h1>
+		</div>
+		<div class="overlay-body">
+			<p class="target"></p>
+		</div>
+		<div class="overlay-footer clearfix">
+			<input type="button" class="overlay-ok overlay-button" value="Alright" /> 
+		</div>
+	</div> 
 {% endblock %}

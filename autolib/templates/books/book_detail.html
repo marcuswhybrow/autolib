@@ -19,6 +19,13 @@
 <script type="text/javascript">
 	$(function() {
 		
+		// Close events for overlays
+		
+		$('#accept-overlay input.overlay-ok').click(function() {
+			 $.unblockUI();
+			 return false;
+		});
+		
 		$.preLoadImages(
 			'/media/images/icons/vote-arrow-up.png',
 			'/media/images/icons/vote-arrow-up-on.png',
@@ -302,6 +309,18 @@
 	<div class="inner">
 		<p class="center">{{ book.isbn }}</p>
 		<p class="last center">{{ book.pk }}</p>
+	</div>
+</div>
+
+<div id="accept-overlay" class="overlay">
+	<div class="overlay-header">
+		<h1 class="target"></h1>
+	</div>
+	<div class="overlay-body">
+		<p class="target"></p>
+	</div>
+	<div class="overlay-footer clearfix">
+		<input type="button" class="overlay-ok overlay-button" value="Alright" /> 
 	</div>
 </div>
 {% endblock %}

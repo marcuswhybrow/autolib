@@ -12,12 +12,19 @@
 {% endblock %}
 
 {% block head %}
-<link rel="stylesheet" href="/media/js/jqtransform/jqtransform.css" />
+<link rel="stylesheet" href="/media/css/jquery-ui-theme/jquery-ui-1.8rc1.custom.css" />
 <script type="text/javascript" src="/media/js/jquery-ui-1.8rc1.custom.min.js"></script>
 <script type="text/javascript" src="/media/js/jquery.blockUI.js"></script>
 <script type="text/javascript" src="/media/js/jquery.jeditable.mini.js"></script>
 <script type="text/javascript">
 	$(function() {
+		
+		// Close events for overlays
+		
+		$('#accept-overlay input.overlay-ok').click(function() {
+			 $.unblockUI();
+			 return false;
+		});
 		
 		// Editing Details
 		
@@ -60,8 +67,37 @@
 						}
 						
 					} else if(data.meta.success == false) {
-						alert(data.meta.error);
+						$('#accept-overlay').find('h1.target').text('Error Updating The Library');
+						$('#accept-overlay').find('p.target').text(data.meta.error);
+						$.blockUI({ 
+							fadeIn:  200,
+							fadeOut: 200,
+							css: { 
+								border: 'none',
+								opacity: 1,
+								'-webkit-border-radius': '10px',
+								'-moz-border-radius': '10px',
+								backgroundColor: 'none'
+					        },
+				        	message: $('#accept-overlay')
+				        });
 					}
+				},
+				error: function() {
+					$('#accept-overlay').find('h1.target').text('Something Went Wrong!');
+					$('#accept-overlay').find('p.target').text('This is completely our fault, something has gone wrong on our end. We are probably trying to fix it, so try again in a few seconds.');
+					$.blockUI({ 
+						fadeIn:  200,
+						fadeOut: 200,
+						css: { 
+							border: 'none',
+							opacity: 1,
+							'-webkit-border-radius': '10px',
+							'-moz-border-radius': '10px',
+							backgroundColor: 'none'
+				        },
+			        	message: $('#accept-overlay')
+			        });
 				}
 			});
 			
@@ -99,40 +135,63 @@
 		        message: 'Adding Bookshelf' 
 		    });
 			
-			$.post('{% url api_save_collection %}', formData, function(data) {
-				if (data.meta.success == true) {
-					var name = data.collection.name;
-					var description = data.collection.description;
-					var url = data.collection.url;
-					var pk = data.collection.pk;
-					$("ul#bookshelf-list").append('<li id="' + pk + '" style="display: none"><a class="item-title" href="' + url + '">' + name + '</a><span class="item-children-count">0</span><span class="delete">delete</span></li>');
-					$("li#" + pk).slideDown('200');
-					
-					$("#" + pk).hover(bookshelf_hover_over, bookshelf_hover_out);
-					$("#" + pk + " span.delete").click(bookshelf_click_delete);
-					
-					$.growlUI('Bookshelf Added', 'Your bookshelf was added successfully');
-										
-					form.unblock();
-					
-				} else if(data.meta.success == false) {
-					form.unblock();
-					$.blockUI({ css: { 
-			            border: 'none', 
-			            padding: '15px', 
-			            backgroundColor: '#000', 
-			            '-webkit-border-radius': '10px', 
-			            '-moz-border-radius': '10px', 
-			            opacity: .5, 
-			            color: '#fff' 
-			        }, message: '<h1>There was an error adding the Bookshelf</h1><p>' + data.meta.error + '</p><input type="button" value="OK" id="blockUI-OK" />' });
-			        
-			        $("#blockUI-OK").click(function() {
-			        	$.unblockUI();
-			        	return false;
+			$.ajax({
+				url: '{% url api_save_collection %}', 
+				data: formData, 
+				type: 'POST',
+				dataType: 'json',
+				success: function(data) {
+					if (data.meta.success == true) {
+						var name = data.collection.name;
+						var description = data.collection.description;
+						var url = data.collection.url;
+						var pk = data.collection.pk;
+						$("ul#bookshelf-list").append('<li id="' + pk + '" style="display: none"><a class="item-title" href="' + url + '">' + name + '</a><span class="item-children-count">0</span><span class="delete">delete</span></li>');
+						$("li#" + pk).slideDown('200');
+						
+						$("#" + pk).hover(bookshelf_hover_over, bookshelf_hover_out);
+						$("#" + pk + " span.delete").click(bookshelf_click_delete);
+						
+						$.growlUI('Bookshelf Added', 'Your bookshelf was added successfully');
+											
+						form.unblock();
+						
+					} else  {
+						form.unblock();
+				        
+				        $('#accept-overlay').find('h1.target').text('Error Adding Bookshelf');
+						$('#accept-overlay').find('p.target').text(data.meta.error);
+						$.blockUI({ 
+							fadeIn:  200,
+							fadeOut: 200,
+							css: { 
+								border: 'none',
+								opacity: 1,
+								'-webkit-border-radius': '10px',
+								'-moz-border-radius': '10px',
+								backgroundColor: 'none'
+					        },
+				        	message: $('#accept-overlay')
+				        });
+					}
+				},
+				error: function() {
+					$('#accept-overlay').find('h1.target').text('Something Went Wrong!');
+					$('#accept-overlay').find('p.target').text('This is completely our fault, something has gone wrong on our end. We are probably trying to fix it, so try again in a few seconds.');
+					$.blockUI({ 
+						fadeIn:  200,
+						fadeOut: 200,
+						css: { 
+							border: 'none',
+							opacity: 1,
+							'-webkit-border-radius': '10px',
+							'-moz-border-radius': '10px',
+							backgroundColor: 'none'
+				        },
+			        	message: $('#accept-overlay')
 			        });
 				}
-			}, "json");
+			});
 			
 			form.find(':input[name="name"]').val('');
 			
@@ -163,30 +222,52 @@
 				really.css('display', 'inline');
 				
 				really.click(function() {
-					$.post('{% url api_delete_collection %}', {pk: bookshelf_pk}, function(data) {
-						if (data.meta.success == true) {
-							bookshelf_row.slideUp('200', function() {
-								$(this).remove();
-							});
-							$.growlUI('Bookshelf Deleted', 'Your bookshelf was deleted successfully');
-						} else if(data.meta.success == false) {
-							$.blockUI({ css: {
-								'class': 'specialclass',
-					            border: 'none', 
-					            padding: '15px', 
-					            backgroundColor: '#000', 
-					            '-webkit-border-radius': '10px', 
-					            '-moz-border-radius': '10px', 
-					            opacity: .5, 
-					            color: '#fff' 
-					        }, message: '<h1>There was an error deleting the Bookshelf</h1><p>' + data.meta.error + '</p><input type="button" value="OK" id="blockUI-OK" />' });
-					        
-					        $("#blockUI-OK").click(function() {
-					        	$.unblockUI();
-					        	return false;
+					$.ajax({
+						url: '{% url api_delete_collection %}', 
+						data: { pk: bookshelf_pk },
+						dataType: 'json',
+						type: 'POST',
+						success: function(data) {
+							if (data.meta.success == true) {
+								bookshelf_row.slideUp('200', function() {
+									$(this).remove();
+								});
+								$.growlUI('Bookshelf Deleted', 'Your bookshelf was deleted successfully');
+							} else {
+								
+								$('#accept-overlay').find('h1.target').text('Error Deleting Bookshelf');
+								$('#accept-overlay').find('p.target').text(data.meta.error);
+								$.blockUI({ 
+									fadeIn:  200,
+									fadeOut: 200,
+									css: { 
+										border: 'none',
+										opacity: 1,
+										'-webkit-border-radius': '10px',
+										'-moz-border-radius': '10px',
+										backgroundColor: 'none'
+							        },
+						        	message: $('#accept-overlay')
+						        });
+							}
+						},
+						error: function() {
+							$('#accept-overlay').find('h1.target').text('Something Went Wrong!');
+							$('#accept-overlay').find('p.target').text('This is completely our fault, something has gone wrong on our end. We are probably trying to fix it, so try again in a few seconds.');
+							$.blockUI({ 
+								fadeIn:  200,
+								fadeOut: 200,
+								css: { 
+									border: 'none',
+									opacity: 1,
+									'-webkit-border-radius': '10px',
+									'-moz-border-radius': '10px',
+									backgroundColor: 'none'
+						        },
+					        	message: $('#accept-overlay')
 					        });
 						}
-					}, "json");
+					});
 				});
 				
 			}
@@ -197,6 +278,97 @@
 		$("ul#bookshelf-list li").hover(bookshelf_hover_over, bookshelf_hover_out);
 			  
 		$("ul#bookshelf-list li span.delete").click(bookshelf_click_delete);
+		
+		var helpHtml = $('div#help-box').html();
+		
+		$('a#unsorted-bin-changer').click(function() {
+			
+			$('div#help-box').animate({
+				opacity: 0
+			}, function() {
+				$('div#help-box').html($('div#unsorted-bin-box').html());
+				
+				$('li.draggable').draggable({ 
+					revert: true,
+					helper: 'original',
+					opacity: 0.7
+				});
+				
+				$('div#help-box').animate({
+					opacity: 1
+				});
+			});
+			
+			return false;
+		});
+		
+		$('a#help-changer').click(function() {
+			
+			$('div#help-box').animate({
+				opacity: 0
+			}, function() {
+				$('div#help-box').html(helpHtml);
+				
+				$('div#help-box').animate({
+					opacity: 1
+				});
+			});
+			
+			return false;
+		});
+		
+		$('ul#bookshelf-list li.droppable').droppable({
+			drop: function(event, ui) {
+				
+				var profile_pk = event.originalTarget.id;
+				var collection_pk = event.target.id;
+				
+				$.ajax({
+					url: '{% url api_save_profile %}',
+					data: { pk: profile_pk, collection_pk: collection_pk },
+					dataType: 'json',
+					type: 'POST',
+					success: function(data) {
+						if (data.meta.success == true) {
+							$('#' + profile_pk).slideUp('200');
+							
+						} else {
+							$('#accept-overlay').find('h1.target').text('Error Moving Book');
+							$('#accept-overlay').find('p.target').text(data.meta.error);
+							$.blockUI({ 
+								fadeIn:  200,
+								fadeOut: 200,
+								css: { 
+									border: 'none',
+									opacity: 1,
+									'-webkit-border-radius': '10px',
+									'-moz-border-radius': '10px',
+									backgroundColor: 'none'
+						        },
+					        	message: $('#accept-overlay')
+					        });
+						}
+					},
+					error: function() {
+						$('#accept-overlay').find('h1.target').text('Something Went Wrong!');
+						$('#accept-overlay').find('p.target').text('This is completely our fault, something has gone wrong on our end. We are probably trying to fix it, so try again in a few seconds.');
+						$.blockUI({ 
+							fadeIn:  200,
+							fadeOut: 200,
+							css: { 
+								border: 'none',
+								opacity: 1,
+								'-webkit-border-radius': '10px',
+								'-moz-border-radius': '10px',
+								backgroundColor: 'none'
+					        },
+				        	message: $('#accept-overlay')
+				        });
+					}
+				});
+				
+			}
+		});
 	});
 </script>
 {% endblock %}
@@ -214,7 +386,7 @@
 					</div>
 				</div>
 				<div class="third omega">
-					<h3><a href="{{ library.get_absolute_url }}{{ unsorted_bin.slug }}/">{{ unsorted_bin.value }}</a></h3>
+					<h3><a id="unsorted-bin-changer" href="{{ library.get_absolute_url }}{{ unsorted_bin.slug }}/">{{ unsorted_bin.value }}</a><a id="help-changer" href="">Help</a></h3>
 					<p>This Library has {{ library.books.all|length }} book{{ library.books.all|pluralize }} which you should move into a bookshelf.</p>
 				</div>
 			</div>
@@ -227,9 +399,9 @@
 				<div class="two-thirds alpha">
 					<ul id="bookshelf-list" class="item-list">
 						{% for bookshelf in library.children.all %}
-							<li id="{{ bookshelf.pk }}">
+							<li id="{{ bookshelf.pk }}" class="droppable">
 								<a class="item-title" href="{{ bookshelf.get_absolute_url }}">{{ bookshelf.name }}</a>
-								<span class="item-children-count">{{ bookshelf.children.all|length }}</span>
+								<span class="item-children-count">{{ bookshelf.books.all|length }}</span>
 							</li>
 						{% endfor %}
 						{% if library.children.all %}
@@ -246,7 +418,7 @@
 						</form>	
 					</div>
 				</div>
-				<div class="third omega">
+				<div id="help-box" class="third omega">
 					<h3>Overview</h3>
 					<p>Bookshelves are a way to organise collections of books, which you might in real life store next to each other on the same "bookshelf".</p>
 					
@@ -259,6 +431,13 @@
 					<h3>Adding</h3>
 					<p>No two bookshelves in the same library may have the same name.</p>
 				</div>
+				<div style="display:none;" id="unsorted-bin-box" class="third omega">
+					<ul class="item-list img-items">
+						{% for book in library.books.all %}
+							<li id="{{ book.pk }}" class="draggable" ><img src="{{ book.book_instance.thumbnail_small }}" /><a href="{{ book.get_absolute_url }}" class="item-title">{{ book.title }}</a></li>
+						{% endfor %}
+					</ul>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -268,12 +447,16 @@
 			<p class="center last"><a href="{% url add_books %}?c={{ library.pk }}">Add a Book To This Library</a></p>
 		</div>
 	</div>
-	
-	<div id="bookshelf-delete" class="dialog" title="Delete this Bookshelf?">
-		<p><span class="ui-icon ui-icon-alert" style="float:left; margin:3px 7px 30px 0;"></span>This bookshelf will be permanently deleted. Are you sure?</p>
-	</div>
-	
-	<div id="bookshelf-delete-error" class="dialog" title="Problem deleting Library!">
-		<p class="error-message"><span class="ui-icon ui-icon-alert" style="float:left; margin:2px 7px 30px 0;"></span></p>
+
+	<div id="accept-overlay" class="overlay">
+		<div class="overlay-header">
+			<h1 class="target"></h1>
+		</div>
+		<div class="overlay-body">
+			<p class="target"></p>
+		</div>
+		<div class="overlay-footer clearfix">
+			<input type="button" class="overlay-ok overlay-button" value="Alright" /> 
+		</div>
 	</div>
 {% endblock %}

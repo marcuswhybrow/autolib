@@ -50,7 +50,7 @@ class BookDetail():
 			entry = self.soup
 			
 			author =  entry.find('dc:creator')
-			self.author = author.string if author is not None else None
+			self.author = unescape(author.string) if author is not None else None
 			date = entry.find('dc:date')
 			
 			if date is not None:
@@ -63,7 +63,7 @@ class BookDetail():
 				self.published = None
 				
 			description = entry.find('dc:description')
-			self.description = description.string if description is not None else None
+			self.description = unescape(description.string) if description is not None else None
 			
 			self.width = self.height = self.depth = self.pages = self.format = None
 			
@@ -78,7 +78,7 @@ class BookDetail():
 					elif re.match('[0-9]', format.string):
 						self.pages = int(format.string.split(' ')[0])
 					else:
-						self.format = format.string
+						self.format = unescape(format.string)
 			except IndexError:
 				# Some dimensions are not present
 				pass
@@ -103,7 +103,7 @@ class BookDetail():
 			language = entry.find('dc:language')
 			self.language = language.string if language is not None else None
 			publisher = entry.find('dc:publisher')
-			self.publisher = publisher.string if publisher is not None else None
+			self.publisher = unescape(publisher.string) if publisher is not None else None
 			
 			self.thumbnail_small = self.thumbnail_large = None
 			
@@ -117,10 +117,10 @@ class BookDetail():
 			
 			self.subjects = []
 			for subject in entry.findAll('dc:subject'):
-				self.subjects.append(subject.string)
+				self.subjects.append(unescape(subject.string))
 			
 			title = entry.find('dc:title')
-			self.title = title.string if title is not None else None
+			self.title = unescape(title.string) if title is not None else None
 			
 		else:
 			self.status = False

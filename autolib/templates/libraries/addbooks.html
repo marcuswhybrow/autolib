@@ -21,6 +21,13 @@ Add New Books | {{ block.super }}
 <script type="text/javascript" src="/media/js/jquery.preLoadImages.js"></script>
 <script type="text/javascript">
 	$(function() {
+		
+		// Close events for overlays
+		
+		$('#accept-overlay input.overlay-ok').click(function() {
+			 $.unblockUI();
+			 return false;
+		});
 	
 		$.preLoadImages(
 			'/media/images/ui/more-selected.png',
@@ -31,7 +38,7 @@ Add New Books | {{ block.super }}
 		
 		$("button#add-books-button").attr('disabled', 'disabled');
 		
-		 $('#connection-problem #connection-problem-ok').click(function() { 
+		$('#connection-problem #connection-problem-ok').click(function() { 
             $.unblockUI();
             overlay = false;
             return false;
@@ -106,7 +113,20 @@ Add New Books | {{ block.super }}
 							}
 						} else {
 							// If the query failed display the error message
-							alert(data.meta.error);
+							$('#accept-overlay').find('h1.target').text('Something Went Wrong!');
+							$('#accept-overlay').find('p.target').text(data.meta.error);
+							$.blockUI({ 
+								fadeIn:  200,
+								fadeOut: 200,
+								css: { 
+									border: 'none',
+									opacity: 1,
+									'-webkit-border-radius': '10px',
+									'-moz-border-radius': '10px',
+									backgroundColor: 'none'
+						        },
+					        	message: $('#accept-overlay')
+					        });
 						}
 						
 						// Unblock the bookchelves now that it has been populated (or error displayed)
@@ -135,6 +155,21 @@ Add New Books | {{ block.super }}
 					        },
 					        message: $('#connection-problem')
 					    });
+					    $('#accept-overlay').find('h1.target').text('Something Went Wrong!');
+						$('#accept-overlay').find('p.target').text('We are having connection problems, try again in a few seconds.');
+						$.blockUI({ 
+							fadeIn:  200,
+							fadeOut: 200,
+							css: { 
+								border: 'none',
+								opacity: 1,
+								'-webkit-border-radius': '10px',
+								'-moz-border-radius': '10px',
+								backgroundColor: 'none'
+					        },
+				        	message: $('#accept-overlay')
+				        });
+					    
 					    // Signifys that an overlay is on (used to prevent catching keyboard events)
 					    overlay = true;
 					    // Clear any currently repeating (keyboard initiated) intervals
@@ -196,7 +231,6 @@ Add New Books | {{ block.super }}
 				}
 			} else {
 				// Otherwise we are at the bottom of the list (and were just trying to move down), so stop any repeating movements
-				//alert('no more down');
 				clearInterval(repeatInterval);
 			}
 			return false;
@@ -241,7 +275,6 @@ Add New Books | {{ block.super }}
 				}
 			} else {
 				// Otherwise we are at the top of the list (and were just trying to move up), so stop any repeating movements
-				//alert('no more up');
 				clearInterval(repeatInterval);
 			}
 			return false;
@@ -418,24 +451,39 @@ Add New Books | {{ block.super }}
 					var booksBox = $("#books-box");
 					
 					if ($("#" + data.book.pk).length > 0) {
-						alert('You already have this book in your box!');
+						$('#accept-overlay').find('h1.target').text('You Have This Book Already!');
+						$('#accept-overlay').find('p.target').text('You already have "' + data.book.title + '" in you Books-Box.');
+						$.blockUI({ 
+							fadeIn:  200,
+							fadeOut: 200,
+							css: { 
+								border: 'none',
+								opacity: 1,
+								'-webkit-border-radius': '10px',
+								'-moz-border-radius': '10px',
+								backgroundColor: 'none'
+					        },
+				        	message: $('#accept-overlay')
+				        });
 					} else {
 						booksBox.append('<li style="display: none;" id="' + data.book.pk + '"><a class="item-title">' + data.book.title + '</a> by ' + data.book.author + '</li>');
 						$("#" + data.book.pk).slideDown('200');
 						$("button#add-books-button").attr('disabled', '');
 					}
 				} else {
+					$('#accept-overlay').find('h1.target').text('Error Finding Book!');
+					$('#accept-overlay').find('p.target').text(data.meta.error);
 					$.blockUI({ 
+						fadeIn:  200,
+						fadeOut: 200,
 						css: { 
-				            border: 'none', 
-				            padding: '15px', 
-				            backgroundColor: '#000', 
-				            '-webkit-border-radius': '10px', 
-				            '-moz-border-radius': '10px', 
-				            opacity: .5, 
-				            color: '#fff' 
-				        }, message: data.meta.error,
-				        timeout: 2000
+							border: 'none',
+							opacity: 1,
+							'-webkit-border-radius': '10px',
+							'-moz-border-radius': '10px',
+							backgroundColor: 'none'
+				        },
+			        	message: $('#accept-overlay')
 			        });
 				}
 				
@@ -468,7 +516,20 @@ Add New Books | {{ block.super }}
 						}
 					},
 					error: function() {
-						alert('no response');
+						$('#accept-overlay').find('h1.target').text('Something Went Wrong!');
+						$('#accept-overlay').find('p.target').text('This is completely our fault, something has gone wrong on our end. We are probably trying to fix it, so try again in a few seconds.');
+						$.blockUI({ 
+							fadeIn:  200,
+							fadeOut: 200,
+							css: { 
+								border: 'none',
+								opacity: 1,
+								'-webkit-border-radius': '10px',
+								'-moz-border-radius': '10px',
+								backgroundColor: 'none'
+					        },
+				        	message: $('#accept-overlay')
+				        });
 					},
 					dataType: 'json'
 				});
@@ -579,9 +640,16 @@ Add New Books | {{ block.super }}
 		</div>
 	</div>
 
-<div id="connection-problem" class="overlay"> 
-	<p>Oops. There was a connection problem.</p>
-	<input type="button" id="connection-problem-ok" value="OK" /> 
-</div> 
+	<div id="accept-overlay" class="overlay">
+		<div class="overlay-header">
+			<h1 class="target"></h1>
+		</div>
+		<div class="overlay-body">
+			<p class="target"></p>
+		</div>
+		<div class="overlay-footer clearfix">
+			<input type="button" class="overlay-ok overlay-button" value="Alright" /> 
+		</div>
+	</div>
 
 {% endblock %}

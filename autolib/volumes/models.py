@@ -99,9 +99,6 @@ class BookProfile(UUIDSyncable):
 		
 	def get_tags(self):
 		return Tag.objects.get_for_object(self) 
-		
-	class Meta:
-		unique_together = ('book_instance', 'collection')
 	
 	def __unicode__(self):
 		return self.book_instance.title
@@ -120,41 +117,73 @@ class BookProfile(UUIDSyncable):
 		
 		return ('profile_detail', [library, bookshelf, self.isbn, self.slug])
 	
-	def get_isbn(self):
+	@property
+	def isbn(self):
 		return self.book_instance.isbn
 	
-	def get_title(self):
+	@property
+	def isbn10(self):
+		return self.book_instance.isbn10
+	
+	@property
+	def isbn13(self):
+		return self.book_instance.isbn13
+	
+	@property
+	def title(self):
 		return self.book_instance.title
 	
-	def get_description(self):
+	@property
+	def description(self):
 		return self.book_instance.description
 	
-	def get_author(self):
+	@property
+	def author(self):
 		return self.book_instance.author
 		
-	def get_publisher(self):
+	@property
+	def publisher(self):
 		return self.book_instance.publisher
 	
-	def get_published(self):
+	@property
+	def published(self):
 		return self.book_instance.published
 	
-	def get_pages(self):
+	@property
+	def pages(self):
 		return self.book_instance.pages
 	
-	def get_width(self):
+	@property
+	def width(self):
 		return self.book_instance.width
 	
-	def get_height(self):
+	@property
+	def height(self):
 		return self.book_instance.height
 	
-	def get_depth(self):
+	@property
+	def depth(self):
 		return self.book_instance.depth
 	
-	def get_format(self):
+	@property
+	def format(self):
 		return self.book_instance.format
 	
-	def get_language(self):
+	@property
+	def language(self):
 		return self.book_instance.language
+	
+	@property
+	def edition_group(self):
+		return self.book_instance.edition_group
+	
+	@property
+	def thumbnail_large(self):
+		return self.book_instance.thumbnail_large
+	
+	@property
+	def thumbnail_small(self):
+		return self.book_instance.thumbnail_small
 	
 	def get_owner(self):
 		if self.collection.collection_type == 'library':
@@ -165,20 +194,6 @@ class BookProfile(UUIDSyncable):
 			return self.collection.parent.parent.owner
 		else:
 			return None
-	
-	isbn = property(get_isbn)
-	title = property(get_title)
-	description = property(get_description)
-	author = property(get_author)
-	publisher = property(get_publisher)
-	published = property(get_published)
-	user = property(get_owner)
-	pages = property(get_pages)
-	width = property(get_width)
-	height = property(get_height)
-	depth = property(get_depth)
-	format = property(get_format)
-	language = property(get_language)
 	
 	def save(self, *args, **kwargs):
 		self.slug = slugify(self.title)

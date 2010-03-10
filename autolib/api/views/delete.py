@@ -9,11 +9,18 @@ class DeleteCollection(APIAuthView):
 		collection_pk = request.POST.get('pk', None)
 		if collection_pk is not None:
 			try:
-				collection = Collection.objects.get(Q(pk=collection_pk) & (Q(owner=self.user) | Q(parent__owner=self.user) | Q(parent__parent__owner=self.user)))
+				c = Collection.objects.get(Q(pk=collection_pk) & (Q(owner=self.user) | Q(parent__owner=self.user) | Q(parent__parent__owner=self.user)))
 				if not collection.children.all():
 					if not collection.books.all():
 						self.data['collection'] = {
-							'pk': collection.pk
+							'pk': c.pk,
+							'name': c.name,
+							'parent': c.parent.pk if c.parent is not None else None,
+							'description': c.description,
+							'url': c.get_absolute_url() if c.collection_type != 'series' else None,
+							'slug': c.slug,
+							'added': str(c.added),
+							'last_modified': str(c.last_modified),
 						}
 						collection.delete()
 						self.data['meta']['success'] = True
@@ -33,7 +40,26 @@ class DeleteBookProfile(APIAuthView):
 			try:
 				profile = BookProfile.objects.get(Q(pk=profile_pk) & (Q(collection__owner=self.user) | Q(collection__parent__owner=self.user) | Q(collection__parent__parent__owner=self.user)))
 				self.data['profile'] = {
-					'pk': series.pk
+					'pk': profile.pk,
+					'isbn10': profile.isbn10,
+					'isbn13': profile.isbn13,
+					'title': profile.title,
+					'description': profile.description,
+					'author': profile.author,
+					'publisher': profile.publisher,
+					'published': str(profile.published),
+					'pages': profile.pages,
+					'width': profile.width,
+					'height': profile.height,
+					'depth': profile.depth,
+					'format': profile.format,
+					'language': profile.language,
+					'added': str(profile.added),
+					'last_modified': str(profile.last_modified),
+					'edition_group': profile.edition_group.pk,
+					'url': profile.get_absolute_url(),
+					'thumbnail_large': profile.thumbnail_large,
+					'thumbnail_small': profile.thumbnail_small,
 				}
 				profile.delete()
 				self.data['meta']['success'] = True
