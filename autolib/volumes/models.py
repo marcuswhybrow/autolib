@@ -1,3 +1,5 @@
+#from __future__ import with_statement
+
 from django.db import models
 from django.db.models import permalink
 from.django import forms
@@ -21,6 +23,10 @@ from base.models import UUIDSyncable
 from tagging.fields import TagField
 from tagging.models import Tag
 import tagging
+
+from api.decorators import synchronized
+
+import threading
 
 class BookEditionGroup(UUIDSyncable):
 	
@@ -197,15 +203,21 @@ class BookProfile(UUIDSyncable):
 	
 	def save(self, *args, **kwargs):
 		self.slug = slugify(self.title)
-		
 		uniqueConstraint = {'book_instance': self.book_instance, 'collection': self.collection}
 		
-		profiles = BookProfile.objects.filter(Q(**uniqueConstraint) & ~Q(pk=self.pk))
+		lock = threading.Lock()
+		lock.acquire()
 		
-		if len(profiles) == 0:
-			super(BookProfile, self).save(*args, **kwargs)
-		else:
-			raise ValidationError('A Book Profile for that book instance in that collection already exists')
+		try:
+			profiles = BookProfile.objects.filter(Q(**uniqueConstraint) & ~Q(pk=self.pk))
+			
+			if len(profiles) == 0:
+				super(BookProfile, self).save(*args, **kwargs)
+			else:
+				#lock.release()
+				raise ValidationError('A Book Profile for that book instance in that collection already exists')
+		finally:
+			lock.release()
 
 #tagging.register(BookProfile)
 

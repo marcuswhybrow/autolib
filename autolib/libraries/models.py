@@ -12,6 +12,8 @@ import re
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 
+import threading
+
 #########################
 ### Collections Model ###
 #########################
@@ -89,18 +91,26 @@ class Collection(UUIDSyncable):
 		# The uniqueness constraints a collection must abide by
 		constraint = {'collection_type': self.collection_type, 'owner': self.owner, 'parent': self.parent, 'slug': self.slug}
 		
-		# Gather any collections which match those values
-		collections = list(Collection.objects.filter(Q(**constraint) & ~Q(pk=self.pk)))
+		lock = threading.Lock()
+		lock.acquire()
 		
-		if len(collections) == 0:
-			# If there are no matches
+		try:
+		
+			# Gather any collections which match those values
+			collections = list(Collection.objects.filter(Q(**constraint) & ~Q(pk=self.pk)))
 			
-			# Save the current collection
-			super(Collection, self).save(*args, **kwargs)
-			
-		else:
-			# Otherwise you cannot add the collection in its current state
-			raise ValidationError('There already exists a collection of that collection type "parent or owner" and slug')
+			if len(collections) == 0:
+				# If there are no matches
+				
+				# Save the current collection
+				super(Collection, self).save(*args, **kwargs)
+				
+			else:
+				# Otherwise you cannot add the collection in its current state
+				raise ValidationError('There already exists a collection of that collection type "parent or owner" and slug')
+		
+		finally:
+			lock.release()
 	
 	def get_owner(self):
 		"""
