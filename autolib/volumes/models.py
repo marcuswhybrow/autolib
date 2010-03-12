@@ -24,8 +24,6 @@ from tagging.fields import TagField
 from tagging.models import Tag
 import tagging
 
-from api.decorators import synchronized
-
 import threading
 
 class BookEditionGroup(UUIDSyncable):
