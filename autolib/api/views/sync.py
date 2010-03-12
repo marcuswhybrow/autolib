@@ -101,7 +101,7 @@ class SyncUpdate(APIAuthView):
 				# Build a list of the objects to insert
 				object_list = []
 				for pk,i in insert.items():
-					if u.content_object is not None:
+					if i.content_object is not None:
 						object_list.append(i.content_object)
 				
 				# Serialise the objects to insert
