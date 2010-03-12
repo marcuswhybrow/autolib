@@ -83,7 +83,8 @@ class SyncUpdate(APIAuthView):
 				# Build a list of the objects to delete
 				object_list = []
 				for pk,u in delete.items():
-					object_list.append(u.content_object)
+					if u.content_object is not None:
+						object_list.append(u.content_object)
 				
 				# Serialise the objects to delete
 				self.data['delete'] = simplejson.loads(serializers.serialize("json", object_list))
@@ -91,7 +92,8 @@ class SyncUpdate(APIAuthView):
 				# Build a list of objects to update
 				object_list = []
 				for pk,u in update.items():
-					object_list.append(u.content_object)
+					if u.content_object is not None:
+						object_list.append(u.content_object)
 				
 				# Serialise the objects to update
 				self.data['update'] = simplejson.loads(serializers.serialize("json", object_list))
@@ -99,7 +101,8 @@ class SyncUpdate(APIAuthView):
 				# Build a list of the objects to insert
 				object_list = []
 				for pk,i in insert.items():
-					object_list.append(i.content_object)
+					if u.content_object is not None:
+						object_list.append(i.content_object)
 				
 				# Serialise the objects to insert
 				self.data['insert'] = simplejson.loads(serializers.serialize("json", object_list))
