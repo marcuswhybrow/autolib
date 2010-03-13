@@ -1,5 +1,3 @@
-#from __future__ import with_statement
-
 from django.db import models
 from django.db.models import permalink
 from.django import forms
@@ -14,6 +12,8 @@ from django.core.exceptions import ValidationError
 from django.db.models import Q
 
 import re
+
+from base import locks
 
 ##################
 ### Book Model ###
@@ -203,7 +203,7 @@ class BookProfile(UUIDSyncable):
 		self.slug = slugify(self.title)
 		uniqueConstraint = {'book_instance': self.book_instance, 'collection': self.collection}
 		
-		lock = threading.Lock()
+		lock = locks.DjangoLock('BookProfile')
 		lock.acquire()
 		
 		try:

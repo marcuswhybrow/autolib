@@ -14,6 +14,8 @@ from django.db.models import Q
 
 import threading
 
+from base import locks
+
 #########################
 ### Collections Model ###
 #########################
@@ -91,7 +93,7 @@ class Collection(UUIDSyncable):
 		# The uniqueness constraints a collection must abide by
 		constraint = {'collection_type': self.collection_type, 'owner': self.owner, 'parent': self.parent, 'slug': self.slug}
 		
-		lock = threading.Lock()
+		lock = locks.DjangoLock('Collection')
 		lock.acquire()
 		
 		try:

@@ -124,8 +124,11 @@ ACCOUNT_ACTIVATION_DAYS = 7
 
 FORCE_LOWERCASE_TAGS = True
 
-
+# The email address registration confirmation emails will appear to be sent from
 DEFAULT_FROM_EMAIL = 'autolib-noreply@marcuswhybrow.net'
+
+# 
+LOCK_DIR = os.path.join(PATH, 'locks')
 
 # Loads any local settings (possibly overriding values here).
 try:
