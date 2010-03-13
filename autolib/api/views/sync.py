@@ -42,10 +42,18 @@ class SyncUpdate(APIAuthView):
 				# All of the following is logic to reduce the needless update information.
 				
 				# Dictionaries to whitle down the objects which need to be synced
-				delete = update = insert = {}
+				delete = {}
+				update = {}
+				insert = {}
 				
 				for u in updates:
 					# For all updates
+					
+					if u.content_object is None:
+						# If the object has been delete (which it shouldn't have been)
+						# Delete the update referencing it
+						u.delete()
+						continue
 						
 					if u.action == 'delete':
 						# If it's a delete Update
@@ -79,6 +87,10 @@ class SyncUpdate(APIAuthView):
 							
 							# Add it to the insert dictionary
 							insert[u.object_pk] = u
+				
+				print delete
+				print update
+				print insert
 				
 				# Build a list of the objects to delete
 				object_list = []
