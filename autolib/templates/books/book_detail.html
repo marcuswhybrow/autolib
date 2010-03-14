@@ -278,12 +278,17 @@
 <div class="section">
 	<div class="inner clearfix">
 		<div id="editions" class="votable-content">
-			<h3>Editions Of This Book</h3>
-			<ul>
-			{% for edition in book.edition_group.editions.all %}
-				<li id="{{ edition.pk }}" {% ifequal edition.pk book.pk %}class="this"{% endifequal %}>{{ edition.published|date:"Y"|default:'0000' }} <a href="{{ edition.get_absolute_url }}">{{ edition.isbn }}</a>	</li>
-			{% endfor %}
-			</ul>
+			<div class="rounded-wrapper">
+				<h3>Editions Of This Book</h3>
+				<ul class="double-title item-list">
+				{% for edition in book.edition_group.editions.all %}
+					<li id="{{ edition.pk }}" {% ifequal edition.pk book.pk %}class="this"{% endifequal %}>
+						<a class="item-title" href="{{ edition.get_absolute_url }}">{{ edition.published|date:"Y"|default:'0000' }}</a>
+						<p class="item-subtitle">{{ edition.isbn }}</p>
+					</li>
+				{% endfor %}
+				</ul>
+			</div>
 		</div>
 	</div>
 </div>

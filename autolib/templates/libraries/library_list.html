@@ -30,25 +30,25 @@ Your Libraries | {{ block.super }}
 		// Library List
 		
 		function library_hover_over() {
-			$(this).find('span.delete, span.really').css('display', 'inline');
+			$(this).find('button.delete, button.really').css('display', 'block');
 		}
 		
 		function library_hover_out() {
-			$(this).find('span.delete').css('display', 'none');
-			$(this).find('span.really').remove();
+			$(this).find('button.delete').css('display', 'none');
+			$(this).find('button.really').remove();
 		}
 		
 		function library_click_delete() {
 			var library_row = $(this).parent();
 			var library_pk = library_row.attr("id");
 			
-			if (library_row.find('span.really').length == 0) {
+			if (library_row.find('button.really').length == 0) {
 				
-				library_row.append('<span class="really">really</span>');
+				library_row.append('<button class="really">really</button>');
 			
-				var really = library_row.find('span.really');
+				var really = library_row.find('button.really');
 				
-				really.css('display', 'inline');
+				really.css('display', 'block');
 				
 				really.click(function() {
 					$.ajax({
@@ -101,11 +101,11 @@ Your Libraries | {{ block.super }}
 			}
 		}
 		
-		$("ul#library-list li").append('<span class="delete">delete</span>');
+		$("ul#library-list li").append('<button class="delete">delete</span>');
 		
 		$("ul#library-list li").hover(library_hover_over, library_hover_out);
 		
-		$("ul#library-list li span.delete").click(library_click_delete);
+		$("ul#library-list li button.delete").click(library_click_delete);
 		
 		// Add New Library
 		
@@ -133,14 +133,34 @@ Your Libraries | {{ block.super }}
 			$.post('{% url api_save_collection %}', formData, function(data) {
 				if (data.meta.success == true) {
 					var name = data.collection.name;
+					var truncateLength = 40;
+					
+					if (name.length > truncateLength) {
+						name = name.substring(0, truncateLength) + '...';
+					}
+					
+					String.prototype.capitalise = function() {
+						return this.replace( /(^|\s)([a-z])/g , function(m,p1,p2){ return p1+p2.toUpperCase(); } );
+					};
+					
+					name = name.capitalise();
+					
 					var description = data.collection.description;
 					var url = data.collection.url;
 					var pk = data.collection.pk;
-					$("ul#library-list").append('<li id="' + pk + '" style="display: none"><a class="item-title" href="' + url + '">' + name + '</a><span class="item-children-count">0</span><span class="delete">delete</span></li>');
+					
+					var listItem = '<li id="' + pk + '" style="display: none">' +
+					'<img src="/media/images/events/home.png" width="16" height="16" title="Library" />' +
+					'<a class="item-title img-title" href="' + url + '">' + name + ' →</a>' +
+					'<p class="item-subtitle">0 bookshelves, 0 unsorted books</p>' +
+					'<button class="delete">delete</button>' +
+					'</li>';
+					
+					$("ul#library-list").append(listItem);
 					$("li#" + pk).slideDown('200');
 					
 					$("#" + pk).hover(library_hover_over, library_hover_out);
-					$("#" + pk + " span.delete").click(library_click_delete);
+					$("#" + pk + " button.delete").click(library_click_delete);
 					
 					$.growlUI('Library Added', 'Your new library was added successfully');
 					
@@ -184,29 +204,28 @@ Your Libraries | {{ block.super }}
 		<div class="inner">
 			<div class="container clearfix">
 				<div class="two-thirds alpha">
-					<ul id="library-list" class="item-list">
-						{% for library in object_list %}
-							<li id="{{ library.pk }}">
-								<a class="item-title" href="{{ library.get_absolute_url }}">{{ library.name|title|truncatechars:30 }}</a>
-								<span class="item-children-count" title="Your '{{ library.name }}' library has {{ library.children.all|length }} bookshel{{ library.children.all|length|pluralize:"f,ves" }}">{{ library.children.all|length }}</span>
-							</li>
-						{% endfor %}
-					</ul>
+					<div class="rounded-wrapper">
+						<h3>Your Libraries</h3>
+						<ul id="library-list" class="double-title item-list">
+							{% for library in object_list %}
+								<li id="{{ library.pk }}">
+									<img src="/media/images/events/home.png" width="16" height="16" title="Library" />
+									<a class="item-title img-title" href="{{ library.get_absolute_url }}">{{ library.name|title|truncatechars:40 }} →</a>
+									<p class="item-subtitle">{{ library.children.all|length }} bookshel{{ library.children.all|length|pluralize:'f,ves' }}, {{ library.books.all|length }} unsorted book{{ library.books.all|length|pluralize }}</p>
+								</li>
+							{% endfor %}
+						</ul>
+						<h3>Add a New Library</h3>
+						<form id="new-library-form" action="" method="post">
+							<input type="hidden" name="collection_type" value="library" />
+							{{ form.name }}
+							<input type="submit" value="Create" />
+						</form>
+					</div>
 					{% if object_list %}
 					{% else %}
 					<p class="empty-list-text center">Ah Hello, Pick a name for your new library to get started.</p>
 					{% endif %}
-					<div class="new-item-form">
-						<form id="new-library-form" action="" method="post" class="jqtransform">
-							<input type="hidden" name="collection_type" value="library" />
-							<div class="rowElem">
-								{{ form.name }}
-							</div>
-							<div class="rowElem">
-								<input type="submit" value="Create" />
-							</div>
-						</form>
-					</div>
 				</div>
 				<div class="third">
 					<h3>Overview</h3>

@@ -1,9 +1,16 @@
 {% extends "users/base.html" %}
 
+{% block title %}
+Users | {{ block.super }}
+{% endblock %}
+
 {% block breadcrumbs %}
 {{ block.super }}
 <li><a href="{% url users.views.user_list %}">Users</a></li>
 {% endblock %}
+
+{% load gravatar %}
+{% load truncate_filters %}
 
 {% block content %}
 <div class="section">
@@ -15,16 +22,29 @@
 
 <div class="section">
 	<div class="inner">
-		{% if users %}
-		<ul id="users-list" class="item-list">
-			{% for user in users %}
-				<li>
-					<a class="item-title" href="{{ user.get_absolute_url }}">{{ user.username }} ({{ user.get_full_name|default:user.username }})</a>
-					<span class="item-children-count">{{ user.date_joined|timesince }}</span>
-				</li>
-			{% endfor %}
-		</ul>
-		{% endif %}
+		<div class="container clearfix">
+			<div class="third alpha">
+				<div class="rounded-wrapper">
+					{% if users %}
+					<ul id="users-list" class="item-list double-title">
+						{% for user in users %}
+							<li>
+								{% gravatar user 16 %}
+								<a class="item-title img-title" href="{{ user.get_absolute_url }}">{{ user.username|truncatechars:40 }}</a>
+								<p class="item-subtitle">Joined {{ user.date_joined|date }}</p>
+							</li>
+						{% endfor %}
+					</ul>
+					{% endif %}
+				</div>
+			</div>
+			<div class="thrid">
+			
+			</div>
+			<div class="third omega">
+			
+			</div>
+		</div>
 	</div>
 </div>
 {% endblock %}

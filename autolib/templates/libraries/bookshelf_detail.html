@@ -1,5 +1,7 @@
 {% extends "libraries/library_detail.html" %}
 
+{% load truncate_filters %}
+
 {% block title %}
 {% if bookshelf %}
 	{{ bookshelf.name }} | {{ block.super }}
@@ -13,9 +15,9 @@
 {% block breadcrumbs %}
 	{{ block.super }}
 	{% if bookshelf %}
-		<li id="bc-libraries-bookshelf-detail" class="bookshelf"><a href="{% url bookshelf_detail library.slug, bookshelf.slug %}">{{ bookshelf.name }}</a></li>
+		<li id="bc-libraries-bookshelf-detail" class="bookshelf"><a href="{% url bookshelf_detail library.slug, bookshelf.slug %}">{{ bookshelf.name|truncatechars:40 }}</a></li>
 	{% else %}
-		<li id="bc-libraries-bookshelf-detail" class="bookshelf"><a href="{% url library_detail library.slug %}{{ unsorted_bin.slug }}/">{{ unsorted_bin.value }}</a></li>
+		<li id="bc-libraries-bookshelf-detail" class="bookshelf"><a href="{% url library_detail library.slug %}{{ unsorted_bin.slug }}/">{{ unsorted_bin.value|truncatechars:40 }}</a></li>
 	{% endif %}
 {% endblock %}
 
@@ -120,7 +122,25 @@
 				success: function(data) {
 					if (data.meta.success == true) {
 						var book = data.book;
-						$("ul#book-list").append('<li id="' + book.pk + '" style="display:none"><a class="item-title deleted">' + book.title + '</a> by ' + book.author + '<button class="confirm">confirm</button><button class="cancel">cancel</button></li>');
+						var title = book.title;
+						var author = book.author;
+						var pk = book.pk;
+						var url = book.url;
+						
+						var truncateLength = 40;
+					
+						if (title.length > truncateLength) {
+							title = name.substring(0, truncateLength) + '...';
+						}
+						
+						var listItem = '<li id="' + pk + '" style="display: none">' +
+						'<img src="/media/images/events/book-brown.png" width="16" height="16" title="Book" />' +
+						'<a class="item-title img-title" href="' + url + '">' + title + ' →</a>' +
+						'<p class="item-subtitle">by ' + author + '</p>' +
+						'<button class="confirm">confirm</button><button class="cancel">cancel</button>' +
+						'</li>';
+						
+						$("ul#book-list").append(listItem);
 						
 						var item = $('li#' + book.pk);
 						var book_pk = item.attr('id');
@@ -137,7 +157,15 @@
 										item.attr('id', data.profile.pk);
 										var title = item.find('a.item-title');
 										title.attr('href', data.profile.url).removeClass('deleted');
-										item.find('button').fadeOut('200');
+										item.find('button.cancel').fadeOut('200', function() {
+											$(this).remove();
+										});
+										item.find('button.confirm').fadeOut('200', function() {
+											$(this).remove();
+											item.append('<button class="delete">delete</button>');
+											item.find('button.delete').click(book_click_delete);
+											item.hover(book_hover_over, book_hover_out);
+										});
 									} else if(data.meta.success == false) {
 										$('#accept-overlay').find('h1.target').text('Error Finding Book');
 										$('#accept-overlay').find('p.target').text(data.meta.error);
@@ -227,25 +255,25 @@
 		// Books List
 		
 		function book_hover_over() {
-			$(this).find('span.delete, span.really').css('display', 'inline');
+			$(this).find('button.delete, button.really').css('display', 'block');
 		}
 		
 		function book_hover_out() {
-			$(this).find('span.delete').css('display', 'none');
-			$(this).find('span.really').remove();
+			$(this).find('button.delete').css('display', 'none');
+			$(this).find('button.really').remove();
 		}
 		
 		function book_click_delete() {
 			var book_row = $(this).parent();
 			var book_pk = book_row.attr("id");
 			
-			if (book_row.find('span.really').length == 0) {
+			if (book_row.find('button.really').length == 0) {
 				
-				book_row.append('<span class="really">really</span>');
+				book_row.append('<button class="really">really</button>');
 			
-				var really = book_row.find('span.really');
+				var really = book_row.find('button.really');
 				
-				really.css('display', 'inline');
+				really.css('display', 'block');
 				
 				really.click(function() {
 					$.ajax({
@@ -299,11 +327,11 @@
 			}
 		}
 		
-		$("ul#book-list li").append('<span class="delete">delete</span>');
+		$("ul#book-list li").append('<button class="delete">delete</button>');
 			  
 		$("ul#book-list li").hover(book_hover_over, book_hover_out);
 			  
-		$("ul#book-list li span.delete").click(book_click_delete);
+		$("ul#book-list li button.delete").click(book_click_delete);
 		
 	});
 </script>
@@ -338,11 +366,15 @@
 		<div class="inner">
 			<div class="container clearfix">
 				<div class="two-thirds alpha">
+					<div class="rounded-wrapper">
 					{% if bookshelf %}
-						<ul id="book-list" class="item-list">
+						<h3>Books</h3>
+						<ul id="book-list" class="double-title item-list">
 							{% for book in bookshelf.books.all %}
 								<li id="{{ book.pk }}">
-									<a class="item-title" href="{{ book.get_absolute_url }}">{{ book.title }}</a> by {{ book.author }}
+									<img src="/media/images/events/book-brown.png" width="16" height="16" title="Book" />
+									<a class="item-title img-title" href="{{ book.get_absolute_url }}">{{ book.title }} →</a>
+									<p class="item-subtitle">by {{ book.author }}</p>
 								</li>
 							{% endfor %}
 						</ul>
@@ -350,17 +382,19 @@
 						{% else %}
 							<p class="center">There are no books in this bookshelf.</p>
 						{% endif %}
-						<div class="new-item-form">
-							<form id="add-book-form" action="" method="post">
-								<input type="text" name="isbn" id="id_isbn" />
-								<input type="submit" value="Add" />
-							</form>	
-						</div>
+						<h3>Add a Book Here</h3>
+						<form id="add-book-form" action="" method="post">
+							<input type="text" name="isbn" id="id_isbn" />
+							<input type="submit" value="Add" />
+						</form>	
 					{% else %}
+						<h3>Unsorted Books</h3>
 						<ul id="book-list" class="item-list">
 							{% for book in library.books.all %}
 								<li id="{{ book.pk }}">
-									<a class="item-title" href="{{ book.get_absolute_url }}">{{ book.title }}</a> by {{ book.author }}
+									<img src="/media/images/events/book-brown.png" width="16" height="16" title="Book" />
+									<a class="item-title img-title" href="{{ book.get_absolute_url }}">{{ book.title }} →</a>
+									<p class="item-subtitle">by {{ book.author }}</p>
 								</li>
 							{% endfor %}
 						</ul>
@@ -368,14 +402,14 @@
 						{% else %}
 							<p class="center">There are no books in this {{ unsorted_bin.value|lower }}.</p>
 						{% endif %}
-						<div class="new-item-form">
-							<form id="add-book-form" action="" method="post">
-								<input type="hidden" name="collection_pk" id="collection_pk" value="{{ bookshelf.pk }}" />
-								<input type="text" name="isbn" id="id_isbn" />
-								<input type="submit" value="Add" />
-							</form>	
-						</div>
+						<h3>Add a Book Here</h3>
+						<form id="add-book-form" action="" method="post">
+							<input type="hidden" name="collection_pk" id="collection_pk" value="{{ bookshelf.pk }}" />
+							<input type="text" name="isbn" id="id_isbn" />
+							<input type="submit" value="Add" />
+						</form>
 					{% endif %}
+					</div>
 					
 				</div>
 				<div class="third omega">

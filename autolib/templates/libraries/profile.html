@@ -6,6 +6,8 @@ Profile | {{ block.super }}
 
 {% block page_title %}libraries-profile{% endblock %}
 
+{% load truncate_filters %}
+
 {% block breadcrumbs %}
 {{ block.super }}
 <li id="bc-libraries-profile"><a href="{% url profile %}">Profile</a></li>
@@ -14,43 +16,97 @@ Profile | {{ block.super }}
 {% block content %}
 	<div class="section">
 		<div class="inner">
-			<h1>{{ user.get_full_name|default:user.username }}</h1>
+			<h1>Your Profile ({{ user.get_full_name|default:user.username }})</h1>
 			
 			<div>
-				<div class="third alpha">
-					<h3>Things you can do</h3>
-					<ul class="item-list">
-						<li><a class="item-title" href="{% url library_list %}">Browse Your Libraries</a></li>
-						<li><a class="item-title" href="{% url add_books %}">Add New Books</a></li>
-					</ul>
-				</div>
-				<div class="third">
-					<h3>Recommended Books for You</h3>
-					<ul class="item-list">
-						{% for book in recommended_books %}
-							<li>{{ book }}</li>
-						{% endfor %}
-					</ul>
+				<div class="two-thirds alpha">
+					<div class="container clearfix">
+						<div class="third alpha">
+							<div class="rounded-wrapper">
+								<h3>Your Details <span class="mini-link">[<a href="">edit →</a>]</span></h3>
+								<table>
+									<tbody>
+										<tr>
+											<td>
+												<img src="/media/images/events/user-silhouette.png" width="16" height="15" title="username" />
+												<span>Username</span>
+											</td>
+											<td><span>{{ user.username }}</span></td>
+										</tr>
+										<tr>
+											<td>
+												<img src="/media/images/events/clipboard-text.png" width="16" height="15" title="first name" />
+												<span>First Name</span>
+											</td>
+											<td><span>{{ user.first_name }}</span></td>
+										</tr>
+										<tr>
+											<td>
+												<img src="/media/images/events/clipboard-text.png" width="16" height="15" title="last name" />
+												<span>Last Name</span>
+											</td>
+											<td><span>{{ user.last_name }}</span></td>
+										</tr>
+									</tbody>
+								</table>
+								<h3>Areas</h3>
+								<ul class="item-list double-title">
+									<li>
+										<img src="/media/images/events/home--arrow.png" width="16" height="16" title="Libraries" />
+										<a class="item-title img-title" href="{% url library_list %}">Browse Your Libraries →</a>
+										<p class="item-subtitle">Add, edit and delete your collections of books.</p>
+									</li>
+									<li>
+										<img src="/media/images/events/book--plus.png" width="16" height="16" title="Add Books" />
+										<a class="item-title img-title" href="{% url add_books %}">Add Books →</a>
+										<p class="item-subtitle">Add books in batch to one of your libraries.</p>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="third omega">
+							There
+						</div>
+					</div>
 				</div>
 				<div class="third omega">
-					<h3>Recent Actions</h3>
-					<ul class="item-list">
-						{% for update in updates|slice:":5" %}
-							<li id="update-{{ update.pk }}" class="{{ update.action }}"><a class="item-title{% if not update.content_object.is_deleted %}" href="{{ update.content_object.get_absolute_url }}" {% else %} deleted"{% endif %}>
-							{% ifequal update.action 'insert' %}
-								Added
-							{% else %}
-								{% ifequal update.action 'update' %}
-									Updated
-								{% else %}
-									{% ifequal update.action 'delete' %}
-										Deleted
+					<div class="rounded-wrapper">
+					<h3>Your Recent Actions</h3>
+						<ul class="double-title item-list">
+							{% for update in updates|slice:":5" %}
+								<li id="update-{{ update.pk }}" class="{{ update.action }}">
+									{% ifequal update.action 'insert' %}
+										<img src="/media/images/events/plus-button.png" title="Added" height="16px" width="16px" />
+									{% else %}
+										{% ifequal update.action 'update' %}
+											<img src="/media/images/events/navigation-000-button.png" title="Updated" height="16" width="16" />
+										{% else %}
+											{% ifequal update.action 'delete' %}
+												<img src="/media/images/events/cross-button.png" title="Deleted" height="16" width="16" />
+											{% endifequal %}
+										{% endifequal %}
 									{% endifequal %}
-								{% endifequal %}
-							{% endifequal %}
-							{{ update.content_object }}</a> <br /> {{ update.time|timesince }} ago</li>
-						{% endfor %}
-					</ul>
+									{% if not update.content_object.is_deleted %}
+									<a class="item-title img-title" href="{{ update.content_object.get_absolute_url }}">{{ update.content_object|title|truncatechars:25 }} →</a>
+									{% else %}
+									<a class="deleted item-title img-title">{{ update.content_object|title|truncatechars:25 }}</a>
+									{% endif %}
+									{% ifequal update.action 'insert' %}
+										<p class="item-subtitle">Inserted {{ update.time|timesince }} ago</p>
+									{% else %}
+										{% ifequal update.action 'update' %}
+											<p class="item-subtitle">Updated {{ update.time|timesince }} ago</p>
+										{% else %}
+											{% ifequal update.action 'delete' %}
+												<p class="item-subtitle">Deleted {{ update.time|timesince }} ago</p>
+											{% endifequal %}
+										{% endifequal %}
+									{% endifequal %}
+
+								</li>
+							{% endfor %}
+						</ul>
+					</div>
 				</div>
 			</div>
 		</div>

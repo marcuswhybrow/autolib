@@ -1,14 +1,16 @@
 {% extends "libraries/library_list.html" %}
 
+{% load truncate_filters %}
+
 {% block title %}
-{{ library.name }} | {{ block.super }}
+{{ library.name|truncatechars:40 }} | {{ block.super }}
 {% endblock %}
 
 {% block page_title %}libraries-library-detail{% endblock %}
 
 {% block breadcrumbs %}
 {{ block.super }}
-<li id="bc-libraries-library-detail" class="library"><a href="{% url library_detail library.slug %}">{{ library.name }}</a></li>
+<li id="bc-libraries-library-detail" class="library"><a href="{% url library_detail library.slug %}">{{ library.name|truncatechars:40 }}</a></li>
 {% endblock %}
 
 {% block head %}
@@ -143,14 +145,35 @@
 				success: function(data) {
 					if (data.meta.success == true) {
 						var name = data.collection.name;
+						
+						var truncateLength = 40;
+					
+						if (name.length > truncateLength) {
+							name = name.substring(0, truncateLength) + '...';
+						}
+						
+						String.prototype.capitalise = function() {
+							return this.replace( /(^|\s)([a-z])/g , function(m,p1,p2){ return p1+p2.toUpperCase(); } );
+						};
+						
+						name = name.capitalise();
+						
 						var description = data.collection.description;
 						var url = data.collection.url;
 						var pk = data.collection.pk;
-						$("ul#bookshelf-list").append('<li id="' + pk + '" style="display: none"><a class="item-title" href="' + url + '">' + name + '</a><span class="item-children-count">0</span><span class="delete">delete</span></li>');
+						
+						var listItem = '<li id="' + pk + '" style="display: none">' +
+						'<img src="/media/images/events/drawer.png" width="16" height="16" title="Bookshelf" />' +
+						'<a class="item-title img-title" href="' + url + '">' + name + ' →</a>' +
+						'<p class="item-subtitle">0 Books</p>' +
+						'<button class="delete">delete</button>' +
+						'</li>';
+						
+						$("ul#bookshelf-list").append(listItem);
 						$("li#" + pk).slideDown('200');
 						
 						$("#" + pk).hover(bookshelf_hover_over, bookshelf_hover_out);
-						$("#" + pk + " span.delete").click(bookshelf_click_delete);
+						$("#" + pk + " button.delete").click(bookshelf_click_delete);
 						
 						$.growlUI('Bookshelf Added', 'Your bookshelf was added successfully');
 											
@@ -201,25 +224,25 @@
 		// Bookshelf List
 		
 		function bookshelf_hover_over() {
-			$(this).find('span.delete, span.really').css('display', 'inline');
+			$(this).find('button.delete, button.really').css('display', 'block');
 		}
 		
 		function bookshelf_hover_out() {
-			$(this).find('span.delete').css('display', 'none');
-			$(this).find('span.really').remove();
+			$(this).find('button.delete').css('display', 'none');
+			$(this).find('button.really').remove();
 		}
 		
 		function bookshelf_click_delete() {
 			var bookshelf_row = $(this).parent();
 			var bookshelf_pk = bookshelf_row.attr("id");
 			
-			if (bookshelf_row.find('span.really').length == 0) {
+			if (bookshelf_row.find('button.really').length == 0) {
 				
-				bookshelf_row.append('<span class="really">really</span>');
+				bookshelf_row.append('<button class="really">really</button>');
 			
-				var really = bookshelf_row.find('span.really');
+				var really = bookshelf_row.find('button.really');
 				
-				really.css('display', 'inline');
+				really.css('display', 'block');
 				
 				really.click(function() {
 					$.ajax({
@@ -273,11 +296,11 @@
 			}
 		}
 		
-		$("ul#bookshelf-list li").append('<span class="delete">delete</span>');
+		$("ul#bookshelf-list li").append('<button class="delete">delete</button>');
 			  
 		$("ul#bookshelf-list li").hover(bookshelf_hover_over, bookshelf_hover_out);
 			  
-		$("ul#bookshelf-list li span.delete").click(bookshelf_click_delete);
+		$("ul#bookshelf-list li button.delete").click(bookshelf_click_delete);
 		
 		var helpHtml = $('div#help-box').html();
 		
@@ -397,20 +420,23 @@
 		<div class="inner">
 			<div class="container clearfix">
 				<div class="two-thirds alpha">
-					<ul id="bookshelf-list" class="item-list">
-						{% for bookshelf in library.children.all %}
-							<li id="{{ bookshelf.pk }}" class="droppable">
-								<a class="item-title" href="{{ bookshelf.get_absolute_url }}">{{ bookshelf.name }}</a>
-								<span class="item-children-count">{{ bookshelf.books.all|length }}</span>
-							</li>
-						{% endfor %}
-						{% if library.children.all %}
-						{% else %}
-							<p class="center">This library has no bookshelves, add some here.</p>
-						{% endif %}
-					</ul>
-					<div class="new-item-form clearfix">
-						<form id="new-bookshelf-form" action="" method="post" class="clearfix">
+					<div class="rounded-wrapper">
+						<h3>Bookshelves</h3>
+						<ul id="bookshelf-list" class="double-title item-list">
+							{% for bookshelf in library.children.all %}
+								<li id="{{ bookshelf.pk }}" class="droppable">
+									<img src="/media/images/events/drawer.png" width="16" height="16" title="Bookshelf" />
+									<a class="item-title img-title" href="{{ bookshelf.get_absolute_url }}">{{ bookshelf.name|title|truncatechars:40 }} →</a>
+									<p class="item-subtitle">{{ bookshelf.books.all|length }} book{{ bookshelf.books.all|length|pluralize }}</p>
+								</li>
+							{% endfor %}
+							{% if library.children.all %}
+							{% else %}
+								<p class="center">This library has no bookshelves, add some here.</p>
+							{% endif %}
+						</ul>
+						<h3>Add A New Bookshelf</h3>
+						<form id="new-bookshelf-form" action="" method="post">
 							<input type="hidden" name="parent_pk" id="parent_pk" value="{{ library.pk }}" />
 							<input type="hidden" name="collection_type" id="collection_type" value="bookshelf" />
 							{{ form.name }}

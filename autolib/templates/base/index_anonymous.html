@@ -36,15 +36,15 @@ Welcome | {{ block.super }}
 				<img src="/media/images/icons/Man-DBrown-icon-128.png" width="128" height="128" />
 				<h2>Signup</h2>
 				<p>Create an account, its simple, easy and <strong>free</strong>.</p>
-				<p class="last"><a href="{% url registration.views.register %}">Click here to Sign Up</a></p>
+				<p class="last"><a href="{% url registration.views.register %}">Sign Up</a></p>
 			</div>
 			<div class="third icon-link clearfix">
 				<img src="/media/images/icons/Man-Grey-icon-128.png" width="128" height="128" />
 				<h2>Add</h2>
 				<p>Check out the apps:</p>
 				<ul>
-					<li><a href="#">Android App</a></li>
-					<li><a href="#">Desktop Application</a></li>
+					<li><a href="{% url apps_android %}">Android App</a></li>
+					<li><a href="{% url apps_java %}">Desktop App</a></li>
 				</ul>
 			</div>
 			<div class="third icon-link clearfix omega">

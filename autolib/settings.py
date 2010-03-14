@@ -89,6 +89,7 @@ INSTALLED_APPS = (
     'registration',
     'tagging',
     'voting',
+    'gravatar',
     #'django_openidconsumer',
     #'django_openid_auth',
 )
@@ -112,9 +113,9 @@ OPENID_UPDATE_DETAILS_FROM_SREG = True
 # Put a trailing forward slash at the end of every url.
 APPEND_SLASH = True
 
-LOGIN_URL = '/accounts/login'
+LOGIN_URL = '/accounts/login/'
 # The URL redireted to after a user has authenticated.
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/profile/'
 
 # The amount of days a username registration email is valid, before it is
 # made aavailable again.

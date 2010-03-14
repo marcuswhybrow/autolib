@@ -1,5 +1,9 @@
 {% extends "users/user_list.html" %}
 
+{% block title %}
+{{ user_detail.get_full_name|default:user_detail.username }} | {{ block.super }}
+{% endblock %}
+
 {% block page_title %}users-user-detail{% endblock %}
 
 {% block breadcrumbs %}
@@ -7,11 +11,42 @@
 <li id="bc-users-user-detail"><a href="{% url users.views.user_detail user_detail.username %}">{{ user_detail.get_full_name|default:user_detail.username }}</a></li>
 {% endblock %}
 
+{% load gravatar %}
+
 {% block content %}
 <div class="section">
 	<div class="inner">
 		<h2>{{ user_detail.get_full_name|default:user_detail.username }}</h2>
-		<p>{{ user_detail.get_full_name }}</p>
+		<div class="container clearfix">
+			<div class="two-thirds alpha">
+				<p>{{ user_detail.get_full_name|default:'Name not found.' }}</p>
+			</div>
+			<div class="third omega">
+				<div class="rounded-wrapper">
+					<h3>Gravatar <span class="mini-link">[<a href="http://gravatar.com/">Get Gravatar →</a>]</span></h3>
+					<div class="image-wrapper">
+						{% gravatar user_detail %}
+					</div>
+					<h3>Details</h3>
+					<table>
+						<tbody>
+							<tr>
+								<td>Joined</td>
+								<td>{{ user_detail.date_joined|date }} </td>
+							</tr>
+							<tr>
+								<td>Active User</td>
+								<td>{{ user_detail.is_active }} </td>
+							</tr>
+							<tr>
+								<td>Staff</td>
+								<td>{{ user_detail.is_staff }} </td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 {% endblock %}

@@ -105,7 +105,7 @@ class BookProfile(UUIDSyncable):
 		return Tag.objects.get_for_object(self) 
 	
 	def __unicode__(self):
-		return self.book_instance.title
+		return self.book_instance.__unicode__()
 	
 	@permalink
 	def get_absolute_url(self):
