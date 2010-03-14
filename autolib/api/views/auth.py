@@ -31,8 +31,8 @@ class AuthDestroyToken(APIAuthView):
 	
 	def process(self, request):
 		try:
-			if token_id is not None:
-				session = Session.objects.get(session_key=token_id)
+			if self.token_id is not None:
+				session = Session.objects.get(session_key=self.token_id)
 			else:
 				session = Session.objects.get(session_key=request.session._get_session_key())
 			session.delete()
