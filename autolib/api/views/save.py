@@ -47,9 +47,7 @@ class SaveCollection(APIAuthView):
 					
 					collection = Collection(**kwargs)
 					collection.save() # Errors caught by APIAuthView super class
-					
-					print collection
-					
+										
 				except Collection.DoesNotExist:
 					self.data['meta']['error'] = 'Parent collection with pk ' + str(parent_pk) + ' does not exist for this User'
 					return
@@ -58,7 +56,7 @@ class SaveCollection(APIAuthView):
 				return
 		
 		try:
-			url = colllection.get_absolute_url()
+			url = collection.get_absolute_url()
 		except NoReverseMatch:
 			url = None
 		
