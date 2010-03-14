@@ -4,12 +4,20 @@ from libraries.models import Collection
 from api.views import APIAuthView
 from django.db.models import Q
 
+from django.core.urlresolvers import NoReverseMatch
+
 class DeleteCollection(APIAuthView):
 	def process(self, request):
 		collection_pk = request.POST.get('pk', None)
 		if collection_pk is not None:
 			try:
 				c = Collection.objects.get(Q(pk=collection_pk) & (Q(owner=self.user) | Q(parent__owner=self.user) | Q(parent__parent__owner=self.user)))
+				
+				try:
+					url = c.get_absolute_url()
+				except NoReverseMatch:
+					url = None
+				
 				if not c.children.all():
 					if not c.books.all():
 						self.data['collection'] = {
@@ -17,7 +25,7 @@ class DeleteCollection(APIAuthView):
 							'name': c.name,
 							'parent': c.parent.pk if c.parent is not None else None,
 							'description': c.description,
-							'url': c.get_absolute_url() if c.collection_type != 'series' else None,
+							'url': url,
 							'slug': c.slug,
 							'added': str(c.added),
 							'last_modified': str(c.last_modified),
@@ -39,6 +47,12 @@ class DeleteBookProfile(APIAuthView):
 		if profile_pk is not None:
 			try:
 				profile = BookProfile.objects.get(Q(pk=profile_pk) & (Q(collection__owner=self.user) | Q(collection__parent__owner=self.user) | Q(collection__parent__parent__owner=self.user)))
+				
+				try:
+					url = profile.get_absolute_url()
+				except NoReverseMatch:
+					url = None
+				
 				self.data['profile'] = {
 					'pk': profile.pk,
 					'isbn10': profile.isbn10,
@@ -57,7 +71,7 @@ class DeleteBookProfile(APIAuthView):
 					'added': str(profile.added),
 					'last_modified': str(profile.last_modified),
 					'edition_group': profile.edition_group.pk,
-					'url': profile.get_absolute_url(),
+					'url': url,
 					'thumbnail_large': profile.thumbnail_large,
 					'thumbnail_small': profile.thumbnail_small,
 				}

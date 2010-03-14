@@ -6,6 +6,8 @@ from libraries.models import Collection
 from volumes.models import BookProfile, Book
 from django.db.models import Q
 
+from django.core.urlresolvers import NoReverseMatch
+
 class SaveCollection(APIAuthView):
 	def process(self, request):
 		pk = request.POST.get('pk', None)
@@ -54,14 +56,18 @@ class SaveCollection(APIAuthView):
 			else:
 				self.data['meta']['error'] = 'collection_type, parent_pk or name not found (all required) in the POST data'
 				return
-					
+		
+		try:
+			url = colllection.get_absolute_url()
+		except NoReverseMatch:
+			url = None
 		
 		self.data['collection'] = {
 			'pk': collection.pk,
 			'name': collection.name,
 			'slug': collection.slug,
 			'description': collection.description,
-			'url': collection.get_absolute_url() if collection.collection_type != 'series' else None,
+			'url': url,
 			'added': str(collection.added),
 			'last_modified': str(collection.last_modified),
 		}
@@ -94,13 +100,19 @@ class SaveProfile(APIAuthView):
 				profile.save()
 								
 				# Return data about the profile
+				
+				try:
+					url = profile.get_absolute_url()
+				except NoReverseMatch:
+					url = None
+				
 				self.data['profile'] = {
 					'pk': profile.pk,
 					'book_instance': profile.book_instance.pk,
 					'collection': profile.collection.pk,
 					'added': str(profile.added),
 					'last_modified': str(profile.last_modified),
-					'url': profile.get_absolute_url(),
+					'url': url,
 				}
 				
 				# The request has been completed successfully
@@ -133,6 +145,11 @@ class SaveProfile(APIAuthView):
 						profile = BookProfile(book_instance=book, collection=collection)
 						profile.save()
 						
+						try:
+							url = profile.get_absolute_url()
+						except NoReverseMatch:
+							url = None
+						
 						# Return data regarding the profile
 						self.data['profile'] = {
 							'pk': profile.pk,
@@ -140,7 +157,7 @@ class SaveProfile(APIAuthView):
 							'collection': profile.collection.pk,
 							'added': str(profile.added),
 							'last_modified': str(profile.last_modified),
-							'url': profile.get_absolute_url(),
+							'url': url,
 						}
 						
 						# The request has been successful

@@ -130,49 +130,72 @@ Your Libraries | {{ block.super }}
 		        message: 'Adding Library' 
 		    });
 			
-			$.post('{% url api_save_collection %}', formData, function(data) {
-				if (data.meta.success == true) {
-					var name = data.collection.name;
-					var truncateLength = 40;
-					
-					if (name.length > truncateLength) {
-						name = name.substring(0, truncateLength) + '...';
+			$.ajax({
+				url: '{% url api_save_collection %}', 
+				data: formData,
+				type: 'POST',
+				dataType: 'json',
+				success: function(data) {
+					if (data.meta.success == true) {
+						var name = data.collection.name;
+						var truncateLength = 40;
+						
+						if (name.length > truncateLength) {
+							name = name.substring(0, truncateLength) + '...';
+						}
+						
+						String.prototype.capitalise = function() {
+							return this.replace( /(^|\s)([a-z])/g , function(m,p1,p2){ return p1+p2.toUpperCase(); } );
+						};
+						
+						name = name.capitalise();
+						
+						var description = data.collection.description;
+						var url = data.collection.url;
+						var pk = data.collection.pk;
+						
+						var listItem = '<li id="' + pk + '" style="display: none">' +
+						'<img src="/media/images/events/home.png" width="16" height="16" title="Library" />' +
+						'<a class="item-title img-title" href="' + url + '">' + name + ' →</a>' +
+						'<p class="item-subtitle">0 bookshelves, 0 unsorted books</p>' +
+						'<button class="delete">delete</button>' +
+						'</li>';
+						
+						$("ul#library-list").append(listItem);
+						$("li#" + pk).slideDown('200');
+						
+						$("#" + pk).hover(library_hover_over, library_hover_out);
+						$("#" + pk + " button.delete").click(library_click_delete);
+						
+						$.growlUI('Library Added', 'Your new library was added successfully');
+						
+						form.unblock();
+						
+					} else {
+						form.unblock();
+				        
+				        $('#accept-overlay').find('h1.target').text('Error Adding Library!');
+				        $('#accept-overlay').find('p.target').text(data.meta.error);
+						$.blockUI({ 
+							fadeIn:  100,
+							fadeOut: 100,
+							css: { 
+								border: 'none',
+								opacity: 1,
+								'-webkit-border-radius': '10px',
+								'-moz-border-radius': '10px',
+								backgroundColor: 'none'
+					        },
+				        	message: $('#accept-overlay')
+				        });
 					}
-					
-					String.prototype.capitalise = function() {
-						return this.replace( /(^|\s)([a-z])/g , function(m,p1,p2){ return p1+p2.toUpperCase(); } );
-					};
-					
-					name = name.capitalise();
-					
-					var description = data.collection.description;
-					var url = data.collection.url;
-					var pk = data.collection.pk;
-					
-					var listItem = '<li id="' + pk + '" style="display: none">' +
-					'<img src="/media/images/events/home.png" width="16" height="16" title="Library" />' +
-					'<a class="item-title img-title" href="' + url + '">' + name + ' →</a>' +
-					'<p class="item-subtitle">0 bookshelves, 0 unsorted books</p>' +
-					'<button class="delete">delete</button>' +
-					'</li>';
-					
-					$("ul#library-list").append(listItem);
-					$("li#" + pk).slideDown('200');
-					
-					$("#" + pk).hover(library_hover_over, library_hover_out);
-					$("#" + pk + " button.delete").click(library_click_delete);
-					
-					$.growlUI('Library Added', 'Your new library was added successfully');
-					
-					form.unblock();
-					
-				} else if(data.meta.success == false) {
-					form.unblock();
-			        
-			        $('#overlay-ok').find('p.target').text(data.meta.error);
+				},
+				error: function() {
+					$('#accept-overlay').find('h1.target').text('Something Went Wrong!');
+					$('#accept-overlay').find('p.target').text('This is completely our fault, something has gone wrong on our end. We are probably trying to fix it, so try again in a few seconds.');
 					$.blockUI({ 
-						fadeIn:  100,
-						fadeOut: 100,
+						fadeIn:  200,
+						fadeOut: 200,
 						css: { 
 							border: 'none',
 							opacity: 1,
@@ -180,10 +203,10 @@ Your Libraries | {{ block.super }}
 							'-moz-border-radius': '10px',
 							backgroundColor: 'none'
 				        },
-			        	message: $('#overlay-delete-error')
+			        	message: $('#accept-overlay')
 			        });
 				}
-			}, "json");
+			});
 			
 			form.find(':input[name="name"]').val('');
 			

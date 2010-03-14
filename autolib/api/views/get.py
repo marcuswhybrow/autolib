@@ -7,6 +7,8 @@ from api.views import APIView, APIAuthView
 
 from django.db.models import Q
 
+from django.core.urlresolvers import NoReverseMatch
+
 class GetCollectionList(APIAuthView):
 	def process(self, request):
 		parent_pk = request.POST.get('parent_pk', None) or request.POST.get('pk', None)
@@ -14,14 +16,21 @@ class GetCollectionList(APIAuthView):
 			try:
 				collection = Collection.objects.get(Q(pk=parent_pk)& (Q(owner=self.user) | Q(parent__owner=self.user) | Q(parent__parent__owner=self.user)))
 				self.data['collections'] = []
+				
 				for c in collection.children.all():
+					
+					try:
+						url = c.get_absolute_url()
+					except NoReverseMatch:
+						url = None
+					
 					self.data['collections'].append({
 						'pk': c.pk,
 						'name': c.name,
 						'parent': c.parent.pk if c.parent is not None else None,
 						'slug': c.slug,
 						'description': c.description,
-						'url': c.get_absolute_url() if c.collection_type != 'series' else None,
+						'url': url,
 						'added': str(c.added),
 						'last_modified': str(c.last_modified),
 					})
@@ -31,6 +40,12 @@ class GetCollectionList(APIAuthView):
 		else:
 			self.data['collections'] = []
 			for c in self.user.libraries.all():
+				
+				try:
+					url = c.get_absolute_url()
+				except NoReverseMatch:
+					url = None
+				
 				self.data['collections'].append({
 					'pk': c.pk,
 					'name': c.name,
@@ -50,12 +65,18 @@ class GetCollectionDetail(APIAuthView):
 		if collection_pk is not None:
 			try:
 				c = Collection.objects.get(Q(pk=collection_pk)& (Q(owner=self.user) | Q(parent__owner=self.user) | Q(parent__parent__owner=self.user))) # TODO use Q again
+				
+				try:
+					url = c.get_absolute_url()
+				except NoReverseMatch:
+					url = None
+				
 				self.data['collection'] = {
 					'pk': c.pk,
 					'name': c.name,
 					'parent': c.parent.pk if c.parent is not None else None,
 					'description': c.description,
-					'url': c.get_absolute_url() if c.collection_type != 'series' else None,
+					'url': url,
 					'slug': c.slug,
 					'added': str(c.added),
 					'last_modified': str(c.last_modified),
@@ -73,13 +94,21 @@ class GetBookProfileList(APIAuthView):
 		if collection_id is not None:
 			try:
 				c = Collection.objects.get(Q(pk=collection_id)& (Q(owner=self.user) | Q(parent__owner=self.user) | Q(parent__parent__owner=self.user)))
+				
 				self.data['profiles'] = []
 				for p in c.books.all():
+					
+					try:
+						url = p.get_absolute_url()
+					except NoReverseMatch:
+						url = None
+					
 					self.data['profiles'].append({
 						'collection': p.collection.pk,
-						'book': p.book_instance.pk,
+						'book_instance': p.book_instance.pk,
 						'added': str(p.added),
 						'last_modified': str(p.last_modified),
+						'url': url,
 					})
 				self.data['meta']['success'] = True
 						
@@ -96,6 +125,12 @@ class GetBookProfileDetail(APIAuthView):
 		if profile_pk is not None:
 			try:
 				p = BookProfile.objects.get(Q(pk=profile_pk)& (Q(collection__owner=self.user) | Q(collection__parent__owner=self.user) | Q(collection__parent__parent__owner=self.user))) # TODO use Q again
+				
+				try:
+					url = p.get_absolute_url()
+				except NoReverseMatch:
+					url = None
+				
 				self.data['profile'] = {
 					'pk': p.book_instance.pk,
 					'isbn': p.book_instance.isbn,
@@ -107,7 +142,7 @@ class GetBookProfileDetail(APIAuthView):
 					'collection': p.collection.pk,
 					'added': str(p.added),
 					'last_modified': str(p.last_modified),
-					'url': p.get_absolute_url(),
+					'url': url,
 				}
 				self.data['meta']['success'] = True
 						
@@ -179,6 +214,12 @@ class GetBookDetail(APIView):
 				return
 		
 		if book is not None:
+			
+			try:
+				url = book.get_absolute_url()
+			except NoReverseMatch:
+				url = None
+			
 			self.data['book'] = {
 				'pk': book.pk,
 				'isbn10': book.isbn10,
@@ -197,7 +238,7 @@ class GetBookDetail(APIView):
 				'added': str(book.added),
 				'last_modified': str(book.last_modified),
 				'edition_group': book.edition_group.pk,
-				'url': book.get_absolute_url(),
+				'url': url,
 				'thumbnail_large': book.thumbnail_large,
 				'thumbnail_small': book.thumbnail_small,
 			}

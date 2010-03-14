@@ -74,6 +74,8 @@ class Collection(UUIDSyncable):
 		'''
 		
 		#assert re.match('^[a-zA-Z0-9\ \-\_]*$', self.name), 'The collection name can only contain the characters: a-z, A-Z, 0-9, spaces, underscores and dashes.'
+		if not len(self.name) > 2:
+			raise ValidationError('The title must be at least 3 characters long')
 		
 		self.slug = slugify(self.name)
 		
