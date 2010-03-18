@@ -88,7 +88,6 @@ INSTALLED_APPS = (
     'googlehooks',
     'registration',
     'tagging',
-    'voting',
     'gravatar',
     #'django_openidconsumer',
     #'django_openid_auth',

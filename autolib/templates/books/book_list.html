@@ -4,7 +4,6 @@
 Books Statistics | {{ block.super }}
 {% endblock %}
 
-{% load voting_tags %}
 {% votes_by_user user on books as vote_dict %}
 {% scores_for_objects books as score_dict %}
 
