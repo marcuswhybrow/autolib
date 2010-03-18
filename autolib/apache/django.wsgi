@@ -1,7 +1,9 @@
 import os, sys
 import django.core.handlers.wsgi
 
-sys.path.append(r'/home/marcus/autolib/')
+PATH = os.path.abspath(os.path.dirname(__file__))
+
+sys.path.append(os.path.join(PATH, '..'))
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 

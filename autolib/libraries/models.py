@@ -73,11 +73,11 @@ class Collection(UUIDSyncable):
 		A Series must: not have an owner but must have a Bookshelf for a parent; not have the same name as a sibling series
 		'''
 		
-		#assert re.match('^[a-zA-Z0-9\ \-\_]*$', self.name), 'The collection name can only contain the characters: a-z, A-Z, 0-9, spaces, underscores and dashes.'
-		if not len(self.name) > 2:
-			raise ValidationError('The title must be at least 3 characters long')
-		
 		self.slug = slugify(self.name)
+		
+		#assert re.match('^[a-zA-Z0-9\ \-\_]*$', self.name), 'The collection name can only contain the characters: a-z, A-Z, 0-9, spaces, underscores and dashes.'
+		if not len(self.slug) > 2:
+			raise ValidationError('The title must be at least 3 characters long')
 		
 		if self.collection_type == 'library':
 			assert self.parent is None and self.owner is not None, 'A Library can not have a parent, and must have an owner'
