@@ -80,6 +80,8 @@ class GetCollectionDetail(APIAuthView):
 					'slug': c.slug,
 					'added': str(c.added),
 					'last_modified': str(c.last_modified),
+					'children': c.children.count(),
+					'books': c.books.count(),
 				}
 				self.data['meta']['success'] = True
 			except Collection.DoesNotExist:
@@ -244,8 +246,26 @@ class GetBookDetail(APIView):
 			}
 			self.data['meta']['success'] = True
 
+class GetUserDetail(APIAuthView):
+	
+	
+	def process(self, request):
+		
+		self.data['user'] = {
+			'first_name': self.user.first_name,
+			'last_name': self.user.last_name,
+			'email': self.user.email,
+			'is_staff': self.user.is_staff,
+			'username': self.user.username,
+			'updates': self.user.updates.count(),
+			'libraries': self.user.libraries.count(),
+		}
+		
+		self.data['meta']['success'] = True
+
 get_collection_list = GetCollectionList()
 get_collection_detail = GetCollectionDetail()
 get_profile_list = GetBookProfileList()
 get_profile_detail = GetBookProfileDetail()
 get_book_detail = GetBookDetail()
+get_user_detail = GetUserDetail()

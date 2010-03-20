@@ -105,15 +105,19 @@ class BookDetail():
 			publisher = entry.find('dc:publisher')
 			self.publisher = unescape(publisher.string) if publisher is not None else None
 			
-			self.thumbnail_small = self.thumbnail_large = None
+			self.thumbnail_base = None
+			self.thumbnail_huge = None
+			self.thumbnail_small = None
+			self.thumbnail_large = None
 			
 			# Thubnail
 			for link in entry.findAll('link'):
 				if link['rel'] == self.THUMBNAIL_REL:
 					url = httplib.urlsplit(unescape(link['href']))
-					thumbnail = url.scheme + '://' + url.netloc + url.path + '?id=' + self.googleid + '&printsec=frontcover&img=1&zoom='
-					self.thumbnail_large = thumbnail + '1'
-					self.thumbnail_small = thumbnail + '5'
+					self.thumbnail_base = url.scheme + '://' + url.netloc + url.path + '?id=' + self.googleid + '&printsec=frontcover&img=1&zoom='
+					self.thumbnail_large = self.thumbnail_base + '1'
+					self.thumbnail_small = self.thumbnail_base + '5'
+					self.thumbnail_huge = self.thumbnail_base + '0'
 			
 			self.subjects = []
 			for subject in entry.findAll('dc:subject'):
@@ -143,6 +147,8 @@ class BookDetail():
 				'depth': self.depth,
 				'thumbnail_large': self.thumbnail_large,
 				'thumbnail_small': self.thumbnail_small,
+				'thumbnail_base': self.thumbnail_base,
+				'thumbnail_huge': self.thumbnail_huge,
 			}
 		else:
 			return None

@@ -80,9 +80,9 @@ class UUIDSyncable(models.Model):
 	# UUIDSyncable objects must have a UUID as their primary key
 	uuid = models.CharField(primary_key=True, max_length=64, editable=False, blank=True)
 	
-	@property
-	def updates(self):
-		return Update.all_objects.filter(object_pk=self.pk)
+#	@property
+#	def updates(self):
+#		return Update.objects.filter(object_pk=self.pk)
 	
 	# Flag to specify that the object is deleted (instead of actual deletion)
 	is_deleted = models.BooleanField(default=False, editable=False)

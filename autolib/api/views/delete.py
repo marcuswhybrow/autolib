@@ -18,24 +18,19 @@ class DeleteCollection(APIAuthView):
 				except NoReverseMatch:
 					url = None
 				
-				if not c.children.all():
-					if not c.books.all():
-						self.data['collection'] = {
-							'pk': c.pk,
-							'name': c.name,
-							'parent': c.parent.pk if c.parent is not None else None,
-							'description': c.description,
-							'url': url,
-							'slug': c.slug,
-							'added': str(c.added),
-							'last_modified': str(c.last_modified),
-						}
-						c.delete()
-						self.data['meta']['success'] = True
-					else:
-						self.data['meta']['error'] = "This Collection cannot be deleted as it contains books"
-				else:
-					self.data['meta']['error'] = "This Collection cannot be deleted as it contains child Collections"
+				self.data['collection'] = {
+					'pk': c.pk,
+					'name': c.name,
+					'parent': c.parent.pk if c.parent is not None else None,
+					'description': c.description,
+					'url': url,
+					'slug': c.slug,
+					'added': str(c.added),
+					'last_modified': str(c.last_modified),
+				}
+				c.delete()
+				self.data['meta']['success'] = True
+				
 			except Collection.DoesNotExist:
 				self.data['meta']['error'] = "A Collection with that pk does not exist for this User"
 		else:

@@ -18,6 +18,7 @@
 <script type="text/javascript" src="/media/js/jquery-ui-1.8rc1.custom.min.js"></script>
 <script type="text/javascript" src="/media/js/jquery.blockUI.js"></script>
 <script type="text/javascript" src="/media/js/jquery.jeditable.mini.js"></script>
+<script type="text/javascript" src="/media/js/utils.js"></script>
 <script type="text/javascript">
 	$(function() {
 		
@@ -26,6 +27,25 @@
 		$('#accept-overlay input.overlay-ok').click(function() {
 			 $.unblockUI();
 			 return false;
+		});
+		
+		$('#delete-overlay input.overlay-ok').click(function() {
+			
+			var pk = $(this).attr('id');
+			
+			connection('{% url api_delete_collection %}', { pk: pk }, function(data) {
+				$('#' + pk).slideUp('200', function() {
+					$(this).remove();
+				});
+			});
+			
+			$.unblockUI();
+			return false;
+		});
+		
+		$('#delete-overlay input.overlay-cancel').click(function() {
+			$.unblockUI();
+			return false;
 		});
 		
 		// Editing Details
@@ -53,61 +73,18 @@
 		        },
 		        message: 'Updating' 
 		    });
-			
-			$.ajax({
-				url: '{% url api_save_collection %}',
-				data: postData,
-				async: false,
-				dataType: 'json',
-				type: 'POST',
-				success: function(data) {
-					if (data.meta.success == true) {
-						if (detail.attr('id') == 'name') {
-							result = data.collection.name;
-						} else if (detail.attr('id') == 'description') {
-							result = data.collection.description;
-						}
-						
-					} else if(data.meta.success == false) {
-						$('#accept-overlay').find('h1.target').text('Error Updating The Library');
-						$('#accept-overlay').find('p.target').text(data.meta.error);
-						$.blockUI({ 
-							fadeIn:  200,
-							fadeOut: 200,
-							css: { 
-								border: 'none',
-								opacity: 1,
-								'-webkit-border-radius': '10px',
-								'-moz-border-radius': '10px',
-								backgroundColor: 'none'
-					        },
-				        	message: $('#accept-overlay')
-				        });
-					}
-				},
-				error: function() {
-					$('#accept-overlay').find('h1.target').text('Something Went Wrong!');
-					$('#accept-overlay').find('p.target').text('This is completely our fault, something has gone wrong on our end. We are probably trying to fix it, so try again in a few seconds.');
-					$.blockUI({ 
-						fadeIn:  200,
-						fadeOut: 200,
-						css: { 
-							border: 'none',
-							opacity: 1,
-							'-webkit-border-radius': '10px',
-							'-moz-border-radius': '10px',
-							backgroundColor: 'none'
-				        },
-			        	message: $('#accept-overlay')
-			        });
+		    
+		    connection('{% url api_save_collection %}', postData, function(data) {
+		    	if (detail.attr('id') == 'name') {
+					result = data.collection.name;
+				} else if (detail.attr('id') == 'description') {
+					result = data.collection.description;
 				}
-			});
-			
-			detail.unblock();
-			
+		    });
+		    
+		    detail.unblock();
 			return result;
-		},
-		{ 
+		}, { 
 			cssclass: 'editing',
 			submit: 'save',
 			cancel: 'cancel',
@@ -128,96 +105,51 @@
 				css: { 
 		            border: 'none',
 		            padding: '15px', 
-		            backgroundColor: '#000', 
+		            backgroundColor: '#ff', 
 		            '-webkit-border-radius': '10px', 
 		            '-moz-border-radius': '10px', 
 		            opacity: .5, 
-		            color: '#fff' 
-		        },
-		        message: 'Adding Bookshelf' 
+		            color: '#000' 
+		        }
+		    });
+		    
+		    connection('{% url api_save_collection %}', formData, function(data) {
+				var name = data.collection.name;
+				
+				var truncateLength = 40;
+			
+				if (name.length > truncateLength) {
+					name = name.substring(0, truncateLength) + '...';
+				}
+				
+				String.prototype.capitalise = function() {
+					return this.replace( /(^|\s)([a-z])/g , function(m,p1,p2){ return p1+p2.toUpperCase(); } );
+				};
+				
+				name = name.capitalise();
+				
+				var description = data.collection.description;
+				var url = data.collection.url;
+				var pk = data.collection.pk;
+				
+				var listItem = '<li id="' + pk + '" style="display: none">' +
+				'<img src="/media/images/events/drawer.png" width="16" height="16" title="Bookshelf" />' +
+				'<a class="item-title img-title" href="' + url + '">' + name + ' →</a>' +
+				'<p class="item-subtitle">0 Books</p>' +
+				'<button class="delete">delete</button>' +
+				'</li>';
+				
+				$("ul#bookshelf-list").append(listItem);
+				$("li#" + pk).slideDown('200');
+				
+				$("#" + pk).hover(bookshelf_hover_over, bookshelf_hover_out);
+				$("#" + pk + " button.delete").click(bookshelf_click_delete);
+				
+		    }, function() {
+		    	form.unblock();
 		    });
 			
-			$.ajax({
-				url: '{% url api_save_collection %}', 
-				data: formData, 
-				type: 'POST',
-				dataType: 'json',
-				success: function(data) {
-					if (data.meta.success == true) {
-						var name = data.collection.name;
-						
-						var truncateLength = 40;
-					
-						if (name.length > truncateLength) {
-							name = name.substring(0, truncateLength) + '...';
-						}
-						
-						String.prototype.capitalise = function() {
-							return this.replace( /(^|\s)([a-z])/g , function(m,p1,p2){ return p1+p2.toUpperCase(); } );
-						};
-						
-						name = name.capitalise();
-						
-						var description = data.collection.description;
-						var url = data.collection.url;
-						var pk = data.collection.pk;
-						
-						var listItem = '<li id="' + pk + '" style="display: none">' +
-						'<img src="/media/images/events/drawer.png" width="16" height="16" title="Bookshelf" />' +
-						'<a class="item-title img-title" href="' + url + '">' + name + ' →</a>' +
-						'<p class="item-subtitle">0 Books</p>' +
-						'<button class="delete">delete</button>' +
-						'</li>';
-						
-						$("ul#bookshelf-list").append(listItem);
-						$("li#" + pk).slideDown('200');
-						
-						$("#" + pk).hover(bookshelf_hover_over, bookshelf_hover_out);
-						$("#" + pk + " button.delete").click(bookshelf_click_delete);
-						
-						$.growlUI('Bookshelf Added', 'Your bookshelf was added successfully');
-											
-						form.unblock();
-						
-					} else  {
-						form.unblock();
-				        
-				        $('#accept-overlay').find('h1.target').text('Error Adding Bookshelf');
-						$('#accept-overlay').find('p.target').text(data.meta.error);
-						$.blockUI({ 
-							fadeIn:  200,
-							fadeOut: 200,
-							css: { 
-								border: 'none',
-								opacity: 1,
-								'-webkit-border-radius': '10px',
-								'-moz-border-radius': '10px',
-								backgroundColor: 'none'
-					        },
-				        	message: $('#accept-overlay')
-				        });
-					}
-				},
-				error: function() {
-					$('#accept-overlay').find('h1.target').text('Something Went Wrong!');
-					$('#accept-overlay').find('p.target').text('This is completely our fault, something has gone wrong on our end. We are probably trying to fix it, so try again in a few seconds.');
-					$.blockUI({ 
-						fadeIn:  200,
-						fadeOut: 200,
-						css: { 
-							border: 'none',
-							opacity: 1,
-							'-webkit-border-radius': '10px',
-							'-moz-border-radius': '10px',
-							backgroundColor: 'none'
-				        },
-			        	message: $('#accept-overlay')
-			        });
-				}
-			});
-			
 			form.find(':input[name="name"]').val('');
-			
 			return false;
 		});
 		
@@ -245,54 +177,21 @@
 				really.css('display', 'block');
 				
 				really.click(function() {
-					$.ajax({
-						url: '{% url api_delete_collection %}', 
-						data: { pk: bookshelf_pk },
-						dataType: 'json',
-						type: 'POST',
-						success: function(data) {
-							if (data.meta.success == true) {
+					
+					connection('{% url api_get_collection_detail %}', { pk: bookshelf_pk }, function(data) {
+						if (data.collection.children == 0 && data.collection.books == 0) {
+							connection('{% url api_delete_collection %}', { pk: bookshelf_pk }, function(data) {
 								bookshelf_row.slideUp('200', function() {
 									$(this).remove();
 								});
-								$.growlUI('Bookshelf Deleted', 'Your bookshelf was deleted successfully');
-							} else {
-								
-								$('#accept-overlay').find('h1.target').text('Error Deleting Bookshelf');
-								$('#accept-overlay').find('p.target').text(data.meta.error);
-								$.blockUI({ 
-									fadeIn:  200,
-									fadeOut: 200,
-									css: { 
-										border: 'none',
-										opacity: 1,
-										'-webkit-border-radius': '10px',
-										'-moz-border-radius': '10px',
-										backgroundColor: 'none'
-							        },
-						        	message: $('#accept-overlay')
-						        });
-							}
-						},
-						error: function() {
-							$('#accept-overlay').find('h1.target').text('Something Went Wrong!');
-							$('#accept-overlay').find('p.target').text('This is completely our fault, something has gone wrong on our end. We are probably trying to fix it, so try again in a few seconds.');
-							$.blockUI({ 
-								fadeIn:  200,
-								fadeOut: 200,
-								css: { 
-									border: 'none',
-									opacity: 1,
-									'-webkit-border-radius': '10px',
-									'-moz-border-radius': '10px',
-									backgroundColor: 'none'
-						        },
-					        	message: $('#accept-overlay')
-					        });
+							});
+						} else {
+							// The collection cannot be deleted without user intervention
+							$('#delete-overlay input.overlay-ok').attr('id', data.collection.pk);
+							overlay($('#delete-overlay'));
 						}
 					});
 				});
-				
 			}
 		}
 		
@@ -346,50 +245,11 @@
 				var profile_pk = event.originalTarget.id;
 				var collection_pk = event.target.id;
 				
-				$.ajax({
-					url: '{% url api_save_profile %}',
-					data: { pk: profile_pk, collection_pk: collection_pk },
-					dataType: 'json',
-					type: 'POST',
-					success: function(data) {
-						if (data.meta.success == true) {
-							$('#' + profile_pk).slideUp('200');
-							
-						} else {
-							$('#accept-overlay').find('h1.target').text('Error Moving Book');
-							$('#accept-overlay').find('p.target').text(data.meta.error);
-							$.blockUI({ 
-								fadeIn:  200,
-								fadeOut: 200,
-								css: { 
-									border: 'none',
-									opacity: 1,
-									'-webkit-border-radius': '10px',
-									'-moz-border-radius': '10px',
-									backgroundColor: 'none'
-						        },
-					        	message: $('#accept-overlay')
-					        });
-						}
-					},
-					error: function() {
-						$('#accept-overlay').find('h1.target').text('Something Went Wrong!');
-						$('#accept-overlay').find('p.target').text('This is completely our fault, something has gone wrong on our end. We are probably trying to fix it, so try again in a few seconds.');
-						$.blockUI({ 
-							fadeIn:  200,
-							fadeOut: 200,
-							css: { 
-								border: 'none',
-								opacity: 1,
-								'-webkit-border-radius': '10px',
-								'-moz-border-radius': '10px',
-								backgroundColor: 'none'
-					        },
-				        	message: $('#accept-overlay')
-				        });
-					}
+				connection('{% url api_save_profile %}', { pk: profile_pk, collection_pk: collection_pk }, function() {
+					$('#' + profile_pk).slideUp('200', function() {
+						$(this).remove();
+					});
 				});
-				
 			}
 		});
 	});
@@ -458,11 +318,13 @@
 					<p>No two bookshelves in the same library may have the same name.</p>
 				</div>
 				<div style="display:none;" id="unsorted-bin-box" class="third omega">
-					<ul class="item-list img-items">
-						{% for book in library.books.all %}
-							<li id="{{ book.pk }}" class="draggable" ><img src="{{ book.book_instance.thumbnail_small }}" /><a href="{{ book.get_absolute_url }}" class="item-title">{{ book.title }}</a></li>
-						{% endfor %}
-					</ul>
+					<div class="rounded-wrapper">
+						<ul class="item-list img-items">
+							{% for book in library.books.all %}
+								<li id="{{ book.pk }}" class="draggable" ><img src="{{ book.book_instance.thumbnail_small }}" /><a href="{{ book.get_absolute_url }}" class="item-title">{{ book.title }}</a></li>
+							{% endfor %}
+						</ul>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -483,6 +345,19 @@
 		</div>
 		<div class="overlay-footer clearfix">
 			<input type="button" class="overlay-ok overlay-button" value="Alright" /> 
+		</div>
+	</div>
+	
+	<div id="delete-overlay" class="overlay">
+		<div class="overlay-header">
+			<h1>This Library Is Not Empty</h1>
+		</div>
+		<div class="overlay-body">
+			<p class="error target">If you delete this bookshelf, all its books will be deleted forever. This cannot be undone.</p>
+		</div>
+		<div class="overlay-footer clearfix">
+			<input style="float:left" type="button" class="overlay-cancel overlay-button" value="← Cancel" />
+			<input type="button" class="overlay-ok overlay-button danger" value="OK, delete everything!" />
 		</div>
 	</div>
 {% endblock %}

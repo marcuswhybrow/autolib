@@ -15,6 +15,9 @@
 <script type="text/javascript" src="/media/js/jquery.page-realtime-twitter-reactions.js"></script>
 <script type="text/javascript">
 	$(function() {
+		
+		$("a.zoom").fancyZoom({directory: '/media/images/fancyzoom', scaleImg: true, closeOnClick: true});
+		
 		$("#realtime-twitter-updates").getPageRealtimeReactions({
 			query: "{{ book.author }}",
 			numTweets: 5,
@@ -50,7 +53,9 @@
 					<div class="rounded-wrapper">
 						<h3>Frontcover</h3>
 						<div class="image-wrapper">
-							<img style="margin:0 auto; display:block:" src="{{ book.book_instance.thumbnail_large }}" />
+							<a href="#large-cover-image" class="zoom img-link">
+								<img style="margin:0 auto; display:block:" src="{{ book.book_instance.thumbnail_large }}" />
+							</a>
 						</div>
 						<h3>Editions Of This Book</h3>
 						<ul class="item-list double-title">
@@ -119,7 +124,7 @@
 									<td>{{ book.added|date|default:'unknown' }}</td>
 								</tr>
 								<tr>
-									<td colspan="2" style="font-size:0.9em; text-align:center;">{{ book.pk }}</td>
+									<td colspan="2" style="font-size:0.8em; text-align:center;">{{ book.pk }}</td>
 								</tr>
 							</tbody>
 						</table>
@@ -131,5 +136,9 @@
 			<p>You dont have that book in this library.</p>
 		{% endif %}
 	</div>
+</div>
+
+<div id="large-cover-image">
+	<img src="{{ book.book_instance.thumbnail_huge }}" alt="Huge cover image" />
 </div>
 {% endblock %}

@@ -15,13 +15,15 @@ syncpatterns = patterns('api.views.sync',
 
 getpatterns = patterns('api.views.get',
 
-	url(r'^collection/?$', 'get_collection_list', name='api_get_collection_list'),
-	url(r'^collection_detail/?$', 'get_collection_detail', name='api_get_collection_detail'),
+	url(r'^collections/?$', 'get_collection_list', name='api_get_collection_list'),
+	url(r'^collection/?$', 'get_collection_detail', name='api_get_collection_detail'),
 	
 	url(r'^profiles/?$', 'get_profile_list', name='api_get_profile_list'),
-	url(r'^profile_detail/?$', 'get_profile_detail', name='api_get_profile_detail'),
+	url(r'^profile/?$', 'get_profile_detail', name='api_get_profile_detail'),
 	
 	url(r'^book/?', 'get_book_detail', name='api_get_book_detail'),
+	
+	url(r'^user/?', 'get_user_detail', name='api_get_user_detail'),
 )
 
 savepatterns = patterns('api.views.save',

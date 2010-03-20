@@ -31,13 +31,13 @@ class SyncUpdate(APIAuthView):
 			if sync_type == self.INITIAL_SYNC_TYPE:
 				# If its and initial sync
 				# Get all updates for the user
-				updates = Update.objects.filter(user=self.user).order_by('-time')
+				updates = list(Update.objects.filter(user=self.user).order_by('-time'))
 				
 			elif sync_type == self.INCREMENTAL_SYNC_TYPE:
 				# If its an incremental sync
 				
 				# Get the incremental updates
-				updates = self._incremental_update(request)
+				updates = list(self._incremental_update(request))
 				
 			else:
 				self.data['meta']['error'] = 'Sync type not valid, must be %s or %s' % (self.INITIAL_SYNC_TYPE, self.INCREMENTAL_SYNC_TYPE)
@@ -135,8 +135,6 @@ class SyncUpdate(APIAuthView):
 			if u.content_object is not None:
 				object_list.append(u.content_object)
 				
-		print object_list
-		
 		# Serialise the objects to delete
 		self.data['delete'] = simplejson.loads(serializers.serialize("json", object_list))
 		
@@ -155,8 +153,20 @@ class SyncUpdate(APIAuthView):
 			if i.content_object is not None:
 				object_list.append(i.content_object)
 		
+		book_list = []
+		
+		for obj in object_list:
+			# Check all the object in the finalised insert list
+			if obj.__class__.__name__ == 'BookProfile':
+				# If the object is a book profile
+				# add the Book object that it relies upon.
+				book_list.append(obj.book_instance)
+		
 		# Serialise the objects to insert
 		self.data['insert'] = simplejson.loads(serializers.serialize("json", object_list))
+		
+		# Serialise the books to insert
+		self.data['books'] = simplejson.loads(serializers.serialize("json", book_list))
 		
 		# Remove the owner and is_deleted fields from all serliased objects
 		for obj in list(self.data['insert'] + self.data['update'] + self.data['delete']):
