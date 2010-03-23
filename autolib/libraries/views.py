@@ -19,6 +19,8 @@ from django.views.generic.list_detail import object_list
 
 from django.db.models import Q
 
+from libraries.forms import UserChangeForm
+
 @login_required
 def profile(request):
 	updates = Update.objects.filter(user=request.user).order_by('-time')
@@ -26,6 +28,24 @@ def profile(request):
 	return render_to_response('libraries/profile.html', {
 		'updates': updates,
 	}, context_instance=RequestContext(request))
+
+@login_required
+def profile_edit(request):
+	
+	if request.method == 'POST':
+		form = UserChangeForm(request.POST, instance=request.user)
+		
+		if form.is_valid():
+			form.save()
+		
+		return HttpResponseRedirect(reverse('edit_profile_saved'))
+		
+	else:
+		form = UserChangeForm(instance=request.user)
+		
+		return render_to_response('libraries/profile_edit.html', {
+			'form': form,
+		}, context_instance=RequestContext(request))
 
 @login_required
 def add_books(request):

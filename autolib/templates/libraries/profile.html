@@ -16,6 +16,15 @@ Profile | {{ block.super }}
 {% block content %}
 	<div class="section">
 		<div class="inner">
+		
+			{% if messages %}
+			<ul class="messages">
+				{% for message in messages %}
+				<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+				{% endfor %}
+			</ul>
+			{% endif %}
+			
 			<h1>Your Profile ({{ user.get_full_name|default:user.username }})</h1>
 			
 			<div>
@@ -23,7 +32,7 @@ Profile | {{ block.super }}
 					<div class="container clearfix">
 						<div class="third alpha">
 							<div class="rounded-wrapper">
-								<h3>Your Details <span class="mini-link">[<a href="">edit →</a>]</span></h3>
+								<h3>Your Details <span class="mini-link">[<a href="{% url edit_profile %}">edit →</a>]</span></h3>
 								<table>
 									<tbody>
 										<tr>
@@ -47,6 +56,11 @@ Profile | {{ block.super }}
 											</td>
 											<td><span>{{ user.last_name }}</span></td>
 										</tr>
+										<tr>
+											<td colspan="2">
+												<a href="{% url django.contrib.auth.views.password_change %}">change password</a>
+											</td>
+										</tr>
 									</tbody>
 								</table>
 								<h3>Areas</h3>
@@ -54,7 +68,7 @@ Profile | {{ block.super }}
 									<li>
 										<img src="/media/images/events/home--arrow.png" width="16" height="16" title="Libraries" />
 										<a class="item-title img-title" href="{% url library_list %}">Browse Your Libraries →</a>
-										<p class="item-subtitle">Add, edit and delete your collections of books.</p>
+										<p class="item-subtitle">Add, edit and delete your collections.</p>
 									</li>
 									<li>
 										<img src="/media/images/events/book--plus.png" width="16" height="16" title="Add Books" />
@@ -65,7 +79,9 @@ Profile | {{ block.super }}
 							</div>
 						</div>
 						<div class="third omega">
-							There
+							<div class="rounded-wrapper">
+								<p>I have absolutely no idea what should go here.</p>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -87,9 +103,9 @@ Profile | {{ block.super }}
 										{% endifequal %}
 									{% endifequal %}
 									{% if not update.content_object.is_deleted %}
-									<a class="item-title img-title" href="{{ update.content_object.get_absolute_url }}">{{ update.content_object|title|truncatechars:25 }} →</a>
+									<a class="item-title img-title" href="{{ update.content_object.get_absolute_url }}">{{ update.content_object|title|truncatechars:22 }} →</a>
 									{% else %}
-									<a class="deleted item-title img-title">{{ update.content_object|title|truncatechars:25 }}</a>
+									<a class="deleted item-title img-title">{{ update.content_object|title|truncatechars:22 }}</a>
 									{% endif %}
 									{% ifequal update.action 'insert' %}
 										<p class="item-subtitle">Inserted {{ update.time|timesince }} ago</p>

@@ -1,0 +1,43 @@
+{% extends "libraries/profile.html" %}
+
+{% block title %}
+Edit Details | {{ block.super }}
+{% endblock %}
+
+{% block page_title %}libraries-profile{% endblock %}
+
+{% load truncate_filters %}
+
+{% block breadcrumbs %}
+{{ block.super }}
+<li><a href="{% url edit_profile %}">Edit Details</a></li>
+{% endblock %}
+
+{% block content %}
+
+<div class="section">
+	<div class="inner">
+		<h1>Edit your details</h1>
+		<p>Make your changes adn then go back</p>
+		
+		<form action="" method="post">
+			<div>
+				<label for="id_first_name">First Name</label>
+				{{ form.first_name }}
+			</div>
+			<div>
+				<label for="id_last_name">Last Name</label>
+				{{ form.last_name }}
+			</div>
+			<div>
+				<label for="id_email">Email</label>
+				{{ form.email }}
+			</div>
+			<div>
+				<input type="submit" value="Update Details" /> or <a href="{% url profile %}">go back</a>
+			</div>
+		</form>
+	</div>
+</div>
+
+{% endblock %}

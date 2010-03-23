@@ -1,5 +1,6 @@
 from django import forms
 from libraries.models import Collection
+from django.contrib.auth.models import User
 
 import re
 
@@ -23,25 +24,6 @@ class CollectionForm(forms.ModelForm):
 			else:
 				return name
 		raise forms.ValidationError(u'You already have a Library of that name.')
-	
-# 	def clean(self):
-# 		collection_type = self.cleaned_data['collection_type']
-# 		owner = self.cleaned_data.get('owner', None)
-# 		parent = self.cleaned_data.get('parent', None)
-# 		
-# 		if collection_type == 'library' and owner is not None and parent is None \
-# 		or collection_type == 'bookshelf' and owner is None and parent is not None \
-# 		or collection_type == 'series' and owner is None and parent is not None:
-# 			return self.cleaned_data
-# 		else:
-# 			raise forms.ValidationError(u'A Library must have an owner (but no parent), a Bookshelf and Series must have a parent (but no owner).')
-		
-	
-# 	def save(self, args*, kwargs**):
-# 		if not self.is_valid():
-# 			raise ValueError("Cannot save from an invalid form")
-# 		name = self.cleaned_data['name']
-# 		return Collection.objects.create(name=name, collection_type=self.collection_type, owner=self.owner, parent=self.parent)
 				
 class CreateCollectionForm(CollectionForm):
 	class Meta(CollectionForm.Meta):
@@ -54,3 +36,10 @@ class UpdateCollectionForm(CollectionForm):
 class EditCollectionForm(CollectionForm):
 	class Meta(CollectionForm.Meta):
 		exclude = ['owner', 'collection_type', 'parent']
+
+
+class UserChangeForm(forms.ModelForm):
+	
+	class Meta:
+		model = User
+		fields = ['first_name', 'last_name', 'email']

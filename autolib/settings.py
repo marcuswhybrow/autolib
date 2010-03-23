@@ -80,11 +80,11 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'django.contrib.admin',
     'base',
     'libraries',
     'users',
     'volumes',
-    'django.contrib.admin',
     'googlehooks',
     'registration',
     'tagging',
@@ -100,14 +100,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 	"django.core.context_processors.i18n",
 	"django.core.context_processors.media",
 )
-'''
-AUTHENTICATION_BACKENDS = (
-    'django_openid_auth.auth.OpenIDBackend',
-    'django.contrib.auth.backends.ModelBackend',
-)
-OPENID_CREATE_USERS = True
-OPENID_UPDATE_DETAILS_FROM_SREG = True
-'''
 
 # Put a trailing forward slash at the end of every url.
 APPEND_SLASH = True
@@ -127,8 +119,10 @@ FORCE_LOWERCASE_TAGS = True
 # The email address registration confirmation emails will appear to be sent from
 DEFAULT_FROM_EMAIL = 'autolib-noreply@marcuswhybrow.net'
 
-# 
+# The directory where Marcus' save locks are stored
 LOCK_DIR = os.path.join(PATH, 'locks')
+
+AUTH_PROFILE_MODULE = 'users.UserProfile'
 
 # Loads any local settings (possibly overriding values here).
 try:
