@@ -85,7 +85,6 @@ INSTALLED_APPS = (
     'libraries',
     'users',
     'volumes',
-    'googlehooks',
     'registration',
     'tagging',
     'gravatar',
