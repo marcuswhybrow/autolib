@@ -20,21 +20,25 @@ Edit Details | {{ block.super }}
 		<h1>Edit your details</h1>
 		<p>Make your changes adn then go back</p>
 		
-		<form action="" method="post">
-			<div>
-				<label for="id_first_name">First Name</label>
+		<form action="" method="post" class="normal clearfix">
+			
+			<div class="field clearfix">
+				{{ form.first_name.label_tag }}
 				{{ form.first_name }}
 			</div>
-			<div>
-				<label for="id_last_name">Last Name</label>
+			
+			<div class="field clearfix">
+				{{ form.last_name.label_tag }}
 				{{ form.last_name }}
 			</div>
-			<div>
-				<label for="id_email">Email</label>
+			
+			<div class="field clearfix">
+				{{ form.email.label_tag }}
 				{{ form.email }}
 			</div>
-			<div>
-				<input type="submit" value="Update Details" /> or <a href="{% url profile %}">go back</a>
+			
+			<div class="footer clearfix">
+				<input type="submit" value="Update Details" /> or <a href="{% url profile %}">← go back to profile</a>
 			</div>
 		</form>
 	</div>

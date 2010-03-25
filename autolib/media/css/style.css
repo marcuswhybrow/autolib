@@ -4,15 +4,22 @@ body                { font-family: "Lucida Sans Unicode", "Lucida Grande", Verda
                       font-size: 13px; color: #5e5d5d; background: url(/media/images/header-bg.png) no-repeat top center; }
                       
 strong, em, b, i    { font-family: "Lucida Sans", "Lucida Sans Unicode", "Lucida Grande", Verdana, Arial, Helvetica, sans-serif; }
-p, #content li      { line-height: 21px; }
+
+p, dd  { line-height: 1.5em; }
+
+#content li			{ line-height: 21px; }
+
 p, h1, h2, h3, 
 ul, dl, ol, dt, dd,
-#content li	        { padding-bottom: 9px; }
-p.error             { color: red; padding: 5px; border: 1px red dashed; margin-bottom: 9px; }
+#content li	        {  }
+
+h1, h2				{ margin-bottom: 20px; }
+
+p.error             { padding: 5px; margin-bottom: 20px; background-color: rgba(0,0,0,0.1); -moz-border-radius: 3px; -webkit-border-radius: 3px; text-align: center; }
 
 /* Titles */
 
-h1, h2, h3, dt      { color: #2e2e2e; width: 100%; font-family: "Helvetica"; text-transform: capitalize; }
+h1, h2, h3, dt      { color: #2e2e2e; width: 100%; font-family: "Helvetica"; overflow: hidden; }
 h1                  { font-size: 32px; }
 h2                  { font-size: 30px; }
 h3, dt              { font-size: 16px; }
@@ -24,23 +31,26 @@ h3.inline			{ padding-top: 9px; }
 
 /* Editable Stuff */
 
-.editable .detail form.editing			{ padding: 0; margin: 0; border: 0; position: relative; }
-.editable .detail form.editing input	{ padding: 5px 5px; margin: 0; border: 1px solid #333; background-color: #555; color: #fafafa; position: relative; left: -7px; top: -6px; -moz-border-radius: 3px;
-										  text-shadow: 1px 1px 1px #333; padding-right: 150px; }
+.editable .detail form.editing								{ padding: 0; margin: 0; border: 0; position: relative; }
+.editable .detail form.editing input						{ padding: 5px 5px; margin: 0; border: 1px solid #333; background-color: #555; color: #fafafa; -moz-border-radius: 3px; -webkit-border-radius: 3px;
+										 					  text-shadow: 1px 1px 1px #333; padding-right: 145px; }
 
 .editable .detail form.editing button						{ position: absolute; background-color: #666; border: 1px solid #444; -moz-border-radius: 3px; 
 															  text-transform: uppercase; font-weight: bold; color: #fafafa; cursor: pointer; }
 
 .editable .detail form.editing button:hover					{ background-color: #888; }
 
-.editable .detail form.editing button[type="submit"]		{ top: 0px; right: 0px; }
-.editable .detail form.editing button[type="cancel"]		{ top: 0px; right: 65px; }
+.editable .detail form.editing button[type="submit"]		{ top: 7px; right: 7px; }
+.editable .detail form.editing button[type="cancel"]		{ top: 7px; right: 70px; }
 
 .editable .h2-detail form.editing button					{ padding: 5px 10px; }
 .editable .p-detail form.editing button						{ padding: 1px 10px; }
 
-.editable .h2-detail form.editing input	{ /* color: #2e2e2e; */ font-family: "Helvetica"; text-transform: capitalize; font-size: 30px; font-weight: bold; }
-.editable .p-detail form.editing input	{ /* color: #5E5D5D; */ font-size: 13px; line-height: 21px; }
+.editable .h2-detail form.editing input						{ /* color: #2e2e2e; */ font-family: "Helvetica"; font-size: 30px; font-weight: bold; }
+.editable .p-detail form.editing input						{ /* color: #5E5D5D; */ font-size: 13px; /* line-height: 21px */; }
+
+
+.editable .detail											{  }
 
 
 /* Forms */
@@ -224,20 +234,26 @@ div#header-bg h1    { display: none; }
 
 /* Header - auth-box */
 
-div#auth-box       								{ position: absolute; top: 43px; right: 30px; color: #fff; -moz-border-radius: 6px; -webkit-border-radius: 6px;
-												  background-color: #fff; width: 190px; height: 23px; background: url(/media/images/breadcrumbs-bg.png) repeat-x; }
+div#auth-box       								{ position: absolute; top: 42px; right: 30px; color: #fff; -moz-border-radius: 3px; -webkit-border-radius: 3px;
+												  background-color: #fff; width: 168px; height: 42px; padding: 10px;
+												  background-color: rgba(0, 0, 0, 0.2); border: 1px solid rgba(0,0,0,0.4); }
 
-div#auth-box div								{ color: #474747; text-shadow: #f9faf9 1px 1px 1px; height: 23px; }
+div#auth-box div a								{ color: rgba(255,255,255,0.8); }
 div#auth-box div a:hover						{ text-decoration: none; }
 
-div#auth-box div.authenticated a#ab-username	{ position: absolute; top: 0; left: 0; display: block; height: 20px; padding: 3px 9px 0 6px; width: 120px; text-align: center; }
-div#auth-box div.authenticated a#ab-logout		{ position: absolute; top: 0; right: 0; display: block; height: 20px; padding: 3px 6px 0 9px; background: url(/media/images/breadcrumbs-straight-divider.png) no-repeat top left;
-												  width: 41px; }
+div#auth-box img								{ float: left; }
+div#auth-box div#ab-main						{ float: left; width: 116px; padding-left: 10px; padding-top: 1px; }
 
-div#auth-box div.unauthenticated a#ab-login		{ position: absolute; top: 0; left: 0; display: block; height: 20px; padding: 3px 9px 0 6px; width: 75px; text-align: center; }
-div#auth-box div.unauthenticated a#ab-register	{ position: absolute; top: 0; right: 0; display: block; height: 20px; padding: 3px 6px 0 9px; background: url(/media/images/breadcrumbs-straight-divider.png) no-repeat top left;
-												  width: 85px; text-align: center; }
+div#auth-box div#ab-main a#ab-username,
+div#auth-box div#ab-main a#ab-logout,
+div#auth-box div#ab-main a#ab-login,
+div#auth-box div#ab-main a#ab-register			{ float: left; clear: both; margin-bottom: 8px; }
 
+div#auth-box div#ab-main a#ab-login,
+div#auth-box div#ab-main a#ab-username			{ font-size: 1.2em; }
+
+div#auth-box div#ab-main a#ab-register,
+div#auth-box div#ab-main a#ab-logout			{ color: #888; }
 
 /* Promos */
 
@@ -429,7 +445,7 @@ div.votable-content									{ position: relative; float: right; width: 845px; pa
 /* Overlay */
 
 .overlay											{ display:none; cursor: default; background: url(/media/images/black-50-bg.png) repeat; -webkit-border-radius: 10px; -moz-border-radius: 10px; padding: 10px; color: #fff; }
-.overlay .overlay-header							{ -moz-border-radius: 5px 5px 0 0; -webkit-border-top-left-radius: 5px; -webkit-border-top-right-radius: 5px; background-color: #eaeaea; border: 1px solid #000; border-bottom: 1px solid #ddd; padding: 20px; }
+.overlay .overlay-header							{ -moz-border-radius: 5px 5px 0 0; -webkit-border-top-left-radius: 5px; -webkit-border-top-right-radius: 5px; background-color: #eaeaea; border: 1px solid #000; border-bottom: 1px solid #ddd; padding: 20px 20px 0 20px; }
 .overlay .overlay-body								{ background-color: #fafafa; border-left: 1px solid #000; border-right: 1px solid #000; padding: 20px; color: #333; }
 .overlay .overlay-footer							{ -moz-border-radius: 0 0 5px 5px; -webkit-border-bottom-left-radius: 5px; -webkit-border-bottom-right-radius: 5px; background-color: #fafafa; padding: 0 20px 20px; border: 1px solid #000; border-top: none; }
 
@@ -459,3 +475,20 @@ div.votable-content									{ position: relative; float: right; width: 845px; pa
 /* Drag and Drop */
 
 .draggable											{ cursor: move; }
+
+
+/* Forms */
+
+form.normal	input,
+form.normal label									{ float: left; clear: left; margin-bottom: 10px; }
+
+form.normal label									{ color: #2E2E2E; font-size: 14px; font-family: Helvetica, Arial, Sans-Serif; }
+form.normal input									{ padding: 5px; }
+
+form.normal div.field								{  }
+form.normal div.footer								{ padding-top: 10px; }
+form.normal div.footer input						{ margin-right: 5px; }
+
+form.normal div.field span.error					{ float: left; padding: 7px 0 0 20px; color: red; }
+
+form.normal input.default							{ color: #aaa; }

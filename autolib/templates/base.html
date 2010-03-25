@@ -7,7 +7,8 @@
 	<link rel="stylesheet" href="/media/css/ie.css" />
 	<![endif]-->
 	<!--<link rel="stylesheet" href="/media/css/jquery-ui-theme/jquery-ui-1.8rc1.custom.css" />-->
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js?ver=1.3.2"></script>
+	<!--<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js?ver=1.3.2"></script>-->
+	<script type="text/javascript" src="/media/js/jquery-1.4.2.min.js"></script>
 	<script type="text/javascript" src="/media/js/jquery.fancyzoom.min.js"></script>
 	
 	{% block head %}
@@ -15,6 +16,8 @@
 	
 	<title>{% block title %}AutoLibrarian{% endblock %}</title>
 </head>
+
+{% load gravatar %}
 
 <body id="{% block page_title %}{% endblock %}">
 
@@ -24,9 +27,11 @@
 			<div id="header" class="clearfix">
 				<div id="auth-box">
 					{% if user.is_authenticated %}
-						<div id="ab-main" class="authenticated"><a id="ab-username" href="{% url profile %}">{{ user.username }}</a><a id="ab-logout" href="{% url django.contrib.auth.views.logout %}">logout</a></div>
+						<a href="{% url profile %}">{% gravatar user 42 %}</a>
+						<div id="ab-main" class="authenticated"><a id="ab-username" href="{% url profile %}">{{ user.username }}</a><a id="ab-logout" href="{% url django.contrib.auth.views.logout %}">logout →</a></div>
 					{% else %}
-						<div class="unauthenticated"><a id="ab-login" href="{% url django.contrib.auth.views.login %}">login</a><a id="ab-register" href="{% url registration.views.register %}">register</a></div>
+						<a href="{% url profile %}"><img src="http://gravatar.com/avatar?s=42" alt="default gravatar image" width="42" height="42" /></a>
+						<div id="ab-main" class="unauthenticated"><a id="ab-login" href="{% url django.contrib.auth.views.login %}">login →</a><a id="ab-register" href="{% url registration.views.register %}"> or register →</a></div>
 					{% endif %}
 				</div>
 			</div>

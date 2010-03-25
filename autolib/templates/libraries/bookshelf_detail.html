@@ -25,6 +25,7 @@
 <link rel="stylesheet" href="/media/js/jqtransform/jqtransform.css" />
 <script type="text/javascript" src="/media/js/jquery.jeditable.mini.js"></script>
 <script type="text/javascript" src="/media/js/jquery.blockUI.js"></script>
+<script type="text/javascript" src="/media/js/utils.js"></script>
 <script type="text/javascript">
 	$(function() {
 		
@@ -44,65 +45,26 @@
 			} else if (detail.attr('id') == 'description') {
 				postData = {description: value, pk: '{{ bookshelf.pk }}'}
 			}
+			
 			var result = '';
 			
-			detail.block({
-				fadeIn: 10,
-				fadeOut: 10,
-				css: { 
-		            border: 'none',
-		            padding: '15px', 
-		            backgroundColor: '#000', 
-		            '-webkit-border-radius': '10px', 
-		            '-moz-border-radius': '10px', 
-		            opacity: .5, 
-		            color: '#fff' 
-		        },
-		        message: 'Updating' 
-		    });
-			
-			$.ajax({
-				url: '{% url api_save_collection %}',
-				data: postData,
-				async: false,
-				dataType: 'json',
-				type: 'POST',
-				success: function(data) {
-					if (data.meta.success == true) {
-						if (detail.attr('id') == 'name') {
-							result = data.collection.name;
-						} else if (detail.attr('id') == 'description') {
-							result = data.collection.description;
-						}
-						
-					} else if(data.meta.success == false) {
-						$('#accept-overlay').find('h1.target').text('Something Went Wrong!');
-						$('#accept-overlay').find('p.target').text(data.meta.error);
-						$.blockUI({ 
-							fadeIn:  200,
-							fadeOut: 200,
-							css: { 
-								border: 'none',
-								opacity: 1,
-								'-webkit-border-radius': '10px',
-								'-moz-border-radius': '10px',
-								backgroundColor: 'none'
-					        },
-				        	message: $('#accept-overlay')
-				        });
-					}
+			connection('{% url api_save_collection %}', postData, function(data) {
+				if (detail.attr('id') == 'name') {
+					result = data.collection.name;
+					window.location = data.collection.url;
+					
+				} else if (detail.attr('id') == 'description') {
+					result = data.collection.description;
 				}
-			});
-			
-			detail.unblock();
-			
+			}, undefined, undefined, false);
+						
 			return result;
 		},
 		{ 
 			cssclass: 'editing',
 			submit: 'save',
 			cancel: 'cancel',
-			width: '457px'
+			width: '448px'
 		});
 		
 		// Adding Bookshelves
@@ -113,142 +75,65 @@
 			var formData = form.serialize();
 			
 			form.find(':input').attr('disabled', 'disabled');
-						
-			$.ajax({
-				url: '{% url api_get_book_detail %}', 
-				data: formData,
-				type: 'GET',
-				dataType: 'json',
-				success: function(data) {
-					if (data.meta.success == true) {
-						var book = data.book;
-						var title = book.title;
-						var author = book.author;
-						var pk = book.pk;
-						var url = book.url;
-						
-						var truncateLength = 40;
-					
-						if (title.length > truncateLength) {
-							title = name.substring(0, truncateLength) + '...';
-						}
-						
-						var listItem = '<li id="' + pk + '" style="display: none">' +
-						'<img src="/media/images/events/book-brown.png" width="16" height="16" title="Book" />' +
-						'<a class="item-title img-title" href="' + url + '">' + title + ' →</a>' +
-						'<p class="item-subtitle">by ' + author + '</p>' +
-						'<button class="confirm">confirm</button><button class="cancel">cancel</button>' +
-						'</li>';
-						
-						$("ul#book-list").append(listItem);
-						
-						var item = $('li#' + book.pk);
-						var book_pk = item.attr('id');
-						var collection_pk = '{% if bookshelf %}{{ bookshelf.pk }}{% else %}{{ library.pk }}{% endif %}'
-						
-						item.find('button.confirm').click(function() {
-							$.ajax({
-								url: '{% url api_save_profile %}',
-								data: {collection_pk: collection_pk, book_pk: book_pk},
-								dataType: 'json',
-								type: 'POST',
-								success: function(data) {
-									if (data.meta.success == true) {
-										item.attr('id', data.profile.pk);
-										var title = item.find('a.item-title');
-										title.attr('href', data.profile.url).removeClass('deleted');
-										item.find('button.cancel').fadeOut('200', function() {
-											$(this).remove();
-										});
-										item.find('button.confirm').fadeOut('200', function() {
-											$(this).remove();
-											item.append('<button class="delete">delete</button>');
-											item.find('button.delete').click(book_click_delete);
-											item.hover(book_hover_over, book_hover_out);
-										});
-									} else if(data.meta.success == false) {
-										$('#accept-overlay').find('h1.target').text('Error Finding Book');
-										$('#accept-overlay').find('p.target').text(data.meta.error);
-										$.blockUI({ 
-											fadeIn:  200,
-											fadeOut: 200,
-											css: { 
-												border: 'none',
-												opacity: 1,
-												'-webkit-border-radius': '10px',
-												'-moz-border-radius': '10px',
-												backgroundColor: 'none'
-									        },
-								        	message: $('#accept-overlay')
-								        });
-									}
-								},
-								error: function() {
-									$('#accept-overlay').find('h1.target').text('Something Went Wrong!');
-									$('#accept-overlay').find('p.target').text('This is completely our fault, something has gone wrong on our end. We are probably trying to fix it, so try again in a few seconds.');
-									$.blockUI({ 
-										fadeIn:  200,
-										fadeOut: 200,
-										css: { 
-											border: 'none',
-											opacity: 1,
-											'-webkit-border-radius': '10px',
-											'-moz-border-radius': '10px',
-											backgroundColor: 'none'
-								        },
-							        	message: $('#accept-overlay')
-							        });
-								}
-							});
-						});
-						
-						item.find('button.cancel').click(function() {
-							item.slideUp('200', function() {
-								$(this).remove();
-							});
-						});
-						
-						$('#' + book.pk).slideDown('200');
-						
-					} else if(data.meta.success == false) {
-						
-						$('#accept-overlay').find('h1.target').text('Error Finding Book');
-						$('#accept-overlay').find('p.target').text(data.meta.error);
-						$.blockUI({ 
-							fadeIn:  200,
-							fadeOut: 200,
-							css: { 
-								border: 'none',
-								opacity: 1,
-								'-webkit-border-radius': '10px',
-								'-moz-border-radius': '10px',
-								backgroundColor: 'none'
-					        },
-				        	message: $('#accept-overlay')
-				        });
-					}
-				},
-				error: function() {
-					$('#accept-overlay').find('h1.target').text('Something Went Wrong!');
-					$('#accept-overlay').find('p.target').text('This is completely our fault, something has gone wrong on our end. We are probably trying to fix it, so try again in a few seconds.');
-					$.blockUI({ 
-						fadeIn:  200,
-						fadeOut: 200,
-						css: { 
-							border: 'none',
-							opacity: 1,
-							'-webkit-border-radius': '10px',
-							'-moz-border-radius': '10px',
-							backgroundColor: 'none'
-				        },
-			        	message: $('#accept-overlay')
-			        });
+			
+			connection('{% url api_get_book_detail %}', formData, function(data) {
+				var book = data.book;
+				var title = book.title;
+				var author = book.author;
+				var pk = book.pk;
+				var url = book.url;
+				
+				var truncateLength = 40;
+			
+				if (title.length > truncateLength) {
+					title = name.substring(0, truncateLength) + '...';
 				}
-			});
+				
+				var listItem = '<li id="' + pk + '" style="display: none">' +
+				'<img src="/media/images/events/book-brown.png" width="16" height="16" title="Book" />' +
+				'<a class="item-title img-title" href="' + url + '">' + title + ' →</a>' +
+				'<p class="item-subtitle">by ' + author + '</p>' +
+				'<button class="confirm">confirm</button><button class="cancel">cancel</button>' +
+				'</li>';
+				
+				$("ul#book-list").append(listItem);
+				
+				var item = $('li#' + book.pk);
+				var book_pk = item.attr('id');
+				var collection_pk = '{% if bookshelf %}{{ bookshelf.pk }}{% else %}{{ library.pk }}{% endif %}';
+				
+				item.find('button.confirm').click(function() {
+					
+					connection('{% url api_save_profile %}', { collection_pk: collection_pk, book_pk: book_pk }, function(data) {
+						item.attr('id', data.profile.pk);
+						var title = item.find('a.item-title');
+						title.attr('href', data.profile.url).removeClass('deleted');
+						item.find('button.cancel').fadeOut('200', function() {
+							$(this).remove();
+						});
+						item.find('button.confirm').fadeOut('200', function() {
+							$(this).remove();
+							item.append('<button class="delete">delete</button>');
+							item.find('button.delete').click(book_click_delete);
+							item.hover(book_hover_over, book_hover_out);
+						});
+					});
+				});
+				
+				item.find('button.cancel').click(function() {
+					item.slideUp('200', function() {
+						$(this).remove();
+					});
+				});
+				
+				$('#' + book.pk).slideDown('200');
+			}, function() {
 			
-			form.find(':input').attr('disabled', '');
-			form.find(':input[name="name"]').val('');
+				form.find(':input').attr('disabled', '');
+				form.find(':input[name="name"]').val('');
+			}, 'GET');
 			
+			form.find(':input[name="isbn"]').val('').focus();
 			return false;
 		});
 		

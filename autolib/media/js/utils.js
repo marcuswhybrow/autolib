@@ -28,7 +28,7 @@ function overlay(message)
     });
 }
 
-function connection(url, data, f, last, type)
+function connection(url, data, f, last, type, async)
 {
 	if (type === undefined) {
 		type = 'POST';
@@ -38,12 +38,17 @@ function connection(url, data, f, last, type)
 		last = function() {};
 	}
 	
+	if (async === undefined) {
+		async = true;
+	}
+	
 	$.ajax(
 	{
 		url: url,
 		data: data,
 		dataType: 'json',
 		type: type,
+		async: async,
 		success: function(data)
 		{
 			if (data.meta.success == true)

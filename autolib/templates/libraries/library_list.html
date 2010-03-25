@@ -129,12 +129,6 @@ Your Libraries | {{ block.super }}
 					name = name.substring(0, truncateLength) + '...';
 				}
 				
-				String.prototype.capitalise = function() {
-					return this.replace( /(^|\s)([a-z])/g , function(m,p1,p2){ return p1+p2.toUpperCase(); } );
-				};
-				
-				name = name.capitalise();
-				
 				var description = data.collection.description;
 				var url = data.collection.url;
 				var pk = data.collection.pk;
@@ -151,10 +145,8 @@ Your Libraries | {{ block.super }}
 				
 				$("#" + pk).hover(library_hover_over, library_hover_out);
 				$("#" + pk + " button.delete").click(library_click_delete);
-				
-				$.growlUI('Library Added', 'Your new library was added successfully');
-				
-				form.unblock();
+		    }, function() {
+		    	form.unblock();
 		    });
 			
 			form.find(':input[name="name"]').val('');
@@ -182,7 +174,7 @@ Your Libraries | {{ block.super }}
 							{% for library in object_list %}
 								<li id="{{ library.pk }}">
 									<img src="/media/images/events/home.png" width="16" height="16" title="Library" />
-									<a class="item-title img-title" href="{{ library.get_absolute_url }}">{{ library.name|title|truncatechars:40 }} →</a>
+									<a class="item-title img-title" href="{{ library.get_absolute_url }}">{{ library.name|truncatechars:40 }} →</a>
 									<p class="item-subtitle">{{ library.children.all|length }} bookshel{{ library.children.all|length|pluralize:'f,ves' }}, {{ library.books.all|length }} unsorted book{{ library.books.all|length|pluralize }}</p>
 								</li>
 							{% endfor %}

@@ -4,21 +4,12 @@
 Welcome | {{ block.super }}
 {% endblock %}
 
-{% block head %}
-<script type="text/javascript">
-	$(function() {
-		$("a.zoom").fancyZoom({directory: '/media/images/fancyzoom', scaleImg: true, closeOnClick: true});
-	});
-</script>
-{% endblock %}
-
 {% block content %}
 
 <div class="section">
 	<div class="inner">
 		<h2>Hey{% if user.first_name %} {{ user.first_name }}{% endif %}, You're Authenticated</h2>
 		<p>This is the home page, but you should probably check out this kind of control panel thing at <a href="{% url profile %}">{% url profile %}</a>.</p>
-		<a href="#picture-box" class="zoom">FancyZoom</a>
 	</div>
 </div>
 
@@ -30,9 +21,5 @@ Welcome | {{ block.super }}
 			<dd>Here is a list of all the books in the system: <a href="{% url book_list %}">{% url book_list %}</a></dd>
 		</dl>
 	</div>
-</div>
-
-<div id="picture-box">
-	<img src="/media/images/header-bg.png" />
 </div>
 {% endblock %}

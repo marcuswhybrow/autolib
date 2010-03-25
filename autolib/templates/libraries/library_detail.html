@@ -53,42 +53,28 @@
 		$("div.editable .detail").editable(function(value, settings) {
 			var detail = $(this);
 			if (detail.attr('id') == 'name') {
-				postData = {name: value, pk: '{{ library.pk }}'}
+				postData = { name: value, pk: '{{ library.pk }}' }
 			} else if (detail.attr('id') == 'description') {
-				postData = {description: value, pk: '{{ library.pk }}'}
+				postData = { description: value, pk: '{{ library.pk }}' }
 			}
 			var result = '';
 			
-			detail.block({
-				fadeIn: 10,
-				fadeOut: 10,
-				css: { 
-		            border: 'none',
-		            padding: '15px', 
-		            backgroundColor: '#000', 
-		            '-webkit-border-radius': '10px', 
-		            '-moz-border-radius': '10px', 
-		            opacity: .5, 
-		            color: '#fff' 
-		        },
-		        message: 'Updating' 
-		    });
-		    
-		    connection('{% url api_save_collection %}', postData, function(data) {
-		    	if (detail.attr('id') == 'name') {
+			connection('{% url api_save_collection %}', postData, function(data) {
+				if (detail.attr('id') == 'name') {
 					result = data.collection.name;
+					window.location = data.collection.url;
+					
 				} else if (detail.attr('id') == 'description') {
 					result = data.collection.description;
 				}
-		    });
-		    
-		    detail.unblock();
+			}, undefined, undefined, false);
+			  
 			return result;
 		}, { 
 			cssclass: 'editing',
 			submit: 'save',
 			cancel: 'cancel',
-			width: '457px'
+			width: '448px'
 		});
 				
 		// Adding Bookshelves
@@ -103,17 +89,17 @@
 				fadeIn: 10,
 				fadeOut: 10,
 				css: { 
-		            border: 'none',
-		            padding: '15px', 
-		            backgroundColor: '#ff', 
-		            '-webkit-border-radius': '10px', 
-		            '-moz-border-radius': '10px', 
-		            opacity: .5, 
-		            color: '#000' 
-		        }
-		    });
-		    
-		    connection('{% url api_save_collection %}', formData, function(data) {
+					border: 'none',
+					padding: '15px', 
+					backgroundColor: '#ff', 
+					'-webkit-border-radius': '10px', 
+					'-moz-border-radius': '10px', 
+					opacity: .5, 
+					color: '#000' 
+				}
+			});
+			  
+			connection('{% url api_save_collection %}', formData, function(data) {
 				var name = data.collection.name;
 				
 				var truncateLength = 40;
@@ -121,13 +107,7 @@
 				if (name.length > truncateLength) {
 					name = name.substring(0, truncateLength) + '...';
 				}
-				
-				String.prototype.capitalise = function() {
-					return this.replace( /(^|\s)([a-z])/g , function(m,p1,p2){ return p1+p2.toUpperCase(); } );
-				};
-				
-				name = name.capitalise();
-				
+								
 				var description = data.collection.description;
 				var url = data.collection.url;
 				var pk = data.collection.pk;
@@ -145,9 +125,9 @@
 				$("#" + pk).hover(bookshelf_hover_over, bookshelf_hover_out);
 				$("#" + pk + " button.delete").click(bookshelf_click_delete);
 				
-		    }, function() {
-		    	form.unblock();
-		    });
+			  }, function() {
+			  	form.unblock();
+			  });
 			
 			form.find(':input[name="name"]').val('');
 			return false;
@@ -196,9 +176,9 @@
 		}
 		
 		$("ul#bookshelf-list li").append('<button class="delete">delete</button>');
-			  
+				 
 		$("ul#bookshelf-list li").hover(bookshelf_hover_over, bookshelf_hover_out);
-			  
+				 
 		$("ul#bookshelf-list li button.delete").click(bookshelf_click_delete);
 		
 		var helpHtml = $('div#help-box').html();
@@ -286,7 +266,7 @@
 							{% for bookshelf in library.children.all %}
 								<li id="{{ bookshelf.pk }}" class="droppable">
 									<img src="/media/images/events/drawer.png" width="16" height="16" title="Bookshelf" />
-									<a class="item-title img-title" href="{{ bookshelf.get_absolute_url }}">{{ bookshelf.name|title|truncatechars:40 }} →</a>
+									<a class="item-title img-title" href="{{ bookshelf.get_absolute_url }}">{{ bookshelf.name|truncatechars:40 }} →</a>
 									<p class="item-subtitle">{{ bookshelf.books.all|length }} book{{ bookshelf.books.all|length|pluralize }}</p>
 								</li>
 							{% endfor %}
