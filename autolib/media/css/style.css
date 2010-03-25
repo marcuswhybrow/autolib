@@ -19,7 +19,7 @@ p.error             { padding: 5px; margin-bottom: 20px; background-color: rgba(
 
 /* Titles */
 
-h1, h2, h3, dt      { color: #2e2e2e; width: 100%; font-family: "Helvetica"; overflow: hidden; }
+h1, h2, h3, dt      { color: #2e2e2e; width: 100%; font-family: "Helvetica"; overflow-x: hidden; }
 h1                  { font-size: 32px; }
 h2                  { font-size: 30px; }
 h3, dt              { font-size: 16px; }
