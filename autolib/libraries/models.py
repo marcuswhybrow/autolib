@@ -119,7 +119,7 @@ class Collection(UUIDSyncable):
 	def delete(self, *args, **kwargs):
 	
 		self.children.all().delete()
-		self.books.all.delete()
+		self.books.all().delete()
 		super(Collection, self).delete(*args, **kwargs)
 	
 	def get_owner(self):
