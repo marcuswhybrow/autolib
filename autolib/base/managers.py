@@ -3,7 +3,7 @@ import inspect
 
 class UUIDSyncableManager(models.Manager):
 	
-	use_for_related_fields = True
+	use_for_related_fields = False
 	
 	def get_query_set(self):
 		return super(UUIDSyncableManager, self).get_query_set().filter(is_deleted=False)
