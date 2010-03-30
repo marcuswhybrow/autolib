@@ -116,6 +116,12 @@ class Collection(UUIDSyncable):
 		finally:
 			lock.release()
 	
+	def delete(self, *args, **kwargs):
+	
+		self.children.all().delete()
+		self.books.all.delete()
+		super(Collection, self).delete(*args, **kwargs)
+	
 	def get_owner(self):
 		"""
 		Get the owner (User) of this collection
