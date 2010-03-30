@@ -10,7 +10,7 @@ class UUIDSyncableManager(models.Manager):
 
 class UUIDSyncableDeletedManager(models.Manager):
 	
-	use_for_related_fields = True
+	use_for_related_fields = False
 	
 	def get_query_set(self):
 		return super(UUIDSyncableDeletedManager, self).get_query_set().filter(is_deleted=True)
