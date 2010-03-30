@@ -153,6 +153,9 @@ class SyncUpdate(APIAuthView):
 			if i.content_object is not None:
 				object_list.append(i.content_object)
 		
+		# Serialise the objects to insert
+		self.data['insert'] = simplejson.loads(serializers.serialize("json", object_list))
+		
 		book_list = []
 		
 		for obj in object_list:
@@ -161,9 +164,6 @@ class SyncUpdate(APIAuthView):
 				# If the object is a book profile
 				# add the Book object that it relies upon.
 				book_list.append(obj.book_instance)
-		
-		# Serialise the objects to insert
-		self.data['insert'] = simplejson.loads(serializers.serialize("json", object_list))
 		
 		# Serialise the books to insert
 		self.data['books'] = simplejson.loads(serializers.serialize("json", book_list))
