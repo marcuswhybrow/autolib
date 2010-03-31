@@ -1,0 +1,47 @@
+##
+## Developed for the University of Nottingham G52GRP module
+##
+## Written by:	Marcus Whybrow (mxw18u)
+## Group: 		gp09-drm
+##
+
+## Installation instruction
+
+## 1. Install Python Dependancies
+
+ - BeautifulSoup
+ - Django 1.1.1
+ - django-registration
+ - django-tagging
+ - simplejson
+
+## 2. Preparing the Django Local Settings
+
+You will need to copy the local_settings.py.tpl which specifies
+the database location and other details, to do this run:
+
+	cp local_settings.py.tpl local_settings.py
+
+## 3. Preparing the Database
+
+Django needs to setup the database and fill it with some initial configuration values,
+to do this run:
+
+	python manage.py syncdb
+	
+## 4. Running the Server
+
+Django is now ready to go, you can now run the server by using the following command:
+
+	python manage.py runserver
+
+You can access the server by going to your web browser and pointing it to http://localhost:8000/
+
+If you wish to run allow external machines to view the server also from your IP address start the
+server in the following fashion instead:
+
+	python manage.py runserver 0.0.0.0
+
+And if you wish to listen on a different port (say 80), just specify that like so:
+
+	python manage.py runserver 0.0.0.0:80

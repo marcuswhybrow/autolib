@@ -1,4 +1,9 @@
-# api.views.sync
+##
+## Developed for the University of Nottingham G52GRP module
+##
+## Written by:	Marcus Whybrow (mxw18u)
+## Group: 		gp09-drm
+##
 
 from base import utils
 from django.core import serializers

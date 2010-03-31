@@ -1,3 +1,8 @@
+/*
+ * This is an external library and was *not* developed by the group
+ *
+ */
+
 (function($) {
 	var cache = [];
 	// Arguments are image paths relative to the current page.

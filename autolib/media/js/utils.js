@@ -1,4 +1,12 @@
 /*
+ * Developed for the University of Nottingham G52GRP module
+ *
+ * Written by:	Marcus Whybrow (mxw18u)
+ * Group: 		gp09-drm
+ *
+ */
+
+/*
 var SAVE_COLLECTION = "/api/save/collection";
 var SAVE_PROFILE = "/api/save/profile";
 

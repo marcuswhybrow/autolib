@@ -1,3 +1,10 @@
+##
+## Developed for the University of Nottingham G52GRP module
+##
+## Written by:	Marcus Whybrow (mxw18u)
+## Group: 		gp09-drm
+##
+
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.contrib.auth.models import User
