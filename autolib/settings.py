@@ -71,6 +71,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware', # django debug toolbar
 )
 
 ROOT_URLCONF = 'urls'
@@ -95,6 +96,7 @@ INSTALLED_APPS = (
     'registration',
     'tagging',
     'gravatar',
+    'debug_toolbar',
     #'django_openidconsumer',
     #'django_openid_auth',
 )
