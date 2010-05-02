@@ -34,7 +34,7 @@ class APIAuthView(APIView):
 		
 		self.data = {'meta': {'success': False}}
 		self.token_id = request.POST.get('token_id', None)
-		self.user = utils.get_user_from_token(self.token_id) if self.token_id is not None else request.user
+		self.user = utils.get_user_from_token(self.token_id) and self.token_id is not None or request.user
 		
 		if self.user and self.user.is_authenticated():
 			try:

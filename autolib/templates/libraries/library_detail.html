@@ -127,14 +127,22 @@
 				'</li>';
 				
 				$("ul#bookshelf-list").append(listItem);
-				$("li#" + pk).slideDown('200');
 				
-				$("#" + pk).hover(bookshelf_hover_over, bookshelf_hover_out);
-				$("#" + pk + " button.delete").click(bookshelf_click_delete);
+				var li = $('li#' + pk);
 				
-			  }, function() {
-			  	form.unblock();
-			  });
+				li.hover(bookshelf_hover_over, bookshelf_hover_out);
+				li.find("button.delete").click(bookshelf_click_delete);
+				
+				li.droppable({
+					hoverClass: 'ui-state-hover',
+					drop: droppable
+				});
+				
+				li.slideDown('200');
+				
+			}, function() {
+				form.unblock();
+			});
 			
 			form.find(':input[name="name"]').val('');
 			return false;
@@ -192,53 +200,75 @@
 		
 		$('a#unsorted-bin-changer').click(function() {
 			
-			$('div#help-box').animate({
-				opacity: 0
-			}, function() {
-				$('div#help-box').html($('div#unsorted-bin-box').html());
-				
-				$('li.draggable').draggable({ 
-					revert: true,
-					helper: 'original',
-					opacity: 0.7
-				});
+			var li = $(this).parent();
+			
+			if (! li.hasClass('selected')) {
+				li.siblings().removeClass('selected');
+				li.addClass('selected');
 				
 				$('div#help-box').animate({
-					opacity: 1
+					opacity: 0
+				}, function() {
+					$('div#help-box').html($('div#unsorted-bin-box').html());
+					
+					$('li.draggable').draggable({ 
+						revert: true,
+						helper: 'original',
+						opacity: 0.7
+					});
+					
+					$('div#help-box').animate({
+						opacity: 1
+					});
 				});
-			});
+			}
 			
 			return false;
 		});
 		
 		$('a#help-changer').click(function() {
 			
-			$('div#help-box').animate({
-				opacity: 0
-			}, function() {
-				$('div#help-box').html(helpHtml);
+			var li = $(this).parent();
+			
+			if (! li.hasClass('selected')) {
+				li.siblings().removeClass('selected');
+				li.addClass('selected');
 				
 				$('div#help-box').animate({
-					opacity: 1
+					opacity: 0
+				}, function() {
+					$('div#help-box').html(helpHtml);
+					
+					$('div#help-box').animate({
+						opacity: 1
+					});
 				});
-			});
+			}
 			
 			return false;
 		});
 		
-		$('ul#bookshelf-list li.droppable').droppable({
-			drop: function(event, ui) {
-				
-				var profile_pk = event.originalTarget.id;
-				var collection_pk = event.target.id;
-				
-				connection('{% url api_save_profile %}', { pk: profile_pk, collection_pk: collection_pk }, function() {
-					$('#' + profile_pk).slideUp('200', function() {
-						$(this).remove();
-					});
+		function droppable(event, ui) {
+			var profile_pk = ui.draggable.attr('id');
+			var collection_pk = event.target.id;
+						
+			connection('{% url api_save_profile %}', { pk: profile_pk, collection_pk: collection_pk }, function() {
+				$('#' + profile_pk).slideUp('200', function() {
+					$(this).remove();
 				});
-			}
+			});
+		}
+		
+		$('ul#bookshelf-list li.droppable').droppable({
+			hoverClass: 'ui-state-hover',
+			drop: droppable
 		});
+		
+		// If the URL has '#unsorted' on the end load the unsorted bin
+		if (window.location.hash == '#unsorted') {
+			$('#unsorted-bin-changer').click();
+		}
+		
 	});
 </script>
 {% endblock %}
@@ -252,12 +282,18 @@
 						<h2 id="name" class="h2-detail detail">{{ library.name }}</h2>
 					</div>
 					<div class="editable">
-						<p id="description" class="p-detail detail">{{ library.description }}</p>
+						<p id="description" class="p-detail detail">{{ library.description|default:"No Description (Click here to add one)" }}</p>
 					</div>
 				</div>
 				<div class="third omega">
-					<h3><a id="unsorted-bin-changer" href="{{ library.get_absolute_url }}{{ unsorted_bin.slug }}/">{{ unsorted_bin.value }}</a><a id="help-changer" href="">Help</a></h3>
-					<p>This Library has {{ library.books.all|length }} book{{ library.books.all|pluralize }} which you should move into a bookshelf.</p>
+					<div class="library-switcher">
+						<p>This Library has <strong>{{ library.books.all|length }} book{{ library.books.all|pluralize }}</strong> which you should move from its unsorted bin into a bookshelf.</p>
+						
+						<ul class="clearfix">
+							<li class="alpha"><a id="unsorted-bin-changer" href="{{ library.get_absolute_url }}{{ unsorted_bin.slug }}/">{{ unsorted_bin.value }}</a></li>
+							<li class="omega selected"><a id="help-changer" href="">Help</a></li>
+						</ul>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -319,7 +355,7 @@
 	
 	<div class="section">
 		<div class="inner">
-			<p class="center last"><a href="{% url add_books %}?c={{ library.pk }}">Add a Book To This Library</a></p>
+			<p class="center last"><a href="{% url add_books %}?c={{ library.pk }}">Add Books In Batch To This Library</a></p>
 		</div>
 	</div>
 

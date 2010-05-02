@@ -26,6 +26,7 @@ Add New Books | {{ block.super }}
 <script type="text/javascript" src="/media/js/jquery.blockUI.js"></script>
 <script type="text/javascript" src="/media/js/jquery.scrollTo-min.js"></script>
 <script type="text/javascript" src="/media/js/jquery.preLoadImages.js"></script>
+<script type="text/javascript" src="/media/js/utils.js"></script>
 <script type="text/javascript">
 	$(function() {
 		
@@ -473,8 +474,18 @@ Add New Books | {{ block.super }}
 				        	message: $('#accept-overlay')
 				        });
 					} else {
-						booksBox.append('<li style="display: none;" id="' + data.book.pk + '"><a class="item-title">' + data.book.title + '</a> by ' + data.book.author + '</li>');
-						$("#" + data.book.pk).slideDown('200');
+						booksBox.append('<li style="display: none;" id="' + data.book.pk + '">'
+							+ '<img src="/media/images/events/book-brown.png" width="16" height="16" title="Book" />'
+							+ '<a class="item-title img-title">' + data.book.title + '</a>'
+							+ '<p class="item-subtitle">by ' + data.book.author + '</p>'
+							+ '</li>');
+							
+						var item = $("#" + data.book.pk);
+						item.append('<button class="delete">remove</button>');
+						item.find('button.delete').click(book_click_delete);
+						item.hover(book_hover_over, book_hover_out);
+						item.slideDown('200');
+						
 						$("button#add-books-button").attr('disabled', '');
 					}
 				} else {
@@ -503,15 +514,19 @@ Add New Books | {{ block.super }}
 			
 			var button = $(this);
 			
+			var selection = $('ul li.selected.prime');
+			var collection_pk = selection.attr('id');
+			
 			$("ul#books-box li").each(function() {
+				
 				var item = $(this);
 				var id = item.attr('id');
 				
-				var selection = $('ul li.selected.prime');
+				item.find('button.delete').remove();
 								
 				$.ajax({
 					url: '{% url api_save_profile %}',
-					data: {collection_pk: selection.attr('id'), book_pk:id},
+					data: {collection_pk: collection_pk, book_pk:id},
 					type: 'POST',
 					success: function(data) {
 						button.attr('disabled', 'disabled');
@@ -541,8 +556,55 @@ Add New Books | {{ block.super }}
 					dataType: 'json'
 				});
 			});
+			
+			// Disable the interface
+			$('.removable').slideUp(200, function() {
+				$(this).remove();
+			});
+			
+			$('ul#books-box').after('<button id="add-more-books">Add More Books</button>');
+			$('ul#books-box').after('<button id="view-books">Go To These Books</button>');
+			
+			$('#add-more-books').click(function() {
+				window.location = '{% url add_books %}'
+			});
+			
+			$('#view-books').click(function() {
+				connection('{% url api_get_collection_detail %}', { collection_pk: collection_pk}, function(data) {
+					window.location = data.collection.url;
+				});
+			});
+			
 			return false;
 		});
+		
+		
+		// Remove button
+		
+		function book_hover_over() {
+			$(this).find('button.delete, button.really').css('display', 'block');
+		}
+		
+		function book_hover_out() {
+			$(this).find('button.delete').css('display', 'none');
+			$(this).find('button.really').remove();
+		}
+		
+		function book_click_delete() {
+			$(this).parent().slideUp(200, function() {
+				$(this).remove();
+			});
+		}
+		
+		$("ul#book-list li").append('<button class="delete">remove</button>');
+			  
+		$("ul#book-list li").hover(book_hover_over, book_hover_out);
+			  
+		$("ul#book-list li button.delete").click(book_click_delete);
+		
+		
+		// Pick first library
+		$('#library-picker li:first').click();
 	});
 </script>
 {% endblock %}
@@ -550,102 +612,94 @@ Add New Books | {{ block.super }}
 {% block content %}
 	<div class="section">
 		<div class="inner">
-			<h1>Add Some Books</h1>
+			<h1>Add Books In Batch</h1>
 			<div class="container clearfix">
 				<div class="two-thirds alpha">
-					<div class="clearfix">
-						<h3>Enter your ISBNs</h3>
-						<div class="new-item-form">
-							<form id="add-books" action="" method="post">
-								<input type="text" id="id_isbn" name="isbn" value="" />
-								<input type="submit" value="Add" />
-							</form>
-						</div>
-					</div>
-					<ul id="books-box" class="item-list"></ul>
-				</div>
+					<div class="rounded-wrapper clearfix">
+						
+						<h3>Books List</h3>
+						
+						<ul id="books-box" class="item-list double-title"></ul>
+						
+						<h3 class="removable">Enter Your ISBNs</h3>
+
+						<form id="add-books" action="" method="post" class="removable">
+							<input type="text" id="id_isbn" name="isbn" value="" />
+							<input type="submit" value="Add" />
+						</form>
+						
+						<h3 class="removable">Choose A Home For These Books</h3>
+						
+						<div class="image-wrapper clearfix removable">
+							<div class="left">
+								<!-- <h4>Pick a Library</h4> -->
+								<ul id="library-picker" class="picker">
+									{# <!--If a collection is present--> #}
+									{% if collection %}
+										{% ifequal collection.collection_type 'library' %}
+											{# <!--The collection is a library--> #}
+											{% for library in user.libraries.all %}
+												<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}{% ifequal collection.pk library.pk %} selected prime{% endifequal %}">{{ library.name|truncatechars:25 }}</li>
+											{% endfor %}
+										{% else %}
+											{% ifequal collection.collection_type 'bookshelf' %}
+												{# <!--The collection is a bookshelf bookshelf--> #}
+												{% for library in user.libraries.all %}
+													<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}{% ifequal collection.parent.pk library.pk %} selected{% endifequal %}">{{ library.name|truncatechars:25 }}</li>
+												{% endfor %}
+											{% else %}
+												{# <!--A collection is present but its not a library or a bookshelf--> #}
+												{% for library in user.libraries.all %}
+													<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}">{{ library.name|truncatechars:25 }}</li>
+												{% endfor %}
+											{% endifequal %}
+										{% endifequal %}
+									{% else %}
+										{# <!--A collection is not present--> #}
+										{% for library in user.libraries.all %}
+											<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}">{{ library.name|truncatechars:25 }}</li>
+										{% endfor %}
+									{% endif %}
+								</ul>
+							</div>
+							<div class="left">
+								<!-- <h4>Pick a Bookshelf</h4> -->
+								<ul id="bookshelf-picker" class="picker">
+									{% if collection %}
+										{# <!--A collection is present--> #}
+										{% ifequal collection.collection_type 'bookshelf' %}
+											{# <!--The collection is a bookshelf, so for all children of the parent library, add a list item--> #}
+											{% for bookshelf in collection.parent.children.all %}
+												<li id="{{ bookshelf.pk }}" class="{% ifequal collection.pk bookshelf.pk %}selected prime{% endifequal %}">{{ bookshelf.name|truncatechars:25 }}</li>
+											{% endfor %}
+										{% else %}
+											{% ifequal collection.collection_type 'library' %}
+												{# <!--The collection is a library, load up the bookshelves for that library into the list--> #}
+												{% if collection.children.all %}
+													{% for bookshelf in collection.children.all %}
+														<li id="{{ bookshelf.pk }}" class="{% ifequal collection.pk bookshelf.pk %}selected prime{% endifequal %}">{{ bookshelf.name|truncatechars:25 }}</li>
+													{% endfor %}
+												{% else %}
+													<li class="no-bookshelves">no bookshelves</li>
+												{% endif %}
+											{% endifequal %}
+										{% endifequal %}
+									{% endif %}
+								</ul>
+							</div>
+						</div><!-- / picker box -->
+						
+						<button id="add-books-button" class="removable">Commit All Books To Location</button>
+						
+					</div><!-- / .rounded-wrapper -->
+				</div><!-- / .two-thrids -->
 				<div class="third omega">
 					<h3>Information</h3>
 					<p>Some information will go here.</p>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="section">
-		<div class="inner">
-			<h3>Choose a Home for these Books</h3>
-			<div class="container clearfix">
-				<div class="left">
-					<h4>Pick a Library</h4>
-					<ul id="library-picker" class="picker">
-						{# <!--If a collection is present--> #}
-						{% if collection %}
-							{% ifequal collection.collection_type 'library' %}
-								{# <!--The collection is a library--> #}
-								{% for library in user.libraries.all %}
-									<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}{% ifequal collection.pk library.pk %} selected prime{% endifequal %}">{{ library.name|truncatechars:25 }}</li>
-								{% endfor %}
-							{% else %}
-								{% ifequal collection.collection_type 'bookshelf' %}
-									{# <!--The collection is a bookshelf bookshelf--> #}
-									{% for library in user.libraries.all %}
-										<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}{% ifequal collection.parent.pk library.pk %} selected{% endifequal %}">{{ library.name|truncatechars:25 }}</li>
-									{% endfor %}
-								{% else %}
-									{# <!--A collection is present but its not a library or a bookshelf--> #}
-									{% for library in user.libraries.all %}
-										<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}">{{ library.name|truncatechars:25 }}</li>
-									{% endfor %}
-								{% endifequal %}
-							{% endifequal %}
-						{% else %}
-							{# <!--A collection is not present--> #}
-							{% for library in user.libraries.all %}
-								<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}">{{ library.name|truncatechars:25 }}</li>
-							{% endfor %}
-						{% endif %}
-					</ul>
-				</div>
-				<div class="left">
-					<h4>Pick a Bookshelf</h4>
-					<ul id="bookshelf-picker" class="picker">
-						{% if collection %}
-							{# <!--A collection is present--> #}
-							{% ifequal collection.collection_type 'bookshelf' %}
-								{# <!--The collection is a bookshelf, so for all children of the parent library, add a list item--> #}
-								{% for bookshelf in collection.parent.children.all %}
-									<li id="{{ bookshelf.pk }}" class="{% ifequal collection.pk bookshelf.pk %}selected prime{% endifequal %}">{{ bookshelf.name|truncatechars:25 }}</li>
-								{% endfor %}
-							{% else %}
-								{% ifequal collection.collection_type 'library' %}
-									{# <!--The collection is a library, load up the bookshelves for that library into the list--> #}
-									{% if collection.children.all %}
-										{% for bookshelf in collection.children.all %}
-											<li id="{{ bookshelf.pk }}" class="{% ifequal collection.pk bookshelf.pk %}selected prime{% endifequal %}">{{ bookshelf.name|truncatechars:25 }}</li>
-										{% endfor %}
-									{% else %}
-										<li class="no-bookshelves">no bookshelves</li>
-									{% endif %}
-								{% endifequal %}
-							{% endifequal %}
-						{% endif %}
-					</ul>
-				</div>
-				<div class="left">
-					<h4>Preview</h4>
-					<ul id="preview" class="picker">
-						<li class="no-items">will work soon</li>
-					</ul>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="section">
-		<div class="inner">
-			<h3>Add These Books</h3>
-			<button id="add-books-button">Add All Books</button>
-		</div>
-	</div>
+				</div><!-- / .third -->
+			</div><!-- / .container -->
+		</div><!-- / .inner -->
+	</div><!-- / .section -->
 
 	<div id="accept-overlay" class="overlay">
 		<div class="overlay-header">

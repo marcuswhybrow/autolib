@@ -7,7 +7,7 @@
 
 from django.db import models
 from django.db.models import permalink
-from.django import forms
+from django import forms
 
 from libraries.models import Collection
 from base.models import Config
