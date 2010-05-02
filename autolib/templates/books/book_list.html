@@ -25,16 +25,36 @@ Books Statistics | {{ block.super }}
 				{{ score.score }}
 			{% endfor %}
 			<h2>Books</h2>
-			<p>All books in the system.</p>
+			<p>Here is a list of all the books currently held within the AutoLibrarian system.</p>
+		</div>
+	</div>
+	<div class="section">
+		<div class="inner">
 			<div class="rounded-wrapper">
 				<ul class="item-list">
-					{% for book in books %}
+					{% for book in books.object_list %}
 						<li id="{{ book.pk }}">
 							<a class="item-title" href="{{ book.get_absolute_url }}">{{ book.title }}</a>
 							<span class="item-children-count">{{ book.added|date }}</span>
 						</li>
 					{% endfor %}
 				</ul>
+			</div>
+			
+			<div class="pagination">
+			    <span class="step-links">
+			        {% if books.has_previous %}
+			            <a href="{% url book_list books.previous_page_number %}">previous</a>
+			        {% endif %}
+			
+			        <span class="current">
+			            Page {{ books.number }} of {{ books.paginator.num_pages }}
+			        </span>
+			
+			        {% if books.has_next %}
+			            <a href="{% url book_list books.next_page_number %}">next</a>
+			        {% endif %}
+			    </span>
 			</div>
 		</div>
 	</div>

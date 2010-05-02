@@ -13,6 +13,6 @@ import views
 urlpatterns = patterns('',
 
 	# Enable the Books Application URL paths
-	url(r'^$', views.book_list, name='book_list'),
-	url(r'^(?P<isbn>[^/]+)/?$', views.book_detail, name='book_detail'),
+	url(r'^(?P<page>\d+)?/?$', views.book_list, name='book_list'),
+	url(r'^isbn/(?P<isbn>[^/]+)/?$', views.book_detail, name='book_detail'),
 )
