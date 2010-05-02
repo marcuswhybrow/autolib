@@ -32,7 +32,7 @@ class GetCollectionList(APIAuthView):
 					self.data['collections'].append({
 						'pk': c.pk,
 						'name': c.name,
-						'parent': c.parent.pk and c.parent is not None or None,
+						'parent': c.parent.pk if c.parent is not None else None,
 						'slug': c.slug,
 						'description': c.description,
 						'url': url,
@@ -54,7 +54,7 @@ class GetCollectionList(APIAuthView):
 				self.data['collections'].append({
 					'pk': c.pk,
 					'name': c.name,
-					'parent': c.parent.pk and c.parent is not None or None,
+					'parent': c.parent.pk if c.parent is not None else None,
 					'slug': c.slug,
 					'description': c.description,
 					'url': c.get_absolute_url(),
@@ -79,7 +79,7 @@ class GetCollectionDetail(APIAuthView):
 				self.data['collection'] = {
 					'pk': c.pk,
 					'name': c.name,
-					'parent': c.parent.pk and c.parent is not None or None,
+					'parent': c.parent.pk if c.parent is not None else None,
 					'description': c.description,
 					'url': url,
 					'slug': c.slug,

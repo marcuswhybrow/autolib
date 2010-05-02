@@ -28,7 +28,7 @@ class DeleteCollection(APIAuthView):
 				self.data['collection'] = {
 					'pk': c.pk,
 					'name': c.name,
-					'parent': c.parent.pk and c.parent is not None or None,
+					'parent': c.parent.pk if c.parent is not None else None,
 					'description': c.description,
 					'url': url,
 					'slug': c.slug,

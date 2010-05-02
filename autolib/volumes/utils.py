@@ -70,7 +70,7 @@ class BookDetail:
 				self.published = None
 				
 			description = entry.find('dc:description')
-			self.description = unescape(description.string) and description is not None or None
+			self.description = unescape(description.string) if description is not None else None
 			
 			self.width = self.height = self.depth = self.pages = self.format = None
 			
@@ -108,9 +108,9 @@ class BookDetail:
 						pass
 			
 			language = entry.find('dc:language')
-			self.language = language.string and language is not None or None
+			self.language = language.string if language is not None else None
 			publisher = entry.find('dc:publisher')
-			self.publisher = unescape(publisher.string) and publisher is not None or None
+			self.publisher = unescape(publisher.string) if publisher is not None else None
 			
 			self.thumbnail_base = None
 			self.thumbnail_huge = None
@@ -131,7 +131,7 @@ class BookDetail:
 				self.subjects.append(unescape(subject.string))
 			
 			title = entry.find('dc:title')
-			self.title = unescape(title.string) and title is not None or None
+			self.title = unescape(title.string) if title is not None else None
 			
 		else:
 			self.status = False
@@ -201,7 +201,7 @@ class BookDetail:
 					book.edition_group = edition_group
 				else:
 					# Get the editions (XML data) soup
-					editionSoup = get_editions(self.isbn10) and self.isbn10 is not None or get_editions(self.isbn13)
+					editionSoup = get_editions(self.isbn10) if self.isbn10 is not None else get_editions(self.isbn13)
 					# Check each editions ISBN numbers
 					for entry in editionSoup.findAll('entry'):
 						# For each identifier
@@ -257,7 +257,7 @@ def update_all_editions(book):
 	"""
 	
 	# Get the editions soup for this book
-	soup = get_editions(book.isbn10) and book.isbn10 or get_editions(book.isbn13)
+	soup = get_editions(book.isbn10) if book.isbn10 else get_editions(book.isbn13)
 	
 	# Create a list for the resultant book details URLs
 	books = []

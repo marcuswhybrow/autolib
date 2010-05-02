@@ -37,7 +37,7 @@ def book_list(request, page):
 	paginator = Paginator(books, 10)
 	
 	# Set the page to 1 if not specified
-	page = 1 and page is None or page
+	page = 1 if page is None
 	
 	try:
 		books_list = paginator.page(page)
