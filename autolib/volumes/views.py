@@ -24,7 +24,10 @@ def book_list(request):
 	
 	books = []
 	for edition_group in BookEditionGroup.objects.all():
-		books.append(edition_group.editions.latest())
+		if len(edition_group.editions.all()) == 0:
+			edition_group.delete();
+		else:
+			books.append(edition_group.editions.latest())
 	
 	return render_to_response('books/book_list.html', {
 		'books': books,
