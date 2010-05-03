@@ -57,7 +57,7 @@ class BookDetail:
 			entry = self.soup
 			
 			author =  entry.find('dc:creator')
-			self.author = unescape(author.string) and author is not None or None
+			self.author = unescape(author.string) if author is not None else None
 			date = entry.find('dc:date')
 			
 			if date is not None:
