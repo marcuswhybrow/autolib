@@ -630,63 +630,58 @@ Add New Books | {{ block.super }}
 						
 						<h3 class="removable">Choose A Home For These Books</h3>
 						
-						<div class="image-wrapper clearfix removable">
-							<div class="left">
-								<!-- <h4>Pick a Library</h4> -->
-								<ul id="library-picker" class="picker">
-									{# <!--If a collection is present--> #}
-									{% if collection %}
-										{% ifequal collection.collection_type 'library' %}
-											{# <!--The collection is a library--> #}
+						<div id="picker-wrapper" class="image-wrapper clearfix removable">
+							<ul id="library-picker" class="picker">
+								{# <!--If a collection is present--> #}
+								{% if collection %}
+									{% ifequal collection.collection_type 'library' %}
+										{# <!--The collection is a library--> #}
+										{% for library in user.libraries.all %}
+											<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}{% ifequal collection.pk library.pk %} selected prime{% endifequal %}">{{ library.name|truncatechars:25 }}</li>
+										{% endfor %}
+									{% else %}
+										{% ifequal collection.collection_type 'bookshelf' %}
+											{# <!--The collection is a bookshelf bookshelf--> #}
 											{% for library in user.libraries.all %}
-												<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}{% ifequal collection.pk library.pk %} selected prime{% endifequal %}">{{ library.name|truncatechars:25 }}</li>
+												<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}{% ifequal collection.parent.pk library.pk %} selected{% endifequal %}">{{ library.name|truncatechars:25 }}</li>
 											{% endfor %}
 										{% else %}
-											{% ifequal collection.collection_type 'bookshelf' %}
-												{# <!--The collection is a bookshelf bookshelf--> #}
-												{% for library in user.libraries.all %}
-													<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}{% ifequal collection.parent.pk library.pk %} selected{% endifequal %}">{{ library.name|truncatechars:25 }}</li>
+											{# <!--A collection is present but its not a library or a bookshelf--> #}
+											{% for library in user.libraries.all %}
+												<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}">{{ library.name|truncatechars:25 }}</li>
+											{% endfor %}
+										{% endifequal %}
+									{% endifequal %}
+								{% else %}
+									{# <!--A collection is not present--> #}
+									{% for library in user.libraries.all %}
+										<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}">{{ library.name|truncatechars:25 }}</li>
+									{% endfor %}
+								{% endif %}
+							</ul>
+
+							<ul id="bookshelf-picker" class="picker">
+								{% if collection %}
+									{# <!--A collection is present--> #}
+									{% ifequal collection.collection_type 'bookshelf' %}
+										{# <!--The collection is a bookshelf, so for all children of the parent library, add a list item--> #}
+										{% for bookshelf in collection.parent.children.all %}
+											<li id="{{ bookshelf.pk }}" class="{% ifequal collection.pk bookshelf.pk %}selected prime{% endifequal %}">{{ bookshelf.name|truncatechars:25 }}</li>
+										{% endfor %}
+									{% else %}
+										{% ifequal collection.collection_type 'library' %}
+											{# <!--The collection is a library, load up the bookshelves for that library into the list--> #}
+											{% if collection.children.all %}
+												{% for bookshelf in collection.children.all %}
+													<li id="{{ bookshelf.pk }}" class="{% ifequal collection.pk bookshelf.pk %}selected prime{% endifequal %}">{{ bookshelf.name|truncatechars:25 }}</li>
 												{% endfor %}
 											{% else %}
-												{# <!--A collection is present but its not a library or a bookshelf--> #}
-												{% for library in user.libraries.all %}
-													<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}">{{ library.name|truncatechars:25 }}</li>
-												{% endfor %}
-											{% endifequal %}
+												<li class="no-bookshelves">no bookshelves</li>
+											{% endif %}
 										{% endifequal %}
-									{% else %}
-										{# <!--A collection is not present--> #}
-										{% for library in user.libraries.all %}
-											<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}">{{ library.name|truncatechars:25 }}</li>
-										{% endfor %}
-									{% endif %}
-								</ul>
-							</div>
-							<div class="left">
-								<!-- <h4>Pick a Bookshelf</h4> -->
-								<ul id="bookshelf-picker" class="picker">
-									{% if collection %}
-										{# <!--A collection is present--> #}
-										{% ifequal collection.collection_type 'bookshelf' %}
-											{# <!--The collection is a bookshelf, so for all children of the parent library, add a list item--> #}
-											{% for bookshelf in collection.parent.children.all %}
-												<li id="{{ bookshelf.pk }}" class="{% ifequal collection.pk bookshelf.pk %}selected prime{% endifequal %}">{{ bookshelf.name|truncatechars:25 }}</li>
-											{% endfor %}
-										{% else %}
-											{% ifequal collection.collection_type 'library' %}
-												{# <!--The collection is a library, load up the bookshelves for that library into the list--> #}
-												{% if collection.children.all %}
-													{% for bookshelf in collection.children.all %}
-														<li id="{{ bookshelf.pk }}" class="{% ifequal collection.pk bookshelf.pk %}selected prime{% endifequal %}">{{ bookshelf.name|truncatechars:25 }}</li>
-													{% endfor %}
-												{% else %}
-													<li class="no-bookshelves">no bookshelves</li>
-												{% endif %}
-											{% endifequal %}
-										{% endifequal %}
-									{% endif %}
-								</ul>
-							</div>
+									{% endifequal %}
+								{% endif %}
+							</ul>
 						</div><!-- / picker box -->
 						
 						<button id="add-books-button" class="removable">Commit All Books To Location</button>

@@ -194,7 +194,7 @@ class GetBookDetail(APIView):
 					# Convert the details into a database object
 					book = bookDetails.convert_to_book()
 					
-					# TODO Get Django to queue up the updating of this books Editions
+					# Get Django to queue up the updating of this books Editions
 					utils.UpdateEditions(book).start()
 					
 				else:
@@ -202,7 +202,7 @@ class GetBookDetail(APIView):
 					return
 			
 		else:
-			# Otherwise get look for the a UUID pk of the Book
+			# Otherwise look for the a UUID pk of the Book
 			book_pk = request.GET.get('pk', None)
 			
 			if book_pk is not None:
