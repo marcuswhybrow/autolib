@@ -2,7 +2,6 @@
 
 {% block head %}
 <link rel="stylesheet" href="/media/js/jqtransform/jqtransform.css" />
-<script type="text/javascript" src="/media/js/jqtransform/jquery.jqtransform.js"></script>
 <script type="text/javascript">
 	$(function() {
 		//find all the forms with the class of jqtransform and then apply the plugin
@@ -37,26 +36,26 @@
 <div class="section">
 	<div class="inner">
 		<h2>Register</h2>
-		<form action="{% url registration.urls.register %}" method="post" class="jqtransform">
-			<div class="rowElem">
-				{{ form.username.label_tag }}
-				{{ form.username }}
-			</div>
-			<div class="rowElem">
-				{{ form.email.label_tag }}
-				{{ form.email }}
-			</div>
-			<div class="rowElem">
-				{{ form.password1.label_tag }}
-				{{ form.password1 }}
-			</div>
-			<div class="rowElem">
-				{{ form.password2.label_tag }}
-				{{ form.password2 }}
-			</div>
-			<div class="rowElem">
-				<input type="submit" value="Register" />
-			</div>
+		
+		<form action="{% url registration.urls.register %}" method="post" class="normal">
+			
+			{{ form.username.label_tag }}
+			{{ form.username }}
+			{{ form.username.errors }}
+
+			{{ form.email.label_tag }}
+			{{ form.email }}
+			{{ form.email.errors }}
+
+			{{ form.password1.label_tag }}
+			{{ form.password1 }}
+			{{ form.password1.errors }}
+
+			{{ form.password2.label_tag }}
+			{{ form.password2 }}
+			{{ form.password2.errors }}
+			
+			<input type="submit" value="Register" />
 		</form>
 	</div>
 </div>

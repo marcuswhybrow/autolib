@@ -556,3 +556,8 @@ form.normal input.default							{ color: #aaa; }
 
 #content #apps-table a										{ background-color: transparent; border: none; padding: 0; margin: 0; }
 #content #apps-table tbody a:hover							{ position: relative; top: -10px; }
+
+/* Form Error List */
+
+ul.errorlist												{ float: left; padding-top: 3px; color: red; }
+ul.errorlist li												{ display: inline; float: left; }
