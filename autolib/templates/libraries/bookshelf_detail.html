@@ -239,7 +239,7 @@
 							<h2 id="name" class="h2-detail detail">{{ bookshelf.name }}</h2>
 						</div>
 						<div class="editable">
-							<p id="description" class="p-detail detail">{{ bookshelf.description }}</p>
+							<p id="description" class="p-detail detail">{{ bookshelf.description|default:"No Description (Click here to add one)" }}</p>
 						</div>
 					{% else %}
 						<h2>{{ unsorted_bin.value }}</h2>
@@ -247,8 +247,7 @@
 					{% endif %}
 				</div> <!-- / .two-thirds.alpha -->
 				<div class="third omega">
-					<h3>Title</h3>
-					<p>Not sure what should go here.</p>
+					
 				</div> <!-- / .third.omega -->
 			</div> <!-- / .container.clearfix -->
 		</div> <!-- / .inner -->
@@ -306,7 +305,16 @@
 				</div>
 				<div class="third omega">
 					<h3>Overview</h3>
-					<p>You can add books via 2 methods: Enter an ISBN number right here over on the left, or use the central method.</p>
+					<p>You can add books via 2 methods: Enter an ISBN number right here over on the left, or add books in batch using the link at the bottom of this page.</p>
+					
+					<h3>Deleting</h3>
+					<p>You may delete a book from this bookshelf by placing your mouse over the row. A delete button will apear on the right hand side.</p>
+					
+					<h3>Moving</h3>
+					<p>If you wish to move a book to a different location, view the book you wish to move, and click the "Move This Book" button in right column.</p>
+					
+					<h3>Adding</h3>
+					<p>Enter ISBN numbers to left and click add.</p>
 				</div>
 			</div>
 		</div>

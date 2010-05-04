@@ -23,5 +23,6 @@ from django.template import RequestContext
 
 def index(request):
 	if request.user.is_authenticated():
+		return HttpResponseRedirect(reverse('profile'));
 		return render_to_response('base/index_authenticated.html', context_instance=RequestContext(request))
 	return render_to_response('base/index_anonymous.html')

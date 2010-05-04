@@ -15,7 +15,7 @@ Welcome | {{ block.super }}
 
 <div class="section">
 	<div class="inner">
-		<h2>Hey{% if user.first_name %} {{ user.first_name }}{% endif %}, You're Authenticated</h2>
+		<h2>Hey {{ user.first_name|default:user.username }}, You're Authenticated</h2>
 		<p>This is the home page, but you should probably check out this kind of control panel thing at <a href="{% url profile %}">{% url profile %}</a>.</p>
 	</div>
 </div>
