@@ -23,7 +23,9 @@ ul, dl, ol, dt, dd,
 
 h1, h2				{ margin-bottom: 20px; }
 
-#help-box h3		{ margin-top: 10px; margin-bottom: 5px; }
+#help-box h3,
+.third h3,
+h3.inline			{ margin-top: 10px; margin-bottom: 5px; }
 
 p.error             { padding: 5px; margin-bottom: 20px; background-color: rgba(0,0,0,0.1); -moz-border-radius: 3px; -webkit-border-radius: 3px; text-align: center; }
 
@@ -228,7 +230,7 @@ a:hover                     { text-decoration: underline; }
 #content span.mini-link a									{ background: none; border: none; color: #111; text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.7); text-transform: lowercase; }
 #content span.mini-link a:hover								{ color: #5555dd; }
 
-#content a:hover            { text-decoration: none; background-color: #f0f0f0; border: 1px solid #eaeaea; }
+#content a:hover            { text-decoration: none; background-color: #f0f0f0; border: 1px solid #cacaca; }
 
 #content li.this a			{ background-color: #ffaa55; border-color: #dd8833; }
 #content li.this a:hover	{ background-color: #ffcc77; }
@@ -533,3 +535,24 @@ form.normal input.default							{ color: #aaa; }
 #content .library-switcher ul li a							{ display: block; text-align: center; -moz-border-radius: 0; border: none; background-color: transparent; padding: 5px 0; }
 
 .library-switcher p											{ padding: 10px; font-size: 0.8em; }
+
+
+/* Application pages */
+
+#android-qr													{ margin: 40px auto; display: block; }
+#android-logo												{ margin-bottom: 20px; }
+
+#content a#java-download									{ padding: 10px; font-size: 20px; margin: 20px auto; display: block; text-align: center; }
+
+
+#content #apps-table										{ background-color: transparent; border: none; text-align: center; margin-top: 40px; }
+#content #apps-table td										{ border: none; }
+#content #apps-table img									{ margin: 0 auto; display: block; float: none; }
+
+#content #apps-table #android-logo							{ height: 220px; position: relative; top: -40px; }
+#content #apps-table #java-logo								{ position: relative; top: 40px; }
+
+#content #apps-table tfoot td+td h2							{ position: relative; left: -20px; }
+
+#content #apps-table a										{ background-color: transparent; border: none; padding: 0; margin: 0; }
+#content #apps-table tbody a:hover							{ position: relative; top: -10px; }

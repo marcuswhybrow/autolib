@@ -16,10 +16,21 @@
 		<div class="inner">
 			<h1>Download Our Apps</h1>
 			<p>Using these applications, you can take our fantastic wealth of information everywhere you go.</p>
-			<ul>
-				<li><a href="{% url apps_android %}">Android</a></li>
-				<li><a href="{% url apps_java %}">Java</a></li>
-			</ul>
+			
+			<table id="apps-table">
+				<tbody>
+					<tr>
+						<td><a href="{% url apps_android %}"><img id="android-logo" src="/media/images/android-icon-256.png" /></a></td>
+						<td><a href="{% url apps_java %}"><img id="java-logo" src="/media/images/java-icon-256.png" /></a></td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr>
+						<td><a href="{% url apps_android %}"><h2>Android</h2></a></td>
+						<td><a href="{% url apps_java %}"><h2>Desktop</h2></a></td>
+					</tr>
+				</tfoot>
+			</table>
 		</div>
 	</div>
 {% endblock %}
