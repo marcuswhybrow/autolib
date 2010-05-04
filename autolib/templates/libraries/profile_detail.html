@@ -7,6 +7,8 @@
 
 {% extends "libraries/bookshelf_detail.html" %}
 
+{% load truncate_filters %}
+
 {% block page_title %}user-book-detail{% endblock %}
 
 {% block breadcrumbs %}
@@ -20,6 +22,8 @@
 
 {% block head %}
 <script type="text/javascript" src="/media/js/jquery.page-realtime-twitter-reactions.js"></script>
+<script type="text/javascript" src="/media/js/jquery.blockUI.js"></script>
+<script type="text/javascript" src="/media/js/utils.js"></script>
 <script type="text/javascript">
 	$(function() {
 		
@@ -31,6 +35,422 @@
 			loaderText: "Loading ...",
 			slideIn: false,
 			showHeading: false
+		});
+		
+		
+		$('#accept-overlay input.overlay-ok').click(function() {
+			
+			var collection_pk = $('#picker-wrapper li.selected.prime').attr('id');
+			
+			connection('{% url api_save_profile %}', { collection_pk: collection_pk, pk: '{{ book.pk }}' }, function(data) {
+				window.location = data.profile.url;
+			}, function(data) {
+				$.unblockUI();
+				return false;	
+			});
+		});
+		
+		$('#accept-overlay input.overlay-cancel').click(function() {
+			$.unblockUI();
+			return false;
+		});
+		
+		$('button#move-book').click(function() {
+			
+			$.blockUI({ 
+				fadeIn:  200,
+				fadeOut: 200,
+				css: { 
+					border: 'none',
+					opacity: 1,
+					'-webkit-border-radius': '10px',
+					'-moz-border-radius': '10px',
+					backgroundColor: 'none',
+					width: '620px;'					
+		        },
+	        	message: $('#accept-overlay')
+	        });
+			
+			return false;
+		});
+		
+		
+		
+		
+		////
+        //// The Collection Finder 
+        ////
+        
+        // true if the bookshelf list can be accessed
+        var bookshelvesLocked = false;
+        // true if an overlay is blocking the screen
+        var overlay = false;
+		
+		function select() {
+			// The list item to be selected
+			var selected = $(this);
+			
+			// Make this library the selected element
+			selected.addClass('selected').addClass('prime');
+			selected.siblings(".selected").removeClass('selected').removeClass('prime');
+			
+			if (selected.is('.has-more')) {
+				
+				// If this list item has bookshelves
+				
+				// block the bookshelf picker
+				$('ul#bookshelf-picker').block({
+					fadeIn:  50,
+					fadeOut: 50,
+					css: { 
+						border: 'none',
+						padding: '15px',
+						opacity: 1,
+						color: '#000',
+			        },
+			        overlayCSS:  { 
+						backgroundColor: '#fff', 
+						opacity: 0.8,
+						width: '620px',
+				    }, 
+			        message: '<div class="ajax-loader">&nbsp;</div>' 
+			    });
+			    // Singal that the bookshelf is now locked
+			    bookshelvesLocked = true;
+				
+				// Repopulation the bookshelf field with the appropriate data
+				$.ajax({
+					url: '{% url api_get_collection_list %}', 
+					data: {parent_pk:selected.attr('id')},
+					type: 'POST',
+					success: function(data) {
+						// If the server returns data
+						
+						if (data.meta.success) {
+							// If the query was a success
+							
+							var picker = $("ul#bookshelf-picker");
+							
+							// Initialise the bookshelf picker
+							picker.html('');
+							
+							// for each bookshelf object returned create a new list itme
+							for (var i = data.collections.length - 1; i >= 0; --i) {
+								var collection = data.collections[i];
+								picker.append('<li id="' + collection.pk + '">' + collection.name + '</li>');
+								$("#" + collection.pk).click(function() {
+									selected.removeClass('prime');
+									$(this).addClass('selected').addClass('prime');
+									$(this).siblings(".selected").removeClass('selected').removeClass('prime');
+								});
+							}
+						} else {
+							// If the query failed display the error message
+							$('#accept-overlay').find('h1.target').text('Something Went Wrong!');
+							$('#accept-overlay').find('p.target').text(data.meta.error);
+							$.blockUI({ 
+								fadeIn:  200,
+								fadeOut: 200,
+								css: { 
+									border: 'none',
+									opacity: 1,
+									'-webkit-border-radius': '10px',
+									'-moz-border-radius': '10px',
+									backgroundColor: 'none'
+						        },
+					        	message: $('#accept-overlay')
+					        });
+						}
+						
+						// Unblock the bookchelves now that it has been populated (or error displayed)
+						$('ul#bookshelf-picker').unblock();
+						// Signify that the bookshelf is now unlocked
+						bookshelvesLocked = false;
+					},
+					error: function() {
+						// If the server gave no response (server is down)
+						
+						// Unblock the bookshelf picker
+						$('ul#bookshelf-picker').unblock();
+						// Signify that the bookshelf is now unlocked
+						bookshelvesLocked = false;
+						
+						// Block the entire screen with the connection problem message
+						$.blockUI({
+							fadeIn:  100,
+							fadeOut: 100,
+							css: { 
+								border: 'none',
+								opacity: 1,
+								'-webkit-border-radius': '10px',
+								'-moz-border-radius': '10px',
+								backgroundColor: 'none'
+					        },
+					        message: $('#connection-problem')
+					    });
+					    $('#accept-overlay').find('h1.target').text('Something Went Wrong!');
+						$('#accept-overlay').find('p.target').text('We are having connection problems, try again in a few seconds.');
+						$.blockUI({ 
+							fadeIn:  200,
+							fadeOut: 200,
+							css: { 
+								border: 'none',
+								opacity: 1,
+								'-webkit-border-radius': '10px',
+								'-moz-border-radius': '10px',
+								backgroundColor: 'none'
+					        },
+				        	message: $('#accept-overlay')
+				        });
+					    
+					    // Signifys that an overlay is on (used to prevent catching keyboard events)
+					    overlay = true;
+					    // Clear any currently repeating (keyboard initiated) intervals
+					    clearInterval(repeatInterval);
+					},
+					dataType: 'json'
+				});
+			} else {
+				// If the list item does not have any bookshelves
+				// add a list item saying that
+				$('ul#bookshelf-picker').html('<li class="no-bookshelves">no bookshelves</li>');
+			}
+			return false;
+		}
+		
+		
+		$('ul li.selected').each(function() {
+			// If any list items were selected at page load, ensure they are in view.
+			$(this).parent().scrollTo($(this));
+		});
+		
+		// If a list element in the library-picker is clicked, run the click function on it
+		$("ul#library-picker li").click(select);
+		
+		function downFunc() {
+			var selection = $("ul li.selected.prime");
+			var newSelection = selection.next('li');
+			
+			if (newSelection.length == 1) {
+				// If there is exactly one new selection
+				
+				// Get the relevant values: position from top of visible list, height of item and the containing list
+				var top = newSelection.position().top;
+				var height = newSelection.height();
+				var list = newSelection.parent();
+				
+				if (selection.parent().attr('id') == 'library-picker') {
+					// If the existing selection was within the library-picker ul
+						
+					// Run the select() function on it
+					newSelection.each(select);
+					
+				} else {
+					// Otherwise the item is in the bookshelf-picker ul
+					
+					// Remove the prime class from the existing selection
+					selection.removeClass('prime');
+					
+					// Make this new selection the prime selection.
+					newSelection.addClass('selected').addClass('prime');
+					newSelection.siblings(".selected").removeClass('selected');
+				}
+				
+				// If any part of the itme is out of view, scroll it into view
+				if (top < 0) {
+					list.scrollTop(top + list.scrollTop());
+				} else if (top + height > list.height()) {
+					list.scrollTop(top + list.scrollTop() + height - list.height());
+				}
+			} else {
+				// Otherwise we are at the bottom of the list (and were just trying to move down), so stop any repeating movements
+				clearInterval(repeatInterval);
+			}
+			return false;
+		}
+		
+		function upFunc() {
+			var selection = $("ul li.selected.prime");
+			var newSelection = selection.prev('li');
+			
+			if (newSelection.length == 1) {
+				// If a new item has been selected
+				
+				// Get the relevant values: position from top of visible list, height of item and the containing list
+				var top = newSelection.position().top;
+				var height = newSelection.height();
+				var list = newSelection.parent();
+				
+				if (selection.parent().attr('id') == 'library-picker') {
+					// If the selection is within the library-picker ul
+					
+					// Run the select function on it
+					newSelection.each(select);
+					
+				} else {
+					// Otherwise the selection is within the bookshelf-picker ul
+					var newSelection = $("ul li.selected.prime").prev('li');
+					
+					
+					// Remove prime from the current selector
+					selection.removeClass('prime');
+					
+					// Make the current selection the prime selection
+					newSelection.addClass('selected').addClass('prime');
+					newSelection.siblings(".selected").removeClass('selected');
+				}
+				
+				// If the list item is out of view scroll to it
+				if(top < 0) {
+					list.scrollTop(top + list.scrollTop());
+				} else if (top + height > list.height()) {
+					list.scrollTop(top + list.scrollTop() + height - list.height());
+				}
+			} else {
+				// Otherwise we are at the top of the list (and were just trying to move up), so stop any repeating movements
+				clearInterval(repeatInterval);
+			}
+			return false;
+		}
+		
+		// true if the down key is held down
+		var downKey = false;
+		// true if the up key is held down
+		var upKey = false;
+		// The current repeating action (moving the selection up or down)
+		var repeatInterval;
+		
+		$(window).keydown(function(event) {
+			
+			if (!overlay) {
+				// If there is no overlay blocking (which should block keyboard input)
+				
+				// Get the currently selected list item
+				var selection = $("ul li.selected.prime");
+				
+				if (event.keyCode == 37) {
+					// If the key held down is the LEFT key
+					
+					if (selection.parent().attr('id') == 'bookshelf-picker') {
+						// If the currently selected item is in the bookshelf-picker
+						
+						// Remove the selection on that list item
+						selection.removeClass('selected').removeClass('prime');
+						// Make the currently selected library list item the prime selection
+						$('ul#library-picker li.selected').addClass('prime');
+					}
+					
+					// Don't do the normal thing for the LEFT arrows
+					return false;
+					
+				} else if (event.keyCode == 39) {
+					// If the key held down is the RIGHT key
+					
+					if (selection.parent().attr('id') == 'library-picker' && selection.is('.has-more')) {
+						// If the currently selected list item is in the library-picker and the selection has bookshelves
+						
+						// Get the first bookshelf list item
+						var newSelection = $('ul#bookshelf-picker li:first');
+						
+						if (!newSelection.is('.no-bookshelves') && !bookshelvesLocked) {
+							// If the potential list item is a bookshelf (not a message saying no bookshelves) and the bookshelves list is not locked
+							
+							// Remove the prime selection from the library item
+							selection.removeClass('prime');
+							// Make the new list item the prime selection
+							newSelection.addClass('selected').addClass('prime')
+							newSelection.siblings('.selected').removeClass('selected');
+						}
+					}
+					
+					// Don't do the normal thing for the RIGHT arrows
+					return false;
+					
+				} else if (event.keyCode == 38) {
+					// If the key held down is the UP key
+					
+					// Set its signal to be true
+					upKey = true;
+					// Run the function to move the selection up
+					upFunc();
+					
+					if (downKey) {
+						// If the DOWN key is also held down (user has pressed UP key whilst holding down the DOWN key)
+						
+						// Stop repeating any selection movements
+						clearInterval(repeatInterval);
+					} else {
+						// Otherwise
+						
+						setTimeout(function() {
+							if (upKey) {
+								// If the UP key is still held down
+								
+								// Remove any existing repeating actions
+								clearInterval(repeatInterval);
+								// Move the selection up every 0.05 seconds
+								repeatInterval = setInterval(upFunc, 50);
+							}
+						}, 100);
+					}
+					
+					// Don't do the normal thing for the UP arrows
+					return false;
+					
+				} else if (event.keyCode == 40) {
+					// If the key held down is the DOWN key
+					
+					// Set the signal to true
+					downKey = true;
+					// Run the function to move the selection down
+					downFunc();
+					
+					if (upKey) {
+						// If the UP key is also held down (user has pressed the DOWN key whilst holding down the UP key)
+						
+						// Stop repeating any selection movements
+						clearInterval(repeatInterval);
+					} else {
+						// Otherwise
+						
+						setTimeout(function() {
+							if (downKey) {
+								// If the DOWN key is still held down
+								
+								// Remove the existing repeating actions
+								clearInterval(repeatInterval);
+								// Move the selection down every 0.05 seconds
+								repeatInterval = setInterval(downFunc, 50);
+							}
+						}, 100);
+					}
+					
+					// Don't do the normal thing for the DOWN arrows
+					return false;
+					
+				}
+			}
+		});
+		
+		$(window).keyup(function(event) {
+			
+			if (event.keyCode == 38) {
+				// If the key released is the UP key
+				
+				// State that the UP key is no longer held down
+				upKey = false;
+				// Stop all repeating selection movements
+				clearInterval(repeatInterval);
+				
+			} else if (event.keyCode == 40) {
+				// If the key released is the DOWN key
+				
+				// State that the DOWN key is no longer held down
+				downKey = false;
+				// Stop all repeating selection movements
+				clearInterval(repeatInterval);
+			}
+			return false;
 		});
 	});
 </script>
@@ -45,10 +465,10 @@
 				<div class="two-thirds alpha">
 					<p>{{ book.description }}</p>
 					<p><strong>{{ book.author }}</strong> ({{ book.publisher }}, {{ book.published|date:"Y" }})</p>
-					<h3>Tweets About The Author</h3>
+					<h3 class="inline">Tweets About The Author</h3>
 					<div id="realtime-twitter-updates"></div>
 					<div>
-						<h3>Tags</h3>
+						<h3 class="inline">Tags</h3>
 						<p>Tags don't do anything right now, but in the future they will be used to help you find books like this one.</p>
 						<p class="tag-list center">
 						{% for tag in book.book_instance.tags %}
@@ -65,6 +485,9 @@
 								<img style="margin:0 auto; display:block:" src="{{ book.book_instance.thumbnail_large }}" />
 							</a>
 						</div>
+						
+						<button id="move-book">Move This Book</button>
+						
 						<h3>Editions Of This Book</h3>
 						<ul class="item-list double-title">
 						{% for edition in book.book_instance.edition_group.editions.all %}
@@ -149,4 +572,71 @@
 <div id="large-cover-image">
 	<img src="{{ book.book_instance.thumbnail_huge }}" alt="Huge cover image" />
 </div>
+
+<div id="accept-overlay" class="overlay">
+	<div class="overlay-header">
+		<h1>Pick Your New Location</h1>
+	</div>
+	<div class="overlay-body">
+		<div id="picker-wrapper" class="image-wrapper clearfix removable force">
+			<ul id="library-picker" class="picker">
+				{# <!--If a collection is present--> #}
+				{% if collection %}
+					{% ifequal collection.collection_type 'library' %}
+						{# <!--The collection is a library--> #}
+						{% for library in user.libraries.all %}
+							<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}{% ifequal collection.pk library.pk %} selected prime{% endifequal %}">{{ library.name|truncatechars:25 }}</li>
+						{% endfor %}
+					{% else %}
+						{% ifequal collection.collection_type 'bookshelf' %}
+							{# <!--The collection is a bookshelf bookshelf--> #}
+							{% for library in user.libraries.all %}
+								<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}{% ifequal collection.parent.pk library.pk %} selected{% endifequal %}">{{ library.name|truncatechars:25 }}</li>
+							{% endfor %}
+						{% else %}
+							{# <!--A collection is present but its not a library or a bookshelf--> #}
+							{% for library in user.libraries.all %}
+								<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}">{{ library.name|truncatechars:25 }}</li>
+							{% endfor %}
+						{% endifequal %}
+					{% endifequal %}
+				{% else %}
+					{# <!--A collection is not present--> #}
+					{% for library in user.libraries.all %}
+						<li id="{{ library.pk }}" class="{% if library.children.all %}has-more{% endif %}">{{ library.name|truncatechars:25 }}</li>
+					{% endfor %}
+				{% endif %}
+			</ul>
+		
+			<ul id="bookshelf-picker" class="picker">
+				{% if collection %}
+					{# <!--A collection is present--> #}
+					{% ifequal collection.collection_type 'bookshelf' %}
+						{# <!--The collection is a bookshelf, so for all children of the parent library, add a list item--> #}
+						{% for bookshelf in collection.parent.children.all %}
+							<li id="{{ bookshelf.pk }}" class="{% ifequal collection.pk bookshelf.pk %}selected prime{% endifequal %}">{{ bookshelf.name|truncatechars:25 }}</li>
+						{% endfor %}
+					{% else %}
+						{% ifequal collection.collection_type 'library' %}
+							{# <!--The collection is a library, load up the bookshelves for that library into the list--> #}
+							{% if collection.children.all %}
+								{% for bookshelf in collection.children.all %}
+									<li id="{{ bookshelf.pk }}" class="{% ifequal collection.pk bookshelf.pk %}selected prime{% endifequal %}">{{ bookshelf.name|truncatechars:25 }}</li>
+								{% endfor %}
+							{% else %}
+								<li class="no-bookshelves">no bookshelves</li>
+							{% endif %}
+						{% endifequal %}
+					{% endifequal %}
+				{% endif %}
+			</ul>
+		</div><!-- / picker box -->
+	</div>
+	
+	<div class="overlay-footer clearfix">
+		<input type="button" class="overlay-cancel overlay-button" value="← Cancel" /> 
+		<input type="button" class="overlay-ok overlay-button" value="Move To Location →" /> 
+	</div>
+</div>
+
 {% endblock %}

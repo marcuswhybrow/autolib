@@ -65,7 +65,7 @@ Profile | {{ block.super }}
 										</tr>
 										<tr>
 											<td colspan="2">
-												<a href="{% url django.contrib.auth.views.password_change %}">change password</a>
+												<a id="change-password" href="{% url django.contrib.auth.views.password_change %}">change password</a>
 											</td>
 										</tr>
 									</tbody>
@@ -86,9 +86,16 @@ Profile | {{ block.super }}
 							</div>
 						</div>
 						<div class="third omega">
-							<div class="rounded-wrapper">
-								<p>I have absolutely no idea what should go here.</p>
-							</div>
+							
+							<h3>It's Your Profile</h3>
+							<p>This is your profile page, here you can see everything that is happening that you need to know about.</p>
+							
+							<h3 class="inline">Account</h3>
+							<p>To the left are the details regarding your account and areas you may visit.</p>
+							
+							<h3 class="inline">Recent Actions</h3>
+							<p>To the right are the latest things you have done, the latest books you have added, and the latest libraries you have created.</p>
+							
 						</div>
 					</div>
 				</div>

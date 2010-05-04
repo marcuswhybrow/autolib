@@ -25,9 +25,11 @@ Login | {{ block.super }}
 			
 			{{ form.username.label_tag }}
 			{{ form.username }}
+			{{ form.username.errors }}
 			
 			{{ form.password.label_tag }}
 			{{ form.password }}
+			{{ form.password.errors }}
 			
 			<input type="submit" value="login" />
 		</form>

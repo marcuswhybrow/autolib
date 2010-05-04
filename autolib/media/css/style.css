@@ -419,23 +419,25 @@ div#content table#lookup-status						{ width: 100%; }
 div#content table#lookup-status td.source			{ background-color: #eee; padding: 10px; border: 2px solid white; border-right: 1px solid #ddd; width: 60px; text-transform: uppercase; font-weight: bold; text-align: center; }
 div#content table#lookup-status td.status			{ background-color: #fafafa; padding: 10px; border: 2px solid white; border-left: none; color: #ddd; -moz-user-select: none; }
 
-div#content ul.picker								{ padding: 0; width: 284px; height: 200px; margin: 5px 0; overflow-y: scroll; border-top: 1px solid #ddd; position: relative; background-color: white; }
+ul.picker											{ padding: 0; width: 284px; height: 200px; margin: 5px 0; overflow-y: scroll; border-top: 1px solid #ddd; position: relative; background-color: white; }
+													
+ul.picker li										{ display: block; -moz-user-select: none; cursor: default; padding: 0; color: #444; padding-left: 9px; font-size: 12px; line-height: 17px; height: 17px; }
+ul.picker li.selected								{ background-color: #d4d4d4; }
+ul.picker li.selected.prime							{ color: #fff; background-color: #3875d7; }
+													
+ul.picker li.has-more								{ background: url(/media/images/ui/more.png) top right no-repeat; background-position: 258px 5px; }
+ul.picker li.has-more.selected						{ background: #d4d4d4 url(/media/images/ui/more-selected.png) top right no-repeat; background-position: 258px 5px; }
+ul.picker li.has-more.selected.prime				{ color: #fff; background: #3875d7 url(/media/images/ui/more-selected-prime.png) top right no-repeat; background-position: 258px 5px; }
+													
+													
+#picker-wrapper										{ height: 211px; position: relative; }
+#picker-wrapper.force								{ width: 579px; }
 
-div#content ul.picker li							{ display: block; -moz-user-select: none; cursor: default; padding: 0; color: #444; padding-left: 9px; font-size: 12px; line-height: 17px; height: 17px; }
-div#content ul.picker li.selected					{ background-color: #d4d4d4; }
-div#content ul.picker li.selected.prime				{ color: #fff; background-color: #3875d7; }
-
-div#content ul.picker li.has-more					{ background: url(/media/images/ui/more.png) top right no-repeat; background-position: 258px 5px; }
-div#content ul.picker li.has-more.selected			{ background: #d4d4d4 url(/media/images/ui/more-selected.png) top right no-repeat; background-position: 258px 5px; }
-div#content ul.picker li.has-more.selected.prime	{ color: #fff; background: #3875d7 url(/media/images/ui/more-selected-prime.png) top right no-repeat; background-position: 258px 5px; }
-
-
-div#content #picker-wrapper							{ height: 211px; position: relative; }
-div#content ul#library-picker						{ position: absolute; left: 5px; border-left: 1px solid #eee; }
-div#content ul#bookshelf-picker						{ position: absolute; left: 289px; }
-
-div#content ul li.no-items,
-div#content ul.picker li.no-bookshelves				{ text-align: center; padding: 0; color: #bbb; }
+ul#library-picker									{ position: absolute; left: 5px; border-left: 1px solid #eee; }
+ul#bookshelf-picker									{ position: absolute; left: 289px; }
+													
+ul li.no-items,										
+ul.picker li.no-bookshelves							{ text-align: center; padding: 0; color: #bbb; }
 
 button#add-books-button,
 button#add-more-books,
@@ -479,6 +481,7 @@ div.votable-content									{ position: relative; float: right; width: 845px; pa
 													  font-weight: bold; text-transform: uppercase; }
 .overlay .overlay-button:hover						{ background-color: #737373; text-shadow: 1px 1px 1px #999; }
 .overlay .overlay-button.overlay-ok					{ float: right; }
+.overlay .overlay-button.overlay-cancel				{ float: left; }
 
 /* Realtime Twitter Update Style */
 
@@ -561,3 +564,9 @@ form.normal input.default							{ color: #aaa; }
 
 ul.errorlist												{ float: left; padding-top: 3px; color: red; }
 ul.errorlist li												{ display: inline; float: left; }
+
+/* Profile Page */
+
+a#change-password											{ width: 100%; display: block; text-align: center; padding: 5px 0; }
+
+button#move-book											{ display: block; margin: 20px auto 0 auto; width: 246px; }
